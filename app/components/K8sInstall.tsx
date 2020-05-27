@@ -1,69 +1,41 @@
 import React from 'react';
+import K8sInstallEnvironment from './K8sInstallEnvironment';
+import K8sInstallSsh from './K8sInstallSsh';
+import K8sInstallExecute from './K8sInstallExecute';
 
 export default function K8sInstall() {
-  const [ip, setIp] = React.useState('');
-  const [port, setPort] = React.useState('');
-  const [user, setUser] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  function send(){
-    console.log(ip);
-    console.log(port);
-    console.log(user);
-    console.log(password);
-    return
+  const [page, setPage] = React.useState(1);
 
-    var Client = require('ssh2').Client;
-    var conn = new Client();
-    conn.on('ready', function() {
-      console.log('Client :: ready');
-      conn.exec('hostname', function(err, stream) {
-        if (err) throw err;
-        stream.on('close', function(code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
-          conn.end();
-        }).on('data', function(data) {
-          console.log('STDOUT: ' + data);
-        }).stderr.on('data', function(data) {
-          console.log('STDERR: ' + data);
-        });
-      });
-    }).connect({
-      host: ip,
-      port: port,
-      username: user,
-      password: password
-      // privateKey: require('fs').readFileSync('/here/is/my/key')
-    });
+  const [nodeCnt, setNodeCnt] = React.useState(1);
+
+  const [sshInfo, setSshInfo] = React.useState([]);
+
+  function getComponentOfPage(): JSX.Element | null {
+    let obj = null;
+    if (page === 1) {
+      obj = (
+        <K8sInstallEnvironment
+          page={page}
+          setPage={setPage}
+          setNodeCnt={setNodeCnt}
+        />
+      );
+    } else if (page === 2) {
+      obj = (
+        <K8sInstallSsh
+          page={page}
+          setPage={setPage}
+          nodeCnt={nodeCnt}
+          setSshInfo={setSshInfo}
+        />
+      );
+    } else if (page === 3) {
+      obj = (
+        <K8sInstallExecute page={page} setPage={setPage} sshInfo={sshInfo} />
+      );
+    }
+    return obj;
   }
-  return (
-    <div>
-      <form>
-        <label htmlFor="ip">IP:</label>
-        <input type="text" id="ip" name="ip" value={ip} onChange={function(e){
-          setIp(e.target.value)
-        }}></input>
-        <br></br><br></br>
 
-        <label htmlFor="port">Port:</label>
-        <input type="text" id="port" name="port" value={port} onChange={function(e){
-          setPort(e.target.value)
-        }}></input>
-        <br></br><br></br>
-
-        <label htmlFor="user">User:</label>
-        <input type="text" id="user" name="user" value={user} onChange={function(e){
-          setUser(e.target.value)
-        }}></input>
-        <br></br><br></br>
-
-        <label htmlFor="password">Password:</label>
-        <input type="text" id="password" name="password" value={password} onChange={function(e){
-          setPassword(e.target.value)
-        }}></input>
-        <br></br><br></br>
-
-        <input type="button" value="Submit" onClick={send}></input>
-      </form>
-    </div>
-  );
+  return <div>{getComponentOfPage()}</div>;
 }
