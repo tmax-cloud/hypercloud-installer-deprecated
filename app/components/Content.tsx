@@ -3,9 +3,9 @@ import K8sInstall from './K8sInstall';
 import TestInstall from './TestInstall';
 import styles from './Content.css';
 
-type Props = {
+interface Props {
   menu: string;
-};
+}
 
 export default function Content(props: Props) {
   function getContents(): JSX.Element | null {
@@ -20,7 +20,7 @@ export default function Content(props: Props) {
 
   return (
     <div className={styles.content}>
-      <div className={[styles.wrap, styles.scroll].join(' ')}>{getContents()}</div>
+      <div className={styles.wrap}>{getContents()}</div>
     </div>
   );
 }

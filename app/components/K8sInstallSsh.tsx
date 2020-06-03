@@ -2,12 +2,12 @@ import React from 'react';
 import * as Common from './common';
 import styles from './K8sInstallSsh.css';
 
-type Props = {
+interface Props {
   page: number;
   setPage: Function;
   nodeCnt: number;
   setSshInfo: Function;
-};
+}
 
 export default function K8sInstallSsh(props: Props) {
   const [sshInfo, setSshInfo] = React.useState(() => {
@@ -25,24 +25,28 @@ export default function K8sInstallSsh(props: Props) {
     return temp;
   });
 
-  function sshConnTest(e, i) {
+  function sshConnTest(e: Event, i: number) {
     console.log('Test Info', sshInfo[i]);
 
-    sshInfo[i].isSuccessHTML = <span className={styles.connTesting}>Wait...</span>;
+    sshInfo[i].isSuccessHTML = (
+      <span className={styles.connTesting}>Wait...</span>
+    );
     let temp = [].concat(sshInfo);
     setSshInfo(temp);
 
-    let ip = sshInfo[i].ip;
-    let port = Number(sshInfo[i].port);
-    let user = sshInfo[i].user;
-    let password = sshInfo[i].password;
+    const { ip } = sshInfo[i];
+    const port = Number(sshInfo[i].port);
+    const { user } = sshInfo[i];
+    const { password } = sshInfo[i];
 
     const ssh2 = require('ssh2');
     const connection = new ssh2();
     connection.on('error', function(err) {
       // Handle the connection error
       console.log('error', err);
-      sshInfo[i].isSuccessHTML = <span className={styles.connError}>Error!!!</span>;
+      sshInfo[i].isSuccessHTML = (
+        <span className={styles.connError}>Error!!!</span>
+      );
       temp = [].concat(sshInfo);
       setSshInfo(temp);
       connection.end();
@@ -50,7 +54,9 @@ export default function K8sInstallSsh(props: Props) {
     connection.on('ready', function() {
       // Work with the connection
       console.log('ready');
-      sshInfo[i].isSuccessHTML = <span className={styles.connSuccess}>Success!!!</span>;
+      sshInfo[i].isSuccessHTML = (
+        <span className={styles.connSuccess}>Success!!!</span>
+      );
       sshInfo[i].isSuccess = 1;
       temp = [].concat(sshInfo);
       setSshInfo(temp);
@@ -85,7 +91,9 @@ export default function K8sInstallSsh(props: Props) {
   for (let i = 0; i < props.nodeCnt; i += 1) {
     items.push(
       <form key={i}>
-        [node{i + 1}]
+        [node
+        {i + 1}
+        ]
         <br />
         <label htmlFor="ip">
           <span className={styles.title}>IP : </span>
@@ -110,7 +118,7 @@ export default function K8sInstallSsh(props: Props) {
             value={sshInfo[i].port}
             onChange={function(e) {
               sshInfo[i].port = e.target.value;
-              let temp = [].concat(sshInfo);
+              const temp = [].concat(sshInfo);
               setSshInfo(temp);
             }}
           />
@@ -140,7 +148,7 @@ export default function K8sInstallSsh(props: Props) {
           />
         </label>
         <br />
-        <span className={styles.title}></span>
+        <span className={styles.title} />
         <input
           type="button"
           value="Connection Test"

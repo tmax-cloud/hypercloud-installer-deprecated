@@ -1,51 +1,89 @@
 import React from 'react';
 import * as Common from './common';
 import styles from './K8sInstallExecute.css';
-import * as Text from './ssh/installK8S';
+import * as Script from './ssh/script';
 
-type Props = {
+interface SshInfo {
+  ip: string;
+  port: string;
+  user: string;
+  password: string;
+}
+
+interface Props {
   page: number;
   setPage: Function;
-  sshInfo: Array;
-};
+  sshInfo: Array<SshInfo>;
+}
 
-export default function K8sInstallExecute(props: Props) {
-  console.log('sshInfo', props.sshInfo);
+export default function K8sInstallExecute({ page, setPage, sshInfo }: Props) {
+  console.log('sshInfo', sshInfo);
 
   // const [log, setLog] = React.useState('');
-  const logRef = React.createRef();
+  const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 
   function onClickInstall() {
-    logRef.current.value = '';
-    for (let i = 0; i < props.sshInfo.length; i += 1) {
-      let ip = props.sshInfo[i].ip;
-      let port = props.sshInfo[i].port;
-      let user = props.sshInfo[i].user;
-      let password = props.sshInfo[i].password;
-      const ssh = {
-        ip,
-        port,
-        user,
-        password
-      };
-      const cmd = `
-        touch install.sh;
-        echo "${Text.getK8SInstallScript()}" > install.sh;
-        chmod 777 install.sh
-        ./install.sh
-      `;
-      console.log(ssh, cmd);
-      Common.send(ssh, cmd, data => {
-        logRef.current.value += data;
-        logRef.current.scrollTop = logRef.current.scrollHeight;
-      });
-    }
+    logRef.current!.value = '';
+    const master = sshInfo[0];
+    const masterSsh = {
+      ip: master.ip,
+      port: master.port,
+      user: master.user,
+      password: master.password
+    };
+    // install docker
+    // init cluster
+    // install CNI
+    // get cluster join command
+    let cmd = Script.runScriptAsFile(Script.getDockerInstallScript());
+    cmd += Script.runScriptAsFile(Script.getK8sClusterInitScript());
+    cmd += Script.getCniInstallScript();
+    cmd += Script.getK8sClusterJoinScript(master.ip);
+    console.log('===== master cmd to execute =====', cmd);
+    Common.send(masterSsh, cmd, {
+      close: () => {
+        // console.log('close!!');
+        const joinCmd = logRef.current!.value.split('@@@')[1];
+
+        for (let i = 1; i < sshInfo.length; i += 1) {
+          const worker = sshInfo[i];
+          const workerSsh = {
+            ip: worker.ip,
+            port: worker.port,
+            user: worker.user,
+            password: worker.password
+          };
+          // install docker
+          // install kubelet, kubectl, kubeadm
+          // join cluster
+          cmd = Script.runScriptAsFile(Script.getDockerInstallScript());
+          cmd += Script.getK8sToolsInstallScript();
+          cmd += joinCmd;
+          console.log('===== worker cmd to execute =====', cmd);
+          Common.send(workerSsh, cmd, {
+            close: () => {},
+            stdout: () => {},
+            stderr: () => {}
+          });
+        }
+      },
+      stdout: (data: string) => {
+        // console.log('stdout!!');
+        logRef.current!.value += data;
+        logRef.current!.scrollTop = logRef.current!.scrollHeight;
+      },
+      stderr: (data: string) => {
+        // console.log('stderr!!');
+        logRef.current!.value += data;
+        logRef.current!.scrollTop = logRef.current!.scrollHeight;
+      }
+    });
   }
   return (
     <div>
       <h1>
         Step
-        {props.page}
+        {page}
       </h1>
       <h4>설치</h4>
       <button type="button" onClick={onClickInstall}>
@@ -59,7 +97,7 @@ export default function K8sInstallExecute(props: Props) {
         <button
           type="button"
           onClick={function() {
-            props.setPage(props.page - 1);
+            setPage(page - 1);
           }}
         >
           Prev

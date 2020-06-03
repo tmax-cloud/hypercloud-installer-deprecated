@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
-type Props = {
+interface Props {
   page: number;
   setPage: Function;
   setNodeCnt: Function;
-};
+}
 
 export default function K8sInstallEnvironment(props: Props) {
   // Dom 접근

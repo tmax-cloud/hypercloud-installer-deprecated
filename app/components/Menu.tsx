@@ -1,14 +1,14 @@
 import React from 'react';
 import styles from './Menu.css';
 
-type Props = {
+interface Props {
   onClick: Function;
-};
+}
 
 export default function Menu(props: Props) {
   return (
     <div className={styles.menu}>
-      <div className={[styles.wrap, styles.scroll].join(' ')}>
+      <div className={styles.wrap}>
         <ul>
           <li>
             <a
@@ -20,7 +20,7 @@ export default function Menu(props: Props) {
               K8S Install
             </a>
           </li>
-          <li>
+          {/* <li>
             <a
               href="#"
               onClick={function() {
@@ -29,7 +29,7 @@ export default function Menu(props: Props) {
             >
               Test Install
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

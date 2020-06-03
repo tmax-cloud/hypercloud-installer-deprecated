@@ -1,7 +1,19 @@
-export function send(ssh: object, cmd: string, cb: Function) {
+interface SshInfo {
+  ip: string;
+  port: string;
+  user: string;
+  password: string;
+}
+
+interface SendCb {
+  close: Function;
+  stdout: Function;
+  stderr: Function;
+}
+
+export function send(ssh: SshInfo, cmd: string, cb: SendCb) {
   const { Client } = require('ssh2');
   const conn = new Client();
-  let log = '';
   conn
     .on('ready', function() {
       console.log('Client :: ready');
@@ -9,11 +21,16 @@ export function send(ssh: object, cmd: string, cb: Function) {
         if (err) throw err;
         stream
           .on('close', function(code, signal) {
-            // console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
+            cb.close();
+            console.log(`Stream :: close :: code: ${code}, signal: ${signal}`);
             conn.end();
           })
-          .on('data', cb)
+          .on('data', function(data) {
+            cb.stdout(data);
+            // console.log(`STDOUT: ${data}`);
+          })
           .stderr.on('data', function(data) {
+            cb.stderr(data);
             console.error(`STDERR: ${data}`);
           });
       });
