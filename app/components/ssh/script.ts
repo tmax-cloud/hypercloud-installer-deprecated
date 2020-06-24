@@ -4,7 +4,7 @@ export function getDockerInstallScript(): string {
 
   return `#!/bin/bash
 
-if [[ $(awk -F= '/^ID=/ { print $2 }' /etc/os-release | tr -d '"') == ubuntu ]]; then
+if [ $(awk -F= '/^ID=/ { print $2 }' /etc/os-release | tr -d '"') == ubuntu ]; then
   # install docker
   # if ! command -v docker 2>/dev/null; then
     sudo apt-get remove docker docker-engine docker.io containerd runc;
@@ -42,7 +42,7 @@ export function getK8sToolsInstallScript(): string {
 export function getK8sClusterInitScript(): string {
   return `#!/bin/bash
 
-if [[ $(awk -F= '/^ID=/ { print $2 }' /etc/os-release | tr -d '"') == ubuntu ]]; then
+if [ $(awk -F= '/^ID=/ { print $2 }' /etc/os-release | tr -d '"') == ubuntu ]; then
   # install kubernetes
   # if ! command -v kubectl 2>/dev/null || ! command -v kubeadm 2>/dev/null || ! command -v kubelet 2>/dev/null ; then
     ${getK8sToolsInstallScript()}

@@ -1,26 +1,20 @@
 import React from 'react';
-import K8sInstall from './K8sInstall';
-import TestInstall from './TestInstall';
-import styles from './Content.css';
+import { Switch } from 'react-router';
+import { Route } from 'react-router-dom';
+import routes from '../constants/routes.json';
+import K8sInstallEnvironment from './K8sInstallEnvironment';
+import K8sInstallSsh from './K8sInstallSsh';
 
-interface Props {
-  menu: string;
-}
-
-export default function Content(props: Props) {
-  function getContents(): JSX.Element | null {
-    let obj = null;
-    if (props.menu === 'k8s') {
-      obj = <K8sInstall />;
-    } else if (props.menu === 'test') {
-      obj = <TestInstall />;
-    }
-    return obj;
-  }
-
+export default function Content() {
   return (
-    <div className={styles.content}>
-      <div className={styles.wrap}>{getContents()}</div>
+    <div>
+      <Switch>
+        <Route
+          path={routes.K8S_INSTALL_ENV}
+          component={K8sInstallEnvironment}
+        />
+        <Route path={routes.K8S_INSTALL_SSH} component={K8sInstallSsh} />
+      </Switch>
     </div>
   );
 }

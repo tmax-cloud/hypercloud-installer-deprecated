@@ -1,83 +1,74 @@
+/* eslint-disable no-console */
 import React from 'react';
 import * as Common from './common';
 import styles from './K8sInstallExecute.css';
 import * as Script from './ssh/script';
-
-interface SshInfo {
-  ip: string;
-  port: string;
-  user: string;
-  password: string;
-}
+import Node, { Role } from './class/Node';
 
 interface Props {
-  page: number;
-  setPage: Function;
-  sshInfo: Array<SshInfo>;
+  nodeInfo: Array<Node>;
 }
 
-export default function K8sInstallExecute({ page, setPage, sshInfo }: Props) {
-  console.log('sshInfo', sshInfo);
+export default function K8sInstallExecute({ nodeInfo }: Props) {
+  console.log('nodeInfo', nodeInfo);
 
-  // const [log, setLog] = React.useState('');
   const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 
   function onClickInstall() {
     logRef.current!.value = '';
-    const master = sshInfo[0];
-    const masterSsh = {
-      ip: master.ip,
-      port: master.port,
-      user: master.user,
-      password: master.password
-    };
-    // install docker
-    // init cluster
-    // install CNI
-    // get cluster join command
-    let cmd = Script.runScriptAsFile(Script.getDockerInstallScript());
-    cmd += Script.runScriptAsFile(Script.getK8sClusterInitScript());
-    cmd += Script.getCniInstallScript();
-    cmd += Script.getK8sClusterJoinScript(master.ip);
-    console.log('===== master cmd to execute =====', cmd);
-    Common.send(masterSsh, cmd, {
-      close: () => {
-        // console.log('close!!');
-        const joinCmd = logRef.current!.value.split('@@@')[1];
-
-        for (let i = 1; i < sshInfo.length; i += 1) {
-          const worker = sshInfo[i];
-          const workerSsh = {
-            ip: worker.ip,
-            port: worker.port,
-            user: worker.user,
-            password: worker.password
-          };
-          // install docker
-          // install kubelet, kubectl, kubeadm
-          // join cluster
-          cmd = Script.runScriptAsFile(Script.getDockerInstallScript());
-          cmd += Script.getK8sToolsInstallScript();
-          cmd += joinCmd;
-          console.log('===== worker cmd to execute =====', cmd);
-          Common.send(workerSsh, cmd, {
-            close: () => {},
-            stdout: () => {},
-            stderr: () => {}
-          });
-        }
-      },
-      stdout: (data: string) => {
-        // console.log('stdout!!');
-        logRef.current!.value += data;
-        logRef.current!.scrollTop = logRef.current!.scrollHeight;
-      },
-      stderr: (data: string) => {
-        // console.log('stderr!!');
-        logRef.current!.value += data;
-        logRef.current!.scrollTop = logRef.current!.scrollHeight;
+    for (let i = 0; i < nodeInfo.length; i += 1) {
+      if (nodeInfo[i].role === Role.MASTER) {
+        const master = nodeInfo[i];
+        console.log('master!!!', master);
+        // install docker
+        // init cluster
+        // install CNI
+        // get cluster join command
+        let command = Script.runScriptAsFile(Script.getDockerInstallScript());
+        command += Script.runScriptAsFile(Script.getK8sClusterInitScript());
+        command += Script.getCniInstallScript();
+        command += Script.getK8sClusterJoinScript(master.ip);
+        master.cmd = command;
+        Common.send(master, {
+          close: () => {
+            // console.log('close!!');
+            // TODO: 마스터 개수만큼 돌았을 때 워커 실행 해야 함..??
+            // if 문 추가??
+            const joinCmd = logRef.current!.value.split('@@@')[1];
+            for (let j = 0; j < nodeInfo.length; j += 1) {
+              if (nodeInfo[j].role === Role.WORKER) {
+                const worker = nodeInfo[j];
+                console.log('worker!!!', worker);
+                // install docker
+                // install kubelet, kubectl, kubeadm
+                // join cluster
+                command = Script.runScriptAsFile(
+                  Script.getDockerInstallScript()
+                );
+                command += Script.getK8sToolsInstallScript();
+                command += joinCmd;
+                worker.cmd = command;
+                Common.send(worker, {
+                  close: () => {},
+                  stdout: () => {},
+                  stderr: () => {}
+                });
+              }
+            }
+          },
+          stdout: (data: string) => {
+            // console.log('stdout!!');
+            logRef.current!.value += data;
+            logRef.current!.scrollTop = logRef.current!.scrollHeight;
+          },
+          stderr: (data: string) => {
+            // console.log('stderr!!');
+            logRef.current!.value += data;
+            logRef.current!.scrollTop = logRef.current!.scrollHeight;
+          }
+        });
       }
-    });
+    }
   }
   return (
     <div>

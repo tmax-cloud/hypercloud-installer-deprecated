@@ -1,37 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Menu.css';
+import routes from '../constants/routes.json';
 
-interface Props {
-  onClick: Function;
-}
-
-export default function Menu(props: Props) {
+export default function Menu() {
   return (
-    <div className={styles.menu}>
-      <div className={styles.wrap}>
-        <ul>
-          <li>
-            <a
-              href="#"
-              onClick={function() {
-                props.onClick('k8s');
-              }}
-            >
-              K8S Install
-            </a>
-          </li>
-          {/* <li>
-            <a
-              href="#"
-              onClick={function() {
-                props.onClick('test');
-              }}
-            >
-              Test Install
-            </a>
-          </li> */}
-        </ul>
-      </div>
+    <div className={styles.wrap}>
+      <ul>
+        <li>
+          <Link to={routes.K8S_INSTALL_ENV}>K8S Install</Link>
+        </li>
+      </ul>
     </div>
   );
 }

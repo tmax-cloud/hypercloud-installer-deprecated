@@ -1,4 +1,6 @@
 {
   "HOME": "/",
-  "COUNTER": "/counter"
+  "COUNTER": "/counter",
+  "K8S_INSTALL_ENV": "/k8sInstallEnv",
+  "K8S_INSTALL_SSH": "/k8sInstallSsh"
 }

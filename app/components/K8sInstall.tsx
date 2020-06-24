@@ -1,41 +1,36 @@
-import React from 'react';
-import K8sInstallEnvironment from './K8sInstallEnvironment';
-import K8sInstallSsh from './K8sInstallSsh';
-import K8sInstallExecute from './K8sInstallExecute';
+// /* eslint-disable no-console */
+// import React from 'react';
+// import { connect } from 'react-redux';
+// import K8sInstallEnvironment from './K8sInstallEnvironment';
+// import K8sInstallSsh from './K8sInstallSsh';
+// import K8sInstallExecute from './K8sInstallExecute';
+// import { mapStateToProps, mapDispatchToProps } from '../actions/pager';
 
-export default function K8sInstall() {
-  const [page, setPage] = React.useState(1);
+// type Props = {
+//   pager: number;
+// };
 
-  const [nodeCnt, setNodeCnt] = React.useState(1);
+// function K8sInstall(props: Props) {
+//   console.log('K8sInstall props : ', props);
+//   const { pager } = props;
 
-  const [sshInfo, setSshInfo] = React.useState([]);
+//   const [nodeCnt, setNodeCnt] = React.useState(1);
 
-  function getComponentOfPage(): JSX.Element | null {
-    let obj = null;
-    if (page === 1) {
-      obj = (
-        <K8sInstallEnvironment
-          page={page}
-          setPage={setPage}
-          setNodeCnt={setNodeCnt}
-        />
-      );
-    } else if (page === 2) {
-      obj = (
-        <K8sInstallSsh
-          page={page}
-          setPage={setPage}
-          nodeCnt={nodeCnt}
-          setSshInfo={setSshInfo}
-        />
-      );
-    } else if (page === 3) {
-      obj = (
-        <K8sInstallExecute page={page} setPage={setPage} sshInfo={sshInfo} />
-      );
-    }
-    return obj;
-  }
+//   const [nodeInfo, setNodeInfo] = React.useState([]);
 
-  return <div>{getComponentOfPage()}</div>;
-}
+//   function getComponentOfPage(): JSX.Element | null {
+//     let obj = null;
+//     if (pager === 1) {
+//       obj = <K8sInstallEnvironment setNodeCnt={setNodeCnt} />;
+//     } else if (pager === 2) {
+//       obj = <K8sInstallSsh nodeCnt={nodeCnt} setNodeInfo={setNodeInfo} />;
+//     } else if (pager === 3) {
+//       obj = <K8sInstallExecute nodeInfo={nodeInfo} />;
+//     }
+//     return obj;
+//   }
+
+//   return <div>{getComponentOfPage()}</div>;
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(K8sInstall);

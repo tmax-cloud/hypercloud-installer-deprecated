@@ -1,21 +1,11 @@
-.menu{
-  width: 100%;
-  height: 100%;
-}
-
-/* Create two columns/boxes that floats next to each other */
 .wrap {
   float: left;
   padding: 20px;
   width: 20%;
   height: 100vh;
   background: white;
-  overflow: auto
-}
-/* Style the list inside the menu */
-.wrap ul {
-  list-style-type: none;
-  padding: 0;
+  overflow: auto;
+  text-align: center;
 }
 
 @media (max-width: 600px) {
