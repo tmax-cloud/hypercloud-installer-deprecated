@@ -1,0 +1,10 @@
+.wrap {
+  padding: 50px 50px;
+}
+
+.tableToolBarBox {
+  width: 50%;
+  /* span tag width 적용 위함*/
+  display: inline-block;
+  text-align: right;
+}

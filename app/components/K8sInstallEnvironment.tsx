@@ -5,7 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes.json';
-import nodes from '../constants/test.json';
+import nodes from '../constants/env.json';
 import { mapStateToProps, mapDispatchToProps } from '../actions/env';
 
 type Props = {
@@ -18,27 +18,6 @@ function K8sInstallEnvironment(props: Props) {
   console.log('routes', routes);
   console.log('nodes:', nodes);
   const { setEnv } = props;
-
-  // const nodes = [
-  //   {
-  //     ip: '192.168.1.1',
-  //     port: 22,
-  //     user: 'root',
-  //     password: '1234'
-  //   },
-  //   {
-  //     ip: '192.168.1.2',
-  //     port: 22,
-  //     user: 'root',
-  //     password: '1234'
-  //   }
-  // ];
-  // const fs = require('fs');
-  // fs.writeFile('test.json', JSON.stringify(nodes), (err: any) => {
-  //   if (err) {
-  //     console.log(err);
-  //   }
-  // });
 
   function onChangeK8sVersion(e: any) {
     setEnv({

@@ -1,0 +1,11 @@
+.wrap {
+  background: linear-gradient(to right, #2980b9, #2c3e50);
+
+  /* color: white; */
+
+  /* 전체 높이 - header 높이 */
+  height: calc(100vh - 50px);
+
+  /* overflow 시, 스크롤 생성 */
+  overflow: auto;
+}

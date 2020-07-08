@@ -2,5 +2,8 @@
   "HOME": "/",
   "COUNTER": "/counter",
   "K8S_INSTALL_ENV": "/k8sInstallEnv",
-  "K8S_INSTALL_SSH": "/k8sInstallSsh"
+  "K8S_INSTALL_SSH": "/k8sInstallSsh",
+  "ENV_ADD":"/EnvContentsAdd",
+  "ENV_NOT_EXIST":"/EnvContentsNotExist",
+  "ENV_EXIST":"/EnvContentsExist"
 }

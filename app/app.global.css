@@ -32,10 +32,7 @@ body {
   margin:0;
   position: relative;
   height: 100vh;
-  background-color: #232c39;
-  background-image: linear-gradient(to right, #c1c161 0%, #c1c161 0%, #d4d4b1 100%);
   font-family: Arial, Helvetica, Helvetica Neue, serif;
-  overflow-y: hidden;
 }
 
 h1 {
@@ -48,4 +45,80 @@ li {
 
 ul {
   padding: 0
+}
+
+
+/*
+공통
+*/
+.red{
+  color: red;
+}
+
+.visible{
+  visibility : visible;
+}
+.hidden{
+  visibility : hidden;
+}
+
+/*
+img
+*/
+img.small {
+  width: 50px;
+  height: 50px;
+}
+img.medium {
+  width: 100px;
+  height: 100px;
+}
+img.large {
+  width: 200px;
+  height: 200px;
+}
+
+/*
+div
+*/
+div.left {
+  float: left;
+}
+div.right {
+  float: right;
+}
+div.clear {
+  clear: both;
+}
+/* child 상하 가운데 정렬 */
+div.childUpDownCenter {
+  display: flex;
+  align-items: center;
+}
+/* child 상하 하 정렬 */
+div.childUpDownDown {
+  display: flex;
+  align-items: flex-end;
+}
+/* child 좌우 가운데 정렬 */
+div.childLeftRightCenter {
+  display: flex;
+  justify-content: center;
+}
+/* child 좌우 우 정렬 */
+div.childLeftRightRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/*
+span
+*/
+/* child 왼쪽 정렬 */
+span.left{
+  text-align: left;
+}
+/* child 오른쪽 정렬 */
+span.right{
+  text-align: right;
 }
