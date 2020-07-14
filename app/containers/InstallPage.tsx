@@ -10,19 +10,20 @@ export const InstallPageContext = React.createContext('');
 
 const initialState = { mode: CONST.INSTALL.MAIN };
 const reducer = (state, action) => {
-  switch (action) {
-    case CONST.INSTALL.MAIN:
-      return { mode: CONST.INSTALL.MAIN };
+  switch (action.type) {
+    case 'SET_MODE':
+      return { ...state, ...action.data };
     default:
       throw new Error();
   }
 };
 
-function InstallPage() {
-  const [installPageState, dispatchInstallPage] = useReducer(
-    reducer,
-    initialState
-  );
+function InstallPage(props: any) {
+  const { node } = props;
+  const [installPageState, dispatchInstallPage] = useReducer(reducer, {
+    mode: CONST.INSTALL.MAIN,
+    node
+  });
   return (
     <InstallPageContext.Provider
       value={{

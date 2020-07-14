@@ -2,9 +2,18 @@
   padding: 50px 50px;
 }
 
-.tableToolBarBox {
+.tableToolBar {
+  margin-bottom: 5px;
+}
+.tableToolBar > span {
   width: 50%;
   /* span tag width 적용 위함*/
   display: inline-block;
-  text-align: right;
+}
+
+.select {
+  margin-right: 10px !important;
+}
+.select > div > select {
+  padding-top: 3px;
 }

@@ -4,12 +4,27 @@ const CONST = {
     ENV: 'env'
   },
   INSTALL: {
-    MAIN: 'main'
+    MAIN: 'main',
+    KUBERNETES: 'Kubernetes'
   },
   ENV: {
     MANAGE: 'manage',
-    ADD: 'add',
-    TEST_ADD: 'test_add'
+    ADD: 'add'
+  },
+  PRODUCT: {
+    REQUIRED: [
+      {
+        NAME: 'Kubernetes'
+      }
+    ],
+    OPTIONAL: [
+      {
+        NAME: 'Helm'
+      },
+      {
+        NAME: 'HyperCloud Operator'
+      }
+    ]
   }
 };
 

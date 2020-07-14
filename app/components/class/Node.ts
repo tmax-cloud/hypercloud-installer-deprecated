@@ -25,9 +25,9 @@ export default class Node {
 
   private _cmd: string;
 
-  private _state: State;
+  private _state?: State;
 
-  private _role: Role;
+  private _role?: Role;
 
   constructor(
     ip: string,
@@ -35,8 +35,8 @@ export default class Node {
     user: string,
     password: string,
     cmd: string,
-    state: State,
-    role: Role
+    state?: State,
+    role?: Role
   ) {
     this._ip = ip;
     this._port = port;

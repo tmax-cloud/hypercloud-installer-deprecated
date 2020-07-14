@@ -4,6 +4,8 @@ import routes from './constants/routes.json';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import CounterPage from './containers/CounterPage';
+import EnvPage from './containers/EnvPage';
+import InstallPage from './containers/InstallPage';
 
 export default function Routes() {
   return (

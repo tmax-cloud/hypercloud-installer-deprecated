@@ -11,4 +11,10 @@
   text-align: center;
 }
 
+.textBox{
+  margin: 10px 0px;
+}
+.textBox > svg{
+  font-size: 10.1875rem;
+}
 

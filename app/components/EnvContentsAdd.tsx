@@ -15,10 +15,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  IconButton
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import CONST from '../constants/constant';
 import styles from './EnvContentsAdd.css';
 import env from '../constants/env.json';
@@ -50,7 +60,7 @@ function EnvContentsAdd(props: Props) {
       return true;
     }
 
-    for (let i=0; i<env.length; i+=1) {
+    for (let i = 0; i < env.length; i += 1) {
       if (target === env[i].name) {
         console.log(target, env[i].name);
         setNameError('중복 된 이름이 존재합니다.');
@@ -125,8 +135,6 @@ function EnvContentsAdd(props: Props) {
     return false;
   };
 
-  const [isShowPassword, setisShowPassword] = useState(true);
-
   const initValue = () => {
     setIp('');
     setPort('');
@@ -139,7 +147,7 @@ function EnvContentsAdd(props: Props) {
         <div className="childLeftRightCenter">
           <span
             style={{
-              'marginTop': '10px'
+              marginTop: '10px'
             }}
           >
             추가된 노드가 없습니다.
@@ -208,6 +216,7 @@ function EnvContentsAdd(props: Props) {
     return selected.indexOf(clickedIp) !== -1;
   };
 
+  const [isShowPassword, setisShowPassword] = useState(true);
   const getPasswordVisibility = () => {
     return isShowPassword ? (
       <VisibilityOffIcon
@@ -227,60 +236,94 @@ function EnvContentsAdd(props: Props) {
   };
 
   const classes = useStyles();
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
       <div className={styles.box}>
-        <div className={[styles.rowBox, 'childUpDownCenter'].join(' ')}>
-          <div>
+        <div className={[styles.rowBox, ''].join(' ')}>
+          {/* <div>
             <span>이름</span>
-          </div>
+          </div> */}
           <div>
-            <input
+            {/* <input
               type="text"
               value={name}
               onChange={e => {
                 setName(e.target.value);
                 hasNameError(e.target.value);
               }}
+            /> */}
+            <TextField
+              required
+              id="outlined-required"
+              label="Name"
+              variant="outlined"
+              size="small"
+              value={name}
+              onChange={e => {
+                setName(e.target.value);
+                hasNameError(e.target.value);
+              }}
+              error={nameError.length !== 0}
+              helperText={nameError}
             />
-            <span className={nameError ? 'visible red' : 'hidden'}>
+            {/* <span className={nameError ? 'visible red' : 'hidden'}>
               {nameError}
-            </span>
+            </span> */}
           </div>
         </div>
-        <div className={[styles.rowBox, 'childUpDownCenter'].join(' ')}>
-          <div className={['left', 'childUpDownCenter'].join(' ')}>
+        <div className={[styles.rowBox, ''].join(' ')}>
+          {/* <div className={['left', 'childUpDownCenter'].join(' ')}>
             <span>노드</span>
-          </div>
+          </div> */}
           <div className="left">
-            <div>
+            {/* <div>
               <span>IP</span>
-            </div>
+            </div> */}
             <div>
-              <input
+              {/* <input
                 type="text"
                 value={ip}
                 onChange={e => {
                   setIp(e.target.value);
                   hasIpError(e.target.value);
                 }}
+              /> */}
+              <TextField
+                required
+                id="outlined-required"
+                label="IP"
+                variant="outlined"
+                size="small"
+                value={ip}
+                onChange={e => {
+                  setIp(e.target.value);
+                  hasIpError(e.target.value);
+                }}
+                error={ipError.length !== 0}
+                helperText={ipError}
               />
             </div>
-            <div
+            {/* <div
               className={[
                 ipError ? 'visible red' : 'hidden',
                 styles.errorBox
               ].join(' ')}
             >
               <span>{ipError}</span>
-            </div>
+            </div> */}
           </div>
           <div className="left">
-            <div>
+            {/* <div>
               <span>포트</span>
-            </div>
+            </div> */}
             <div>
-              <input
+              {/* <input
                 type="number"
                 min="0"
                 max="65535"
@@ -289,49 +332,129 @@ function EnvContentsAdd(props: Props) {
                   setPort(e.target.value);
                   hasPortError(e.target.value);
                 }}
+              /> */}
+              <TextField
+                required
+                id="outlined-required"
+                label="Port"
+                variant="outlined"
+                size="small"
+                value={port}
+                onChange={e => {
+                  setPort(e.target.value);
+                  hasPortError(e.target.value);
+                }}
+                error={portError.length !== 0}
+                helperText={portError}
               />
             </div>
-            <div
+            {/* <div
               className={[
                 portError ? 'visible red' : 'hidden',
                 styles.errorBox
               ].join(' ')}
             >
               <span>{portError}</span>
-            </div>
+            </div> */}
           </div>
           <div className="left">
-            <div>
+            {/* <div>
               <Tooltip
                 title="root 계정 비밀번호를 입력해 주세요."
                 placement="top"
               >
                 <span>사용자 비밀번호</span>
               </Tooltip>
-            </div>
-            <div className="childUpDownDown">
-              <input
+            </div> */}
+            <div className="left">
+              {/* <input
                 type={isShowPassword ? 'password' : 'text'}
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
                   hasPasswordError(e.target.value);
                 }}
+              /> */}
+              <TextField
+                required
+                type={isShowPassword ? 'password' : 'text'}
+                id="outlined-required"
+                label="Password"
+                variant="outlined"
+                size="small"
+                value={password}
+                onChange={e => {
+                  setPassword(e.target.value);
+                  hasPasswordError(e.target.value);
+                }}
+                error={passwordError.length !== 0}
+                helperText={passwordError}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">
+                      {getPasswordVisibility()}
+                    </InputAdornment>
+                  )
+                }}
               />
-              {getPasswordVisibility()}
+
+              {/* <FormControl
+                // className={clsx(classes.margin, classes.textField)}
+                variant="outlined"
+                size="small"
+              >
+                <InputLabel htmlFor="outlined-adornment-password">
+                  Password *
+                </InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={isShowPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    hasPasswordError(e.target.value);
+                  }}
+                  error={passwordError.length !== 0}
+                  helperText={passwordError}
+                  endAdornment={(
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={e => {
+                          isShowPassword
+                            ? setisShowPassword(false)
+                            : setisShowPassword(true);
+                        }}
+                        onMouseDown={e => {
+                          isShowPassword
+                            ? setisShowPassword(false)
+                            : setisShowPassword(true);
+                        }}
+                        edge="end"
+                      >
+                        {isShowPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  )}
+                  labelWidth={70}
+                />
+              </FormControl> */}
             </div>
-            <div
+            {/* <div
               className={[
                 passwordError ? 'visible red' : 'hidden',
                 styles.errorBox
               ].join(' ')}
             >
               <span>{passwordError}</span>
-            </div>
+            </div> */}
           </div>
-          <div>
-            <button
-              type="button"
+          <div className="left">
+            <Button
+              className={styles.addRemoveButton}
+              variant="contained"
+              color="primary"
+              size="small"
               onClick={() => {
                 let hasError = false;
                 if (hasIpError()) hasError = true;
@@ -364,12 +487,12 @@ function EnvContentsAdd(props: Props) {
                 setTotalError('');
               }}
             >
-              추가
-            </button>
+              <AddIcon />
+            </Button>
           </div>
         </div>
-        <div className={[styles.table].join(' ')}>
-          <TableContainer component={Paper}>
+        <div className={[styles.table, 'clear'].join(' ')}>
+          <TableContainer component={Paper} variant="outlined">
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -429,8 +552,11 @@ function EnvContentsAdd(props: Props) {
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <button
-                        type="button"
+                      <Button
+                        className={styles.addRemoveButton}
+                        variant="contained"
+                        color="secondary"
+                        size="small"
                         onClick={e => {
                           // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
                           e.stopPropagation();
@@ -458,8 +584,8 @@ function EnvContentsAdd(props: Props) {
                           });
                         }}
                       >
-                        -
-                      </button>
+                        <RemoveIcon />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -483,8 +609,10 @@ function EnvContentsAdd(props: Props) {
             'childLeftRightCenter'
           ].join(' ')}
         >
-          <button
-            type="button"
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
             onClick={() => {
               let hasError = false;
               if (hasNameError()) hasError = true;
@@ -499,15 +627,24 @@ function EnvContentsAdd(props: Props) {
                 nodes: [],
                 updatedTime: new Date().getTime()
               };
-              // TODO: 마스터, 워커노드 변수 추가 해야 할 듯
-              state.data.forEach(node => {
+              for (let i=0; i<state.data.length; i++) {
+                const node = state.data[i];
+                // worker
+                let role = 1;
+                console.log(node.ip);
+                console.log(selected);
+                if (selected.indexOf(node.ip) !== -1) {
+                  // master
+                  role = 0;
+                }
                 newEnv.nodes.push({
                   ip: node.ip,
                   password: node.password,
                   port: node.port,
-                  user: 'root'
+                  user: 'root',
+                  role
                 });
-              });
+              }
               env.push(newEnv);
               console.log('env', env);
               const jsonData = JSON.stringify(env);
@@ -522,15 +659,17 @@ function EnvContentsAdd(props: Props) {
             }}
           >
             추가
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
             onClick={() => {
               handleClickOpen();
             }}
           >
             취소
-          </button>
+          </Button>
           <Dialog
             open={open}
             onClose={handleClose}

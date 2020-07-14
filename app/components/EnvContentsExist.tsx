@@ -1,11 +1,6 @@
-import React, { Fragment, useState, useContext } from 'react';
-import clsx from 'clsx';
-import {
-  createStyles,
-  lighten,
-  makeStyles,
-  Theme
-} from '@material-ui/core/styles';
+/* eslint-disable import/no-cycle */
+import React, { useState, useContext } from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,16 +9,16 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
+import EditIcon from '@material-ui/icons/Edit';
+
 import {
   Collapse,
   Box,
@@ -32,13 +27,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  TextField
 } from '@material-ui/core';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import DeleteIcon from '@material-ui/icons/Delete';
 import styles from './EnvContentsExist.css';
 import { HomePageContext } from '../containers/HomePage';
 import CONST from '../constants/constant';
+import env from '../constants/env.json';
 
 // interface Data {
 //   calories: number;
@@ -152,6 +154,32 @@ const headCells: HeadCell[] = [
   // { id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
 ];
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    // root: {
+    //   width: '100%'
+    // },
+    paper: {
+      width: '100%',
+      marginBottom: theme.spacing(2)
+    },
+    table: {
+      minWidth: 750
+    },
+    visuallyHidden: {
+      border: 0,
+      clip: 'rect(0 0 0 0)',
+      height: 1,
+      margin: -1,
+      overflow: 'hidden',
+      padding: 0,
+      position: 'absolute',
+      top: 20,
+      width: 1
+    }
+  })
+);
+
 interface EnhancedTableProps {
   classes: ReturnType<typeof useStyles>;
   numSelected: number;
@@ -196,7 +224,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            // align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -292,36 +320,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 //   );
 // };
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    // root: {
-    //   width: '100%'
-    // },
-    paper: {
-      width: '100%',
-      marginBottom: theme.spacing(2)
-    },
-    table: {
-      minWidth: 750
-    },
-    visuallyHidden: {
-      border: 0,
-      clip: 'rect(0 0 0 0)',
-      height: 1,
-      margin: -1,
-      overflow: 'hidden',
-      padding: 0,
-      position: 'absolute',
-      top: 20,
-      width: 1
-    }
-  })
-);
-
-export default function EnvContentsExist(props) {
-  const { env } = props;
+export default function EnvContentsExist() {
   const [rows, setRows] = useState(env);
-  // const rows = env;
 
   const homePageContext = useContext(HomePageContext);
   const { homePageState, dispatchHomePage } = homePageContext;
@@ -331,8 +331,26 @@ export default function EnvContentsExist(props) {
   const [orderBy, setOrderBy] = React.useState<keyof Data>('updatedTime');
   const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  // search
+  const useSlectStyles = makeStyles((theme: Theme) =>
+    createStyles({
+      formControl: {
+        margin: theme.spacing(1.6),
+        minWidth: 120
+      },
+      selectEmpty: {
+        marginTop: theme.spacing(5)
+      }
+    })
+  );
+  const selectClasses = useSlectStyles();
+  const [age, setAge] = React.useState('');
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setAge(event.target.value as string);
+  };
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -383,29 +401,28 @@ export default function EnvContentsExist(props) {
     setPage(0);
   };
 
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
+  // const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setDense(event.target.checked);
+  // };
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-  const [open, setOpen] = React.useState(false);
-
+  // delete dialog
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const handleClickOpen = () => {
-    setOpen(true);
+    setDialogOpen(true);
   };
-
   const handleClose = () => {
-    setOpen(false);
+    setDialogOpen(false);
   };
   const getDeleteDialogContents = () => {
     if (selected.length > 1) {
       return (
         <div>
-          선택한
+          선택한&nbsp;
           {selected.length}
           개의 환경을 삭제하시겠습니까?
         </div>
@@ -421,6 +438,7 @@ export default function EnvContentsExist(props) {
     );
   };
 
+  // table row
   function Row({ row, index }) {
     const isItemSelected = isSelected(row.name);
     const labelId = `enhanced-table-checkbox-${index}`;
@@ -461,16 +479,25 @@ export default function EnvContentsExist(props) {
             scope="row"
             padding="none"
             onClick={() => {
-              dispatchHomePage(CONST.HOME.INSTALL);
+              const node = env.filter(environment => {
+                return environment.name === row.name;
+              })[0];
+              dispatchHomePage({
+                type: 'SET_MODE',
+                data: {
+                  mode: CONST.HOME.INSTALL,
+                  node
+                }
+              });
             }}
           >
             {row.name}
           </TableCell>
-          <TableCell align="right">{row.nodes.length}</TableCell>
-          <TableCell align="right">{row.installedCnt}</TableCell>
+          <TableCell>{row.nodes.length}</TableCell>
+          <TableCell>{row.installedCnt}</TableCell>
           <TableCell>{new Date(row.updatedTime).toString()}</TableCell>
-          <TableCell align="right">
-            <button type="button">Edit</button>
+          <TableCell>
+            <EditIcon />
           </TableCell>
         </TableRow>
         <TableRow>
@@ -507,23 +534,27 @@ export default function EnvContentsExist(props) {
   }
   return (
     <div className={styles.wrap}>
-      <div>
-        <span className={[styles.tableToolBarBox, 'left'].join(' ')}>
-          <button
-            type="button"
+      <div className={styles.tableToolBar}>
+        <span className={['left'].join(' ')}>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<DeleteIcon />}
+            size="small"
             onClick={e => {
               handleClickOpen();
             }}
+            disabled={!selected.length}
           >
             삭제
-          </button>
+          </Button>
           <Dialog
-            open={open}
+            open={dialogOpen}
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
+            <DialogTitle id="alert-dialog-title">환경 삭제</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {getDeleteDialogContents()}
@@ -563,9 +594,9 @@ export default function EnvContentsExist(props) {
             </DialogActions>
           </Dialog>
         </span>
-        <span className={[styles.tableToolBarBox, 'right'].join(' ')}>
+        <span className={['right'].join(' ')}>
           <div className="childLeftRightRight">
-            <select name="searchCategory">
+            {/* <select name="searchCategory">
               <option value="envName">환경이름</option>
             </select>
             <input
@@ -579,11 +610,46 @@ export default function EnvContentsExist(props) {
                 });
                 setRows(searchResultEnv);
               }}
+            /> */}
+            <FormControl className={styles.select}>
+              {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
+              <Select
+                native
+                value={age}
+                onChange={handleChange}
+                inputProps={{
+                  name: 'age',
+                  id: 'age-native-simple'
+                }}
+              >
+                {/* <option aria-label="None" value="" /> */}
+                <option value={10}>환경 이름</option>
+              </Select>
+            </FormControl>
+            <TextField
+              id="input-with-icon-textfield"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+              size="small"
+              onChange={e => {
+                const searchResultEnv = [];
+                env.map(environment => {
+                  if (environment.name.indexOf(e.target.value) !== -1) {
+                    searchResultEnv.push(environment);
+                  }
+                });
+                setRows(searchResultEnv);
+              }}
             />
           </div>
         </span>
       </div>
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} variant="outlined">
         {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer>
           <Table
@@ -625,10 +691,10 @@ export default function EnvContentsExist(props) {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
+      {/* <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
-      />
+      /> */}
     </div>
   );
 }

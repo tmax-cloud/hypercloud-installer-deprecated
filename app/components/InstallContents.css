@@ -4,12 +4,6 @@
   height: 100%;
 }
 
-.box{
-  width: 200px;
-  height: 200px;
-  border: 1px solid black;
-}
-
 @media (max-width: 600px) {
   .wrap {
     width: 100%;

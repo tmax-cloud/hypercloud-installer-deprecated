@@ -1,6 +1,10 @@
 .wrap {
-  background: linear-gradient(to right, #000000, #434343);
+  /* background: linear-gradient(to right, #000000, #434343); */
 
-  color: white;
+  /* color: white; */
   height: 50px;
+}
+
+.title{
+  margin: 0px 10px;
 }

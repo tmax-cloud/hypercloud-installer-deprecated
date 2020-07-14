@@ -9,8 +9,10 @@
 }
 
 .rowBox{
-  height: 50px;
-  margin-bottom: 20px;
+  padding: 20px;
+}
+.rowBox > div{
+  height: 65px;
 }
 .rowBox>div:not(:last-child){
   margin-right: 20px;
@@ -25,6 +27,11 @@
 }
 
 .icon{
-  width: 21px;
-  height: 21px;
+  width: 30px;
+  height: 30px;
+}
+
+.addRemoveButton {
+  min-width: 30px;
+  height: 40px;
 }
