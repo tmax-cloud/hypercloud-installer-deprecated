@@ -58,6 +58,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    icon: '',
     webPreferences:
       process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
         ? {
@@ -90,6 +91,9 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  // app에서 menu bar 삭제
+  mainWindow.setMenuBarVisibility(false);
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Menu.css';
-import routes from '../constants/routes.json';
+import routes from '../../utils/constants/routes.json';
 
 export default function Menu() {
   return (

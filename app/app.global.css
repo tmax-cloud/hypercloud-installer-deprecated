@@ -59,7 +59,7 @@ ul {
   visibility : visible;
 }
 .hidden{
-  visibility : hidden;
+  visibility : none;
 }
 
 /*
@@ -90,26 +90,40 @@ div.right {
 div.clear {
   clear: both;
 }
-/* child 상하 가운데 정렬 */
+div.fullHeight {
+  height: 100%;
+}
+div.fullWidth {
+  width: 100%;
+}
+/* child 상하 정렬 */
+div.childUpDownUP {
+  display: flex;
+  align-items: flex-start;
+}
 div.childUpDownCenter {
   display: flex;
   align-items: center;
 }
-/* child 상하 하 정렬 */
 div.childUpDownDown {
   display: flex;
   align-items: flex-end;
 }
-/* child 좌우 가운데 정렬 */
+/* child 좌우 정렬 */
+div.childLeftRightLeft {
+  display: flex;
+  justify-content: flex-start;
+}
 div.childLeftRightCenter {
   display: flex;
   justify-content: center;
 }
-/* child 좌우 우 정렬 */
 div.childLeftRightRight {
   display: flex;
   justify-content: flex-end;
 }
+
+
 
 /*
 span

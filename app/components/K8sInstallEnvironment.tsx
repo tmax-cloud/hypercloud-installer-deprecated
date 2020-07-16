@@ -4,8 +4,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import routes from '../constants/routes.json';
-import nodes from '../constants/env.json';
+import routes from '../../utils/constants/routes.json';
+import nodes from '../../utils/constants/env.json';
 import { mapStateToProps, mapDispatchToProps } from '../actions/env';
 
 type Props = {

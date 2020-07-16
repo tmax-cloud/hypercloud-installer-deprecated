@@ -1,8 +1,8 @@
 /* eslint-disable import/no-cycle */
 import React, { useReducer } from 'react';
-import EnvHeader from '../components/EnvHeader';
-import EnvContents from '../components/EnvContents';
-import CONST from '../constants/constant';
+import EnvHeader from '../components/env/EnvHeader';
+import EnvContents from '../components/env/EnvContents';
+import CONST from '../utils/constants/constant';
 import { Switch, Route } from 'react-router-dom';
 import CounterPage from './CounterPage';
 import HomePage from './HomePage';

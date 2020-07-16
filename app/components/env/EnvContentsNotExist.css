@@ -1,0 +1,20 @@
+.wrap {
+  /* 영역 확인용 background-color */
+  /* background-color:yellow; */
+}
+
+.box{
+  /* 영역 확인용 background-color */
+  /* background-color: black; */
+
+  /* child 가운데 정렬 */
+  text-align: center;
+}
+
+.textBox{
+  margin: 10px 0px;
+}
+.textBox > svg{
+  font-size: 10.1875rem;
+}
+

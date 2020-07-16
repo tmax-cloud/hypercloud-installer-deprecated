@@ -1,0 +1,19 @@
+.wrap{
+  padding: 10px;
+}
+
+.textBox{
+  margin-bottom: 50px;
+}
+.textBoxRow{
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 36px;
+}
+
+.productBox {
+  height: 100%;
+  width: 100%;
+}

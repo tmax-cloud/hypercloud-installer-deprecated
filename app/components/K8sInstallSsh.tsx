@@ -5,10 +5,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import routes from '../constants/routes.json';
+import routes from '../../utils/constants/routes.json';
 import styles from './K8sInstallSsh.css';
-import Node, { State, Role } from './class/Node';
-import * as Common from './common';
+import Node, { State, Role } from '../../utils/class/Node';
+import * as Common from '../../utils/common/ssh';
 import { mapStateToProps, mapDispatchToProps } from '../actions/env';
 
 interface Props {

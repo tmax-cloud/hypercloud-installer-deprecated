@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import React from 'react';
-import * as Common from './common';
+import * as Common from '../../utils/common/ssh';
 import styles from './K8sInstallExecute.css';
-import * as Script from './ssh/script';
-import Node, { Role } from './class/Node';
+import * as Script from '../../utils/common/script';
+import Node, { Role } from '../../utils/class/Node';
 
 interface Props {
   nodeInfo: Array<Node>;

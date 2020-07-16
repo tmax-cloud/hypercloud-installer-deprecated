@@ -1,0 +1,18 @@
+.wrap{
+  /* border: 1px solid red; */
+  width: 100%;
+}
+.wrap > div{
+  margin-bottom: 20px;
+}
+
+.titleBox {
+  width:200px;
+}
+
+.select {
+  margin-right: 10px !important;
+}
+.select > div > select {
+  padding-top: 3px;
+}

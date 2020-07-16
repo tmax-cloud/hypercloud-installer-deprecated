@@ -1,0 +1,12 @@
+.wrap {
+  width: 75%;
+  height: 100vh;
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    width: 100vw;
+    height: 80%;
+    /* overflow: auto */
+  }
+}

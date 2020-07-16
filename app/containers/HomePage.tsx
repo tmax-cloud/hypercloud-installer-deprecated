@@ -2,14 +2,14 @@
 import React, { useReducer } from 'react';
 import { Switch } from 'react-router';
 import { Route } from 'react-router-dom';
-import CONST from '../constants/constant';
+import CONST from '../utils/constants/constant';
 import InstallPage from './InstallPage';
 import EnvPage from './EnvPage';
-import routes from '../constants/routes.json';
-import env from '../constants/env.json';
-import EnvContentsExist from '../components/EnvContentsExist';
-import EnvContentsNotExist from '../components/EnvContentsNotExist';
-import EnvContentsAdd from '../components/EnvContentsAdd';
+import routes from '../../utils/constants/routes.json';
+import env from '../../utils/constants/env.json';
+import EnvContentsExist from '../components/env/EnvContentsExist';
+import EnvContentsNotExist from '../components/env/EnvContentsNotExist';
+import EnvContentsAdd from '../components/env/EnvContentsAdd';
 import EnvManagePage from './EnvManagePage';
 import EnvEmptyPage from './EnvEmptyPage';
 

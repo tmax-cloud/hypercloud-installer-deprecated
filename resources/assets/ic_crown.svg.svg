@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_crown.svg</title>
+    <g id="Ch1.Installer-Layout" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00_00_02_administration" transform="translate(-437.000000, -520.000000)">
+            <g id="table" transform="translate(401.000000, 365.000000)">
+                <g id="11월_2">
+                    <g>
+                        <g id="1" transform="translate(27.000000, 145.000000)">
+                            <g id="l">
+                                <g id="bg">
+                                    <g id="Group" transform="translate(9.000000, 10.000000)">
+                                        <g id="Icons/work_crown.svg">
+                                            <rect fill-rule="nonzero" x="0" y="0" width="14" height="14"></rect>
+                                            <g id="Group" fill-rule="evenodd" stroke-width="1" transform="translate(0.437500, 0.875000)" fill="#FFC412">
+                                                <path d="M13.125,9.1875 L13.125,12.25 L0,12.25 L0,9.1875 L13.125,9.1875 Z M13.125,0 L13.125,8.3125 L0,8.3125 L0,0 L3.112,3.696 L6.5625,0.4375 L10.013,3.696 L13.125,0 Z" id="Combined-Shape" fill-rule="nonzero"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

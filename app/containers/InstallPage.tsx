@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react';
-import InstallLnb from '../components/InstallLnb';
-import InstallContents from '../components/InstallContents';
-import CONST from '../constants/constant';
+import InstallLnb from '../components/install/InstallLnb';
+import InstallContents from '../components/install/InstallContents';
+import CONST from '../utils/constants/constant';
 
 // component간 depth가 깊어지면
 // props전달로는 한계가 있으므로

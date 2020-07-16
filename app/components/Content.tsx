@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch } from 'react-router';
 import { Route } from 'react-router-dom';
-import routes from '../constants/routes.json';
+import routes from '../../utils/constants/routes.json';
 import K8sInstallEnvironment from './K8sInstallEnvironment';
 import K8sInstallSsh from './K8sInstallSsh';
 
