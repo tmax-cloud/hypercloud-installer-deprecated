@@ -3,7 +3,7 @@ import { counterStateType } from '../reducers/types';
 
 export const SET = 'SET';
 
-export function setEnv(env: object) {
+export function saveEnv(env: object) {
   return (dispatch: Dispatch) => {
     dispatch({
       type: SET,
@@ -21,7 +21,7 @@ export function mapStateToProps(state: counterStateType) {
 export function mapDispatchToProps(dispatch: Dispatch) {
   return bindActionCreators(
     {
-      setEnv
+      saveEnv
     },
     dispatch
   );

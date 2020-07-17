@@ -25,7 +25,8 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CONST from '../../utils/constants/constant';
 import styles from './EnvContentsAdd.css';
-import env from '../../utils/constants/env.json';
+// import env from '../../utils/constants/env.json';
+import * as env from '../../utils/common/env';
 import * as Common from '../../utils/common/ssh';
 
 interface Props {
@@ -33,7 +34,10 @@ interface Props {
 }
 
 function EnvContentsAdd(props: Props) {
+  console.debug('EnvContentsAdd');
   const { dispatchEnvPage } = props;
+
+  const envList = env.loadEnv();
 
   const [state, setState] = useState({
     data: []
@@ -49,9 +53,9 @@ function EnvContentsAdd(props: Props) {
       return true;
     }
 
-    for (let i = 0; i < env.length; i += 1) {
-      if (target === env[i].name) {
-        console.debug(target, env[i].name);
+    for (let i = 0; i < envList.length; i += 1) {
+      if (target === envList[i].name) {
+        console.debug(target, envList[i].name);
         setFunc('중복 된 이름이 존재합니다.');
         return true;
       }
@@ -680,18 +684,21 @@ function EnvContentsAdd(props: Props) {
                   role
                 });
               }
-              env.push(newEnv);
-              console.debug('env', env);
-              const jsonData = JSON.stringify(env);
-              const fs = require('fs');
-              fs.writeFile('./app/utils/constants/env.json', jsonData, function(
-                err
-              ) {
-                if (err) {
-                  console.debug(err);
-                }
-              });
+              // env.push(newEnv);
+              // console.debug('env', env);
+              // const jsonData = JSON.stringify(env);
+              // const fs = require('fs');
+              // fs.writeFileSync(
+              //   './app/utils/constants/env.json',
+              //   jsonData,
+              //   function(err) {
+              //     if (err) {
+              //       console.debug(err);
+              //     }
+              //   }
+              // );
               // MANAGE 모드로 변경
+              env.appendEnv(newEnv);
               dispatchEnvPage(CONST.ENV.MANAGE);
             }}
           >

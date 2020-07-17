@@ -11,6 +11,7 @@ interface Props {
 }
 
 function EnvContentsNotExist(props: Props) {
+  console.debug('EnvContentsNotExist');
   const { dispatchEnvPage } = props;
   // const IMG_PATH = './constants/empty.png';
   return (

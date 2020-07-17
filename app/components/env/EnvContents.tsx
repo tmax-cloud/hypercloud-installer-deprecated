@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import React, { useContext } from 'react';
-import env from '../../utils/constants/env.json';
+import * as env from '../../utils/common/env';
 import EnvContentsExist from './EnvContentsExist';
 import EnvContentsNotExist from './EnvContentsNotExist';
 import EnvContentsAdd from './EnvContentsAdd';
@@ -16,7 +16,7 @@ function EnvContents() {
   const getComponent = () => {
     let component;
     if (envPageState.mode === CONST.ENV.MANAGE) {
-      if (env.length > 0) {
+      if (env.loadEnv().length > 0) {
         component = <EnvContentsExist />;
       } else {
         component = <EnvContentsNotExist dispatchEnvPage={dispatchEnvPage} />;

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
@@ -18,6 +18,7 @@ import styles from './InstallLnb.css';
 import { HomePageContext } from '../../containers/HomePage';
 import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
+import * as env from '../../utils/common/env';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,9 +47,16 @@ function InstallLnb() {
     // setOpen(!open);
   };
 
-  const [age, setAge] = React.useState('');
+  // const [age, setAge] = React.useState('');
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setAge(event.target.value as string);
+    // setAge(event.target.value as string);
+    dispatchInstallPage({
+      type: 'SET_ENV',
+      data: {
+        mode: CONST.INSTALL.MAIN,
+        env: env.getEnvByName(event.target.value as string)
+      }
+    });
   };
 
   const goEnvPage = () => {
@@ -78,7 +86,7 @@ function InstallLnb() {
           {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
           <Select
             native
-            value={age}
+            value={installPageState.env.name}
             onChange={handleChange}
             inputProps={{
               name: 'age',
@@ -86,7 +94,13 @@ function InstallLnb() {
             }}
           >
             {/* <option aria-label="None" value="" /> */}
-            <option value={10}>환경 이름</option>
+            {env.loadEnv().map(e => {
+              return (
+                <option key={e.name} value={e.name}>
+                  {e.name}
+                </option>
+              );
+            })}
           </Select>
         </FormControl>
         <SettingsIcon onClick={goEnvPage} />

@@ -2,15 +2,13 @@ import MuiBox from '@material-ui/core/Box';
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
 import styles from './InstallContentsKubernetes1.css';
-import InstallContentsHeader from './InstallContentsHeader';
-import routes from '../../utils/constants/routes.json';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 
 function InstallContentsKubernetes1() {
   console.log('InstallContentsKubernetes1');
 
   const kubeInstallContext = useContext(KubeInstallContext);
-  const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+  const { dispatchKubeInstall } = kubeInstallContext;
 
   const defaultProps = {
     bgcolor: 'background.paper',

@@ -13,16 +13,19 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_MODE':
       return { ...state, ...action.data };
+    case 'SET_ENV':
+      return { ...state, ...action.data };
     default:
       throw new Error();
   }
 };
 
 function InstallPage(props: any) {
-  const { node } = props;
+  console.debug('InstallPage');
+  const { env } = props;
   const [installPageState, dispatchInstallPage] = useReducer(reducer, {
     mode: CONST.INSTALL.MAIN,
-    node
+    env
   });
   return (
     <InstallPageContext.Provider

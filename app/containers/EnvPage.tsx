@@ -3,12 +3,6 @@ import React, { useReducer } from 'react';
 import EnvHeader from '../components/env/EnvHeader';
 import EnvContents from '../components/env/EnvContents';
 import CONST from '../utils/constants/constant';
-import { Switch, Route } from 'react-router-dom';
-import CounterPage from './CounterPage';
-import HomePage from './HomePage';
-import InstallPage from './InstallPage';
-import routes from './constants/routes.json';
-import env from '../reducers/env';
 
 // component간 depth가 깊어지면
 // props전달로는 한계가 있으므로
@@ -27,7 +21,7 @@ const reducer = (state, action) => {
   }
 };
 
-function EnvPage(props: any) {
+function EnvPage() {
   const [envPageState, dispatchEnvPage] = useReducer(reducer, initialState);
   return (
     <EnvPageContext.Provider

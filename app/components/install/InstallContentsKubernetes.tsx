@@ -1,19 +1,5 @@
-import MuiBox from '@material-ui/core/Box';
-import React, { useState, useReducer } from 'react';
-import {
-  LinearProgressProps,
-  Box,
-  LinearProgress,
-  Typography,
-  Button
-} from '@material-ui/core';
-import { Switch, Route, Redirect } from 'react-router';
-import * as Common from '../../utils/common/ssh';
-import Node from '../../utils/class/Node';
+import React, { useReducer } from 'react';
 import styles from './InstallContentsKubernetes.css';
-import InstallContentsHeader from './InstallContentsHeader';
-import CONST from '../../utils/constants/constant';
-import routes from '../../utils/constants/routes.json';
 import InstallContentsKubernetes1 from './InstallContentsKubernetes1';
 import InstallContentsKubernetes2 from './InstallContentsKubernetes2';
 import InstallContentsKubernetes3 from './InstallContentsKubernetes3';
@@ -58,7 +44,6 @@ function InstallContentsKubernetes() {
         dispatchKubeInstall
       }}
     >
-      <InstallContentsHeader />
       <div className={['childUpDownCenter', styles.wrap].join(' ')}>
         {getComponent()}
       </div>

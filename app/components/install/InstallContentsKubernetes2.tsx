@@ -4,7 +4,12 @@ import {
   Select,
   FormControl,
   InputLabel,
-  TextField
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@material-ui/core';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import CONST from '../../utils/constants/constant';
@@ -21,6 +26,16 @@ function InstallContentsKubernetes2() {
   };
 
   const [registry, setRegistry] = React.useState('');
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <div className={[styles.wrap].join(' ')}>
@@ -62,6 +77,9 @@ function InstallContentsKubernetes2() {
               // hasIpError(e.target.value);
             }}
           />
+          <div>
+            <span>미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.</span>
+          </div>
         </div>
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
@@ -84,13 +102,41 @@ function InstallContentsKubernetes2() {
           color="secondary"
           size="small"
           onClick={() => {
-            dispatchKubeInstall({
-              page: 1
-            });
+            handleClickOpen();
           }}
         >
           취소
         </Button>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+            쿠버네티스 설정 화면에서 나가시겠습니까?
+            설정 내용은 저장되지 않습니다.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleClose();
+                dispatchKubeInstall({
+                  page: 1
+                });
+              }}
+              color="primary"
+            >
+              나가기
+            </Button>
+            <Button onClick={handleClose} color="primary" autoFocus>
+              취소
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );

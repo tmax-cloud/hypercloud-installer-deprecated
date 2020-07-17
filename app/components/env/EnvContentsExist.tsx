@@ -36,8 +36,10 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DeleteIcon from '@material-ui/icons/Delete';
 import styles from './EnvContentsExist.css';
 import { HomePageContext } from '../../containers/HomePage';
+import { EnvPageContext } from '../../containers/EnvPage';
 import CONST from '../../utils/constants/constant';
-import env from '../../utils/constants/env.json';
+// import env from '../../utils/constants/env.json';
+import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
 import Node, { Role } from '../../utils/class/Node';
 
@@ -321,10 +323,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 // };
 
 export default function EnvContentsExist() {
-  const [rows, setRows] = useState(env);
+  console.debug('EnvContentsExist');
+  const [rows, setRows] = useState(env.loadEnv());
 
   const homePageContext = useContext(HomePageContext);
   const { dispatchHomePage } = homePageContext;
+
+  const envPageState = useContext(EnvPageContext);
+  const { dispatchEnvPage } = envPageState;
 
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('desc');
@@ -516,14 +522,11 @@ export default function EnvContentsExist() {
             scope="row"
             padding="none"
             onClick={() => {
-              const node = env.filter(environment => {
-                return environment.name === row.name;
-              })[0];
               dispatchHomePage({
                 type: 'SET_MODE',
                 data: {
                   mode: CONST.HOME.INSTALL,
-                  node
+                  env: env.getEnvByName(row.name)
                 }
               });
             }}
@@ -610,27 +613,21 @@ export default function EnvContentsExist() {
             <DialogActions>
               <Button
                 onClick={() => {
+                  // dialog 닫기
                   handleClose();
+
+                  // 선택된 환경 삭제
                   selected.map(name => {
-                    for (let i = 0; i < env.length; i += 1) {
-                      if (name === env[i].name) {
-                        env.splice(i, 1);
-                        break;
-                      }
-                    }
+                    env.deleteEnvByName(name);
                   });
-                  const jsonData = JSON.stringify(env);
-                  const fs = require('fs');
-                  fs.writeFile(
-                    './app/utils/constants/env.json',
-                    jsonData,
-                    function(err) {
-                      if (err) {
-                        console.log(err);
-                      }
-                    }
-                  );
-                  setRows(env);
+
+                  // 모두 지워졌으면 not exist 화면으로
+                  const envList = env.loadEnv();
+                  if (envList.length > 0) {
+                    setRows(envList);
+                  } else {
+                    dispatchEnvPage(CONST.ENV.MANAGE);
+                  }
                 }}
                 color="primary"
               >
@@ -659,7 +656,7 @@ export default function EnvContentsExist() {
                 setRows(searchResultEnv);
               }}
             /> */}
-            <span style={{ marginRight: '15px' }}>{env.length}
+            <span style={{ marginRight: '15px' }}>{rows.length}
 개
 </span>
             <FormControl className={styles.select}>
@@ -688,8 +685,9 @@ export default function EnvContentsExist() {
               }}
               size="small"
               onChange={e => {
+                console.log(rows);
                 const searchResultEnv = [];
-                env.map(environment => {
+                env.loadEnv().map(environment => {
                   if (environment.name.indexOf(e.target.value) !== -1) {
                     searchResultEnv.push(environment);
                   }

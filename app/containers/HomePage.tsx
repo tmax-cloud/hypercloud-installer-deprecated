@@ -20,7 +20,7 @@ export const HomePageContext = React.createContext('');
 
 const initialState = {
   mode: CONST.HOME.ENV,
-  node: null
+  env: null
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -37,7 +37,7 @@ function HomePage() {
   const getPage = () => {
     switch (homePageState.mode) {
       case CONST.HOME.INSTALL:
-        return <InstallPage node={homePageState.node} />;
+        return <InstallPage env={homePageState.env} />;
       case CONST.HOME.ENV:
         return <EnvPage />;
       default:
