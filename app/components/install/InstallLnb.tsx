@@ -1,24 +1,22 @@
-import React, { useContext, useEffect } from 'react';
+/* eslint-disable import/no-cycle */
+import React, { useContext, useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import SendIcon from '@material-ui/icons/Send';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
-import { FormControl, Select } from '@material-ui/core';
+import { FormControl, Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
+import { Link } from 'react-router-dom';
+import HelpIcon from '@material-ui/icons/Help';
 import styles from './InstallLnb.css';
-import { HomePageContext } from '../../containers/HomePage';
-import { InstallPageContext } from '../../containers/InstallPage';
+import { AppContext } from '../../containers/HomePage';
+// import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
 import * as env from '../../utils/common/env';
+import routes from '../../utils/constants/routes.json';
+import InstalledImage from '../../../resources/assets/ic_finish.svg';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,49 +32,58 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallLnb() {
-  const homePageContext = useContext(HomePageContext);
-  const { homePageState, dispatchHomePage } = homePageContext;
+function InstallLnb(props: any) {
+  console.debug('InstallLnb');
 
-  const installPageContext = useContext(InstallPageContext);
-  const { installPageState, dispatchInstallPage } = installPageContext;
+  const { history } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open] = React.useState(true);
   const handleClick = () => {
     // setOpen(!open);
   };
 
-  // const [age, setAge] = React.useState('');
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    // setAge(event.target.value as string);
-    dispatchInstallPage({
-      type: 'SET_ENV',
-      data: {
-        mode: CONST.INSTALL.MAIN,
-        env: env.getEnvByName(event.target.value as string)
-      }
+    dispatchAppState({
+      env: env.getEnvByName(event.target.value as string)
     });
   };
 
-  const goEnvPage = () => {
-    dispatchHomePage({
-      type: 'SET_MODE',
-      data: {
-        mode: CONST.HOME.ENV
-      }
-    });
-  };
-
-  const goProductInstallPage = name => {
-    if (name === 'Kubernetes') {
-      dispatchInstallPage({
-        type: 'SET_MODE',
-        data: {
-          mode: CONST.INSTALL.KUBERNETES
-        }
-      });
+  const goProductInstallPage = productName => {
+    if (productName === 'Kubernetes') {
+      history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
     }
+  };
+
+  const getInstalledImage = productName => {
+    for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
+      const target = appState.env.installedProducts[i];
+      if (target.name === productName) {
+        return <img src={InstalledImage} alt="Logo" />;
+      }
+    }
+    return '';
+  };
+
+  const isAllRequiredProductInstall = () => {
+    for (let i = 0; i < CONST.PRODUCT.REQUIRED.length; i += 1) {
+      const target = CONST.PRODUCT.REQUIRED[i].NAME;
+      let isInstalled = false;
+      for (let j = 0; j < appState.env.installedProducts.length; j += 1) {
+        const target2 = appState.env.installedProducts[j].name;
+        if (target === target2) {
+          isInstalled = true;
+          break;
+        }
+      }
+      if (!isInstalled) {
+        return false;
+      }
+    }
+    return true;
   };
 
   return (
@@ -86,7 +93,7 @@ function InstallLnb() {
           {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
           <Select
             native
-            value={installPageState.env.name}
+            value={appState.env.name}
             onChange={handleChange}
             inputProps={{
               name: 'age',
@@ -103,7 +110,9 @@ function InstallLnb() {
             })}
           </Select>
         </FormControl>
-        <SettingsIcon onClick={goEnvPage} />
+        <Link to={routes.HOME}>
+          <SettingsIcon />
+        </Link>
       </div>
       <List
         component="nav"
@@ -113,12 +122,7 @@ function InstallLnb() {
             component="div"
             id="nested-list-subheader"
             onClick={() => {
-              dispatchInstallPage({
-                type: 'SET_MODE',
-                data: {
-                  mode: CONST.INSTALL.MAIN
-                }
-              });
+              history.push(`${routes.INSTALL.HOME}/${appState.env.name}/main`);
             }}
           >
             제품 목록
@@ -146,6 +150,8 @@ function InstallLnb() {
                 {/* <ListItemIcon>
                 <StarBorder />
               </ListItemIcon> */}
+                {/* <CheckCircleIcon /> */}
+                {getInstalledImage(P.NAME)}
                 <ListItemText primary={P.NAME} />
               </ListItem>
             ))}
@@ -158,7 +164,25 @@ function InstallLnb() {
           {/* <ListItemIcon>
             <InboxIcon />
           </ListItemIcon> */}
-          <ListItemText primary="호환 제품" />
+          {isAllRequiredProductInstall() ? (
+            <ListItemText primary="호환 제품" />
+          ) : (
+            <div
+              className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+            >
+              <div>
+                <ListItemText primary="호환 제품" />
+              </div>
+              <Tooltip
+                title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
+                placement="right"
+              >
+                <HelpIcon fontSize="small" />
+              </Tooltip>
+              <div />
+            </div>
+          )}
+
           {/* {open ? <ExpandLess /> : <ExpandMore />} */}
         </ListItem>
         <Collapse in={open} timeout="auto" unmountOnExit>
@@ -171,10 +195,12 @@ function InstallLnb() {
                 onClick={() => {
                   goProductInstallPage(P.NAME);
                 }}
+                disabled={!isAllRequiredProductInstall()}
               >
                 {/* <ListItemIcon>
                 <StarBorder />
               </ListItemIcon> */}
+                {getInstalledImage(P.NAME)}
                 <ListItemText primary={P.NAME} />
               </ListItem>
             ))}

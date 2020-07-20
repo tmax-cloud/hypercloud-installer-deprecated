@@ -1,9 +1,11 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useContext } from 'react';
 import styles from './InstallContentsKubernetes.css';
 import InstallContentsKubernetes1 from './InstallContentsKubernetes1';
 import InstallContentsKubernetes2 from './InstallContentsKubernetes2';
 import InstallContentsKubernetes3 from './InstallContentsKubernetes3';
 import InstallContentsKubernetes4 from './InstallContentsKubernetes4';
+import InstallContentsKubernetesAlready from './InstallContentsKubernetesAlready';
+import { AppContext } from '../../containers/HomePage';
 
 const initialState = {
   version: '1.17.3',
@@ -17,6 +19,10 @@ const reducer = (state, action) => {
 
 function InstallContentsKubernetes() {
   console.log('InstallContentsKubernetes');
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
   const [kubeInstallState, dispatchKubeInstall] = useReducer(
     reducer,
     initialState
@@ -24,14 +30,28 @@ function InstallContentsKubernetes() {
 
   const getComponent = () => {
     let component;
-    if (kubeInstallState.page === 1) {
-      component = <InstallContentsKubernetes1 />;
-    } else if (kubeInstallState.page === 2) {
-      component = <InstallContentsKubernetes2 />;
-    } else if (kubeInstallState.page === 3) {
-      component = <InstallContentsKubernetes3 />;
-    } else if (kubeInstallState.page === 4) {
-      component = <InstallContentsKubernetes4 />;
+
+    let isInstalled = false;
+    for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
+      const target = appState.env.installedProducts[i];
+      if (target.name === 'Kubernetes') {
+        isInstalled = true;
+        break;
+      }
+    }
+
+    if (!isInstalled) {
+      if (kubeInstallState.page === 1) {
+        component = <InstallContentsKubernetes1 />;
+      } else if (kubeInstallState.page === 2) {
+        component = <InstallContentsKubernetes2 />;
+      } else if (kubeInstallState.page === 3) {
+        component = <InstallContentsKubernetes3 />;
+      } else if (kubeInstallState.page === 4) {
+        component = <InstallContentsKubernetes4 />;
+      }
+    } else {
+      component = <InstallContentsKubernetesAlready />;
     }
 
     return component;

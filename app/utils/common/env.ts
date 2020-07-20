@@ -25,7 +25,7 @@ export function getEnvByName(name: string) {
       return envList[i];
     }
   }
-  throw new Error();
+  return null;
 }
 
 export function deleteEnvByName(name: string) {
@@ -43,4 +43,12 @@ export function appendEnv(env) {
   const envList = loadEnv();
   envList.push(env);
   saveEnv(envList);
+}
+
+export function isEmpty() {
+  const envList = loadEnv();
+  if (envList.length > 0) {
+    return false;
+  }
+  return true;
 }

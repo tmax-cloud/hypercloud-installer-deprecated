@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useContext } from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -17,35 +17,119 @@ import {
   DialogActions,
   Button,
   TextField,
-  InputAdornment
+  InputAdornment,
+  CircularProgress,
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import CONST from '../../utils/constants/constant';
+import { green } from '@material-ui/core/colors';
+import clsx from 'clsx';
 import styles from './EnvContentsAdd.css';
-// import env from '../../utils/constants/env.json';
 import * as env from '../../utils/common/env';
 import * as Common from '../../utils/common/ssh';
+import routes from '../../utils/constants/routes.json';
+import { AppContext } from '../../containers/HomePage';
+import { Role } from '../../utils/class/Node';
 
-interface Props {
-  dispatchEnvPage: Function;
-}
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    wrapper: {
+      margin: theme.spacing(1),
+      position: 'relative'
+    },
+    buttonSuccess: {
+      backgroundColor: green[500],
+      '&:hover': {
+        backgroundColor: green[700]
+      }
+    },
+    fabProgress: {
+      color: green[500],
+      position: 'absolute',
+      top: -6,
+      left: -6,
+      zIndex: 1
+    },
+    buttonProgress: {
+      color: green[500],
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginTop: -12,
+      marginLeft: -12
+    }
+  })
+);
 
-function EnvContentsAdd(props: Props) {
+function EnvContentsAdd(props: any) {
   console.debug('EnvContentsAdd');
-  const { dispatchEnvPage } = props;
+  console.log(props);
 
-  const envList = env.loadEnv();
+  const { history, location, match } = props;
 
-  const [state, setState] = useState({
-    data: []
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
+  const classes = useStyles();
+  const [loading, setLoading] = React.useState(false);
+  const timer = React.useRef<number>();
+  const handleButtonClick = () => {
+    if (!loading) {
+      // setSuccess(false);
+      setLoading(true);
+      // timer.current = setTimeout(() => {
+      //   // setSuccess(true);
+      //   setLoading(false);
+      // }, 2000);
+    }
+  };
+  const buttonClassname = clsx({
+    // [classes.buttonSuccess]: success
   });
 
-  const [selected, setSelected] = React.useState<string[]>([]);
+  const editTargetEnv = env.getEnvByName(match.params.envName);
+  const [state, setState] = useState(() => {
+    // edit page
+    if (editTargetEnv) {
+      return {
+        data: editTargetEnv.nodes
+      };
+    }
 
-  const [name, setName] = useState('');
+    // add page
+    return {
+      data: []
+    };
+  });
+
+  const [selected, setSelected] = React.useState<string[]>(() => {
+    // edit page
+    if (editTargetEnv) {
+      const result = [];
+      for (let i = 0; i < editTargetEnv.nodes.length; i += 1) {
+        if (editTargetEnv.nodes[i].role === Role.MASTER) {
+          result.push(editTargetEnv.nodes[i].ip);
+        }
+      }
+      return result;
+    }
+
+    // add page
+    return [];
+  });
+
+  const [name, setName] = useState(() => {
+    if (editTargetEnv) {
+      return editTargetEnv.name;
+    }
+    return '';
+  });
   const [nameError, setNameError] = useState('');
   const hasNameError = (target = name, setFunc = setNameError) => {
     if (target.length === 0) {
@@ -53,11 +137,25 @@ function EnvContentsAdd(props: Props) {
       return true;
     }
 
-    for (let i = 0; i < envList.length; i += 1) {
-      if (target === envList[i].name) {
-        console.debug(target, envList[i].name);
-        setFunc('중복 된 이름이 존재합니다.');
-        return true;
+    if (editTargetEnv) {
+      if (target !== editTargetEnv.name) {
+        const envList = env.loadEnv();
+        for (let i = 0; i < envList.length; i += 1) {
+          if (target === envList[i].name) {
+            console.debug(target, envList[i].name);
+            setFunc('중복 된 이름이 존재합니다.');
+            return true;
+          }
+        }
+      }
+    } else {
+      const envList = env.loadEnv();
+      for (let i = 0; i < envList.length; i += 1) {
+        if (target === envList[i].name) {
+          console.debug(target, envList[i].name);
+          setFunc('중복 된 이름이 존재합니다.');
+          return true;
+        }
       }
     }
 
@@ -166,20 +264,19 @@ function EnvContentsAdd(props: Props) {
   };
 
   const [open, setOpen] = React.useState(false);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
 
-  const useStyles = makeStyles({
-    table: {
-      minWidth: 650
-    }
-  });
+  // const useStyles = makeStyles({
+  //   table: {
+  //     minWidth: 650
+  //   }
+  // });
+  // const classes = useStyles();
 
   // function createData(
   //   name: string,
@@ -209,7 +306,9 @@ function EnvContentsAdd(props: Props) {
     //   );
     // }
     // setSelected(newSelected);
-    setSelected([clickedIp]);
+    if (!editTargetEnv) {
+      setSelected([clickedIp]);
+    }
   };
 
   const isSelected = (clickedIp: string) => {
@@ -234,8 +333,6 @@ function EnvContentsAdd(props: Props) {
       />
     );
   };
-
-  const classes = useStyles();
 
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
@@ -303,6 +400,7 @@ function EnvContentsAdd(props: Props) {
                 label="IP"
                 variant="outlined"
                 size="small"
+                disabled={loading}
                 value={ip}
                 onChange={e => {
                   setIp(e.target.value);
@@ -346,6 +444,7 @@ function EnvContentsAdd(props: Props) {
                 label="Port"
                 variant="outlined"
                 size="small"
+                disabled={loading}
                 value={port}
                 onChange={e => {
                   setPort(e.target.value);
@@ -398,6 +497,7 @@ function EnvContentsAdd(props: Props) {
                   label="Password"
                   variant="outlined"
                   size="small"
+                  disabled={loading}
                   value={password}
                   onChange={e => {
                     setPassword(e.target.value);
@@ -471,10 +571,11 @@ function EnvContentsAdd(props: Props) {
           </div>
           <div className="left">
             <Button
-              className={styles.addRemoveButton}
+              className={[styles.addRemoveButton, buttonClassname].join(' ')}
               variant="contained"
               color="primary"
               size="small"
+              disabled={loading}
               onClick={() => {
                 let hasError = false;
                 if (hasIpError()) hasError = true;
@@ -482,6 +583,7 @@ function EnvContentsAdd(props: Props) {
                 if (hasPasswordError()) hasError = true;
                 if (hasError) return;
 
+                handleButtonClick();
                 setTotalError('');
                 Common.connectionTest({
                   ip,
@@ -523,11 +625,17 @@ function EnvContentsAdd(props: Props) {
                     setTotalError(
                       '입력 정보를 확인해주세요. (ssh connection error)'
                     );
+                  })
+                  .finally(() => {
+                    setLoading(false);
                   });
               }}
             >
               <AddIcon />
             </Button>
+            {loading && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
           </div>
         </div>
         <div
@@ -540,7 +648,7 @@ function EnvContentsAdd(props: Props) {
         </div>
         <div className={[styles.table, 'clear'].join(' ')}>
           <TableContainer component={Paper} variant="outlined">
-            <Table className={classes.table} aria-label="simple table">
+            <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell
@@ -581,7 +689,9 @@ function EnvContentsAdd(props: Props) {
                       scope="row"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <Radio checked={isSelected(row.ip)} />
+                      <Radio checked={isSelected(row.ip)}
+                        disabled={editTargetEnv ? true : false}
+                      />
                     </TableCell>
                     <TableCell
                       align="center"
@@ -604,6 +714,7 @@ function EnvContentsAdd(props: Props) {
                         variant="contained"
                         color="secondary"
                         size="small"
+                        disabled={row.role === Role.MASTER}
                         onClick={e => {
                           // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
                           e.stopPropagation();
@@ -659,50 +770,67 @@ function EnvContentsAdd(props: Props) {
               if (hasError) return;
 
               // json 파일 저장
-              console.debug(state.data);
-              const newEnv = {
-                name,
-                nodes: [],
-                installedProducts: [],
-                updatedTime: new Date().getTime()
-              };
-              for (let i = 0; i < state.data.length; i++) {
-                const node = state.data[i];
-                // worker
-                let role = 1;
-                console.debug(node.ip);
-                console.debug(selected);
-                if (selected.indexOf(node.ip) !== -1) {
-                  // master
-                  role = 0;
+              if (editTargetEnv) {
+                // 수정
+                const newEnv = {
+                  name,
+                  nodes: [],
+                  installedProducts: editTargetEnv.installedProducts,
+                  updatedTime: new Date().getTime()
+                };
+                for (let i = 0; i < state.data.length; i += 1) {
+                  const node = state.data[i];
+                  // worker
+                  let role = 1;
+                  console.debug(node.ip);
+                  console.debug(selected);
+                  if (selected.indexOf(node.ip) !== -1) {
+                    // master
+                    role = 0;
+                  }
+                  newEnv.nodes.push({
+                    ip: node.ip,
+                    password: node.password,
+                    port: node.port,
+                    user: 'root',
+                    role
+                  });
                 }
-                newEnv.nodes.push({
-                  ip: node.ip,
-                  password: node.password,
-                  port: node.port,
-                  user: 'root',
-                  role
-                });
+                // 삭제 후 추가
+                env.deleteEnvByName(editTargetEnv.name);
+                env.appendEnv(newEnv);
+              } else {
+                // 추가
+                const newEnv = {
+                  name,
+                  nodes: [],
+                  installedProducts: [],
+                  updatedTime: new Date().getTime()
+                };
+                for (let i = 0; i < state.data.length; i += 1) {
+                  const node = state.data[i];
+                  // worker
+                  let role = 1;
+                  console.debug(node.ip);
+                  console.debug(selected);
+                  if (selected.indexOf(node.ip) !== -1) {
+                    // master
+                    role = 0;
+                  }
+                  newEnv.nodes.push({
+                    ip: node.ip,
+                    password: node.password,
+                    port: node.port,
+                    user: 'root',
+                    role
+                  });
+                }
+                env.appendEnv(newEnv);
               }
-              // env.push(newEnv);
-              // console.debug('env', env);
-              // const jsonData = JSON.stringify(env);
-              // const fs = require('fs');
-              // fs.writeFileSync(
-              //   './app/utils/constants/env.json',
-              //   jsonData,
-              //   function(err) {
-              //     if (err) {
-              //       console.debug(err);
-              //     }
-              //   }
-              // );
-              // MANAGE 모드로 변경
-              env.appendEnv(newEnv);
-              dispatchEnvPage(CONST.ENV.MANAGE);
+              history.push(routes.ENV.EXIST);
             }}
           >
-            추가
+            {editTargetEnv ? '저장' : '추가'}
           </Button>
           <Button
             variant="contained"
@@ -722,16 +850,27 @@ function EnvContentsAdd(props: Props) {
           >
             <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
             <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                환경 추가 화면에서 나가시겠습니까? 설정 내용은 저장되지
-                않습니다.
-              </DialogContentText>
+              {editTargetEnv ? (
+                <DialogContentText id="alert-dialog-description">
+                  환경 수정 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                  않습니다.
+                </DialogContentText>
+              ) : (
+                <DialogContentText id="alert-dialog-description">
+                  환경 추가 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                  않습니다.
+                </DialogContentText>
+              )}
             </DialogContent>
             <DialogActions>
               <Button
                 onClick={() => {
                   handleClose();
-                  dispatchEnvPage(CONST.ENV.MANAGE);
+                  if (!env.isEmpty()) {
+                    history.push(routes.ENV.EXIST);
+                  } else {
+                    history.push(routes.ENV.NOT_EXIST);
+                  }
                 }}
                 color="primary"
               >

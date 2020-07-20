@@ -28,11 +28,9 @@ function InstallContentsKubernetes2() {
   const [registry, setRegistry] = React.useState('');
 
   const [open, setOpen] = React.useState(false);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -68,7 +66,7 @@ function InstallContentsKubernetes2() {
         <div>
           <TextField
             id="outlined"
-            label="Registry"
+            label="예:192.168.6.169:5000"
             variant="outlined"
             size="small"
             value={registry}

@@ -1,59 +1,44 @@
 /* eslint-disable import/no-cycle */
 import React, { useReducer } from 'react';
-import { Switch } from 'react-router';
-import { Route } from 'react-router-dom';
-import CONST from '../utils/constants/constant';
+import { Switch, Route } from 'react-router-dom';
+import { Redirect } from 'react-router';
 import InstallPage from './InstallPage';
 import EnvPage from './EnvPage';
-import routes from '../../utils/constants/routes.json';
-import env from '../../utils/constants/env.json';
-import EnvContentsExist from '../components/env/EnvContentsExist';
-import EnvContentsNotExist from '../components/env/EnvContentsNotExist';
-import EnvContentsAdd from '../components/env/EnvContentsAdd';
-import EnvManagePage from './EnvManagePage';
-import EnvEmptyPage from './EnvEmptyPage';
+import routes from '../utils/constants/routes.json';
 
 // component간 depth가 깊어지면
 // props전달로는 한계가 있으므로
 // Context를 활용
-export const HomePageContext = React.createContext('');
+export const AppContext = React.createContext('');
 
 const initialState = {
-  mode: CONST.HOME.ENV,
   env: null
 };
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_MODE':
-      return { ...state, ...action.data };
-    default:
-      throw new Error();
-  }
+const reducer = (state: any, action: any) => {
+  return { ...state, ...action };
 };
 
 function HomePage() {
-  const [homePageState, dispatchHomePage] = useReducer(reducer, initialState);
+  console.debug('HomePage');
 
-  const getPage = () => {
-    switch (homePageState.mode) {
-      case CONST.HOME.INSTALL:
-        return <InstallPage env={homePageState.env} />;
-      case CONST.HOME.ENV:
-        return <EnvPage />;
-      default:
-        throw new Error();
-    }
-  };
+  const [appState, dispatchAppState] = useReducer(reducer, initialState);
 
   return (
-    <HomePageContext.Provider
+    <AppContext.Provider
       value={{
-        homePageState,
-        dispatchHomePage
+        appState,
+        dispatchAppState
       }}
     >
-      {getPage()}
-    </HomePageContext.Provider>
+      <Switch>
+        <Route path={routes.ENV.HOME} component={EnvPage} />
+        <Route
+          path={`${routes.INSTALL.HOME}/:envName`}
+          component={InstallPage}
+        />
+        <Redirect path="/" to={routes.ENV.HOME} />
+      </Switch>
+    </AppContext.Provider>
   );
 }
 

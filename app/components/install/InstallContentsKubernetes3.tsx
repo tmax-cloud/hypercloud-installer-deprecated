@@ -1,18 +1,21 @@
 import React, { useContext } from 'react';
 import { KubeInstallContext } from './InstallContentsKubernetes';
-import { InstallPageContext } from '../../containers/InstallPage';
+// import { InstallPageContext } from '../../containers/InstallPage';
 import LinearProgress from '@material-ui/core/LinearProgress/LinearProgress';
 import styles from './InstallContentsKubernetes3.css';
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import Node, { Role } from '../../utils/class/Node';
+import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
 import ProgressBar from '../ProgressBar';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3() {
-  const installPageContext = useContext(InstallPageContext);
-  const { installPageState, dispatchInstallPage } = installPageContext;
+  // const installPageContext = useContext(InstallPageContext);
+  // const { installPageState, dispatchInstallPage } = installPageContext;
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const kubeInstallContext = useContext(KubeInstallContext);
   const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;

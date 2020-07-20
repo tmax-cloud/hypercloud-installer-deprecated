@@ -1,6 +1,14 @@
 {
   "HOME": "/",
   "COUNTER": "/counter",
-  "ENV":"/env",
-  "INSTALL":"/install"
+  "ENV": {
+    "HOME": "/env",
+    "EXIST": "/env/exist",
+    "NOT_EXIST": "/env/not-exist",
+    "ADD": "/env/add",
+    "EDIT": "/env/edit"
+  },
+  "INSTALL": {
+    "HOME": "/install"
+  }
 }

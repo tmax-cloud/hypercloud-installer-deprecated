@@ -5,6 +5,7 @@ import { hot } from 'react-hot-loader/root';
 import { History } from 'history';
 import { Store } from '../reducers/types';
 import Routes from '../Routes';
+import { BrowserRouter } from 'react-router-dom';
 
 type Props = {
   store: Store;

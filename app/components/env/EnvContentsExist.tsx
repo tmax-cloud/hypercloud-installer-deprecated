@@ -23,7 +23,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
   Select,
@@ -34,14 +33,13 @@ import {
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { Link } from 'react-router-dom';
 import styles from './EnvContentsExist.css';
-import { HomePageContext } from '../../containers/HomePage';
-import { EnvPageContext } from '../../containers/EnvPage';
-import CONST from '../../utils/constants/constant';
-// import env from '../../utils/constants/env.json';
+import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
-import Node, { Role } from '../../utils/class/Node';
+import { Role } from '../../utils/class/Node';
+import routes from '../../utils/constants/routes.json';
 
 // interface Data {
 //   calories: number;
@@ -322,15 +320,15 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 //   );
 // };
 
-export default function EnvContentsExist() {
+export default function EnvContentsExist(props: any) {
   console.debug('EnvContentsExist');
+
+  const { history, location, match } = props;
+
   const [rows, setRows] = useState(env.loadEnv());
 
-  const homePageContext = useContext(HomePageContext);
-  const { dispatchHomePage } = homePageContext;
-
-  const envPageState = useContext(EnvPageContext);
-  const { dispatchEnvPage } = envPageState;
+  const appContext = useContext(AppContext);
+  const { dispatchAppState } = appContext;
 
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('desc');
@@ -341,17 +339,6 @@ export default function EnvContentsExist() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   // search
-  const useSlectStyles = makeStyles((theme: Theme) =>
-    createStyles({
-      formControl: {
-        margin: theme.spacing(1.6),
-        minWidth: 120
-      },
-      selectEmpty: {
-        marginTop: theme.spacing(5)
-      }
-    })
-  );
   const [age, setAge] = React.useState('');
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setAge(event.target.value as string);
@@ -483,7 +470,7 @@ export default function EnvContentsExist() {
           </div>
         );
       }
-      console.log(component);
+      // console.log(component);
       return component;
     };
 
@@ -522,22 +509,36 @@ export default function EnvContentsExist() {
             scope="row"
             padding="none"
             onClick={() => {
-              dispatchHomePage({
-                type: 'SET_MODE',
-                data: {
-                  mode: CONST.HOME.INSTALL,
-                  env: env.getEnvByName(row.name)
-                }
-              });
+              // dispatchHomePage({
+              //   type: 'SET_MODE',
+              //   data: {
+              //     mode: CONST.HOME.INSTALL,
+              //     env: env.getEnvByName(row.name)
+              //   }
+              // });
             }}
           >
-            {row.name}
+            <Link to={`${routes.INSTALL.HOME}/${row.name}`}>
+              <span
+                onClick={() => {
+                  dispatchAppState({
+                    env: env.getEnvByName(row.name)
+                  });
+                }}
+              >
+                {row.name}
+              </span>
+            </Link>
           </TableCell>
           <TableCell>{row.nodes.length}</TableCell>
           <TableCell>{row.installedProducts.length}</TableCell>
           <TableCell>{new Date(row.updatedTime).toString()}</TableCell>
           <TableCell>
-            <EditIcon />
+            <EditIcon
+              onClick={() => {
+                history.push(`${routes.ENV.EDIT}/${row.name}`);
+              }}
+            />
           </TableCell>
         </TableRow>
         <TableRow>
@@ -626,7 +627,8 @@ export default function EnvContentsExist() {
                   if (envList.length > 0) {
                     setRows(envList);
                   } else {
-                    dispatchEnvPage(CONST.ENV.MANAGE);
+                    // dispatchEnvPage(CONST.ENV.MANAGE);
+                    history.push(routes.ENV.NOT_EXIST);
                   }
                 }}
                 color="primary"

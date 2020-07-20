@@ -1,36 +1,37 @@
 /* eslint-disable import/no-cycle */
-import React, { useContext } from 'react';
+import React, { useEffect } from 'react';
+import { Switch, Route } from 'react-router-dom';
 import * as env from '../../utils/common/env';
 import EnvContentsExist from './EnvContentsExist';
 import EnvContentsNotExist from './EnvContentsNotExist';
 import EnvContentsAdd from './EnvContentsAdd';
 import styles from './EnvContents.css';
-import CONST from '../../utils/constants/constant';
-import { EnvPageContext } from '../../containers/EnvPage';
+import routes from '../../utils/constants/routes.json';
 
-function EnvContents() {
-  // const { mode, setMode } = props;
-  const envPageContext = useContext(EnvPageContext);
-  const { envPageState, dispatchEnvPage } = envPageContext;
+function EnvContents(props: any) {
+  console.debug('EnvContents');
 
-  const getComponent = () => {
-    let component;
-    if (envPageState.mode === CONST.ENV.MANAGE) {
-      if (env.loadEnv().length > 0) {
-        component = <EnvContentsExist />;
-      } else {
-        component = <EnvContentsNotExist dispatchEnvPage={dispatchEnvPage} />;
-      }
-    } else if (envPageState.mode === CONST.ENV.ADD) {
-      component = <EnvContentsAdd dispatchEnvPage={dispatchEnvPage} />;
+  const { history } = props;
+
+  useEffect(() => {
+    if (!env.isEmpty()) {
+      history.push(routes.ENV.EXIST);
+    } else {
+      history.push(routes.ENV.NOT_EXIST);
     }
-
-    return component;
-  };
+  }, []);
 
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      {getComponent()}
+      <Switch>
+        <Route path={routes.ENV.EXIST} component={EnvContentsExist} />
+        <Route path={routes.ENV.NOT_EXIST} component={EnvContentsNotExist} />
+        <Route path={routes.ENV.ADD} component={EnvContentsAdd} />
+        <Route
+          path={`${routes.ENV.EDIT}/:envName`}
+          component={EnvContentsAdd}
+        />
+      </Switch>
     </div>
   );
 }

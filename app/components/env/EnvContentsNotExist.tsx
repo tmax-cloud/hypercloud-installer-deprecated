@@ -1,18 +1,14 @@
 import React from 'react';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
-import styles from './EnvContentsNotExist.css';
-import CONST from '../../utils/constants/constant';
 import { Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
+import { Link } from 'react-router-dom';
 import EmptyImage from '../../../resources/assets/img_empty.svg';
+import styles from './EnvContentsNotExist.css';
+import routes from '../../utils/constants/routes.json';
 
-interface Props {
-  dispatchEnvPage: Function;
-}
-
-function EnvContentsNotExist(props: Props) {
+function EnvContentsNotExist() {
   console.debug('EnvContentsNotExist');
-  const { dispatchEnvPage } = props;
+
   // const IMG_PATH = './constants/empty.png';
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
@@ -30,17 +26,16 @@ function EnvContentsNotExist(props: Props) {
           <span>추가하려면, 아래의 버튼을 클릭해 주세요.</span>
         </div>
         <div>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            size="small"
-            onClick={() => {
-              dispatchEnvPage(CONST.ENV.ADD);
-            }}
-          >
-            환경 추가
-          </Button>
+          <Link to={routes.ENV.ADD}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              size="small"
+            >
+              환경 추가
+            </Button>
+          </Link>
         </div>
         <div className={styles.textBox}>
           <span>추가한 환경에 제품을 설치할 수 있습니다.</span>

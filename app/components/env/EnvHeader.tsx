@@ -1,39 +1,46 @@
 /* eslint-disable import/no-cycle */
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import { Link } from 'react-router-dom';
 import styles from './EnvHeader.css';
-import CONST from '../../utils/constants/constant';
-import { EnvPageContext } from '../../containers/EnvPage';
+import routes from '../../utils/constants/routes.json';
 
-function EnvHeader() {
-  const envPageContext = useContext(EnvPageContext);
-  const { envPageState, dispatchEnvPage } = envPageContext;
+function EnvHeader(props: any) {
+  console.debug('EnvHeader');
+
+  const { history, location } = props;
 
   let title = '';
-  if (envPageState.mode === CONST.ENV.MANAGE) {
+  if (
+    location.pathname === routes.ENV.EXIST ||
+    location.pathname === routes.ENV.NOT_EXIST
+  ) {
     title = '환경 관리';
-  } else if (envPageState.mode === CONST.ENV.ADD) {
+  } else if (location.pathname === routes.ENV.ADD) {
     title = '환경 추가';
+  } else if (location.pathname === routes.ENV.EDIT) {
+    title = '환경 수정';
   }
 
   const getButton = () => {
-    if (envPageState.mode === CONST.ENV.MANAGE) {
+    if (
+      location.pathname === routes.ENV.EXIST ||
+      location.pathname === routes.ENV.NOT_EXIST
+    ) {
       return (
-        <>
-          <Button
-            className={styles.addButton}
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            size="small"
-            onClick={() => {
-              dispatchEnvPage(CONST.ENV.ADD);
-            }}
-          >
-            추가
-          </Button>
-        </>
+        <Button
+          className={styles.addButton}
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          size="small"
+          onClick={()=>{
+            history.push(routes.ENV.ADD);
+          }}
+        >
+          추가
+        </Button>
       );
     }
     return null;

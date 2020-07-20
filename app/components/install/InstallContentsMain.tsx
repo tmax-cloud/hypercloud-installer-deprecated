@@ -1,9 +1,11 @@
+/* eslint-disable import/no-cycle */
 import React, { useContext } from 'react';
 import { Grid, Paper } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import styles from './InstallContentsMain.css';
 import CONST from '../../utils/constants/constant';
-import { InstallPageContext } from '../../containers/InstallPage';
+import { AppContext } from '../../containers/HomePage';
+import routes from '../../utils/constants/routes.json';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,9 +22,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallContentsMain() {
-  const installPageContext = useContext(InstallPageContext);
-  const { installPageState, dispatchInstallPage } = installPageContext;
+function InstallContentsMain(props: any) {
+  console.debug('InstallContentsMain');
+
+  const { history, location, match } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const classes = useStyles();
 
@@ -31,12 +37,13 @@ function InstallContentsMain() {
   const goProductInstallPage = (name) => {
     console.log('goProductInstallPage');
     if (name === 'Kubernetes') {
-      dispatchInstallPage({
-        type: 'SET_MODE',
-        data: {
-          mode: CONST.INSTALL.KUBERNETES
-        }
-      });
+      // dispatchInstallPage({
+      //   type: 'SET_MODE',
+      //   data: {
+      //     mode: CONST.INSTALL.KUBERNETES
+      //   }
+      // });
+      history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
     }
   };
 

@@ -1,17 +1,23 @@
 import React, { useContext } from 'react';
 import styles from './InstallContentsHeader.css';
-import { InstallPageContext } from '../../containers/InstallPage';
+// import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
+import { AppContext } from '../../containers/HomePage';
+import routes from '../../utils/constants/routes.json';
 
-function InstallContentsHeader() {
-  const installPageContext = useContext(InstallPageContext);
-  const { installPageState } = installPageContext;
+function InstallContentsHeader(props: any) {
+  // const installPageContext = useContext(InstallPageContext);
+  // const { installPageState } = installPageContext;
+  const { history, location, match } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const getComponent = () => {
     let component;
-    if (installPageState.mode === CONST.INSTALL.MAIN) {
+    if (location.pathname === routes.INSTALL.MAIN) {
       component = <div></div>;
-    } else if (installPageState.mode === CONST.INSTALL.KUBERNETES) {
+    } else if (location.pathname === routes.INSTALL.KUBERNETES) {
       component = <strong>쿠버네티스</strong>;
     }
 
@@ -19,7 +25,7 @@ function InstallContentsHeader() {
   };
   return (
     <div className={[styles.wrap].join(' ')}>
-      <pre>{installPageState.env.name}</pre>
+      <pre>{appState.env.name}</pre>
       {getComponent()}
     </div>
   );
