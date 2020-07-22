@@ -4,8 +4,8 @@
   /* color: white; */
 
   /* 전체 높이 - header 높이 */
-  height: calc(100vh - 50px);
+  height: calc(100% - 50px);
 
   /* overflow 시, 스크롤 생성 */
-  overflow: auto;
+  /* overflow: auto; */
 }

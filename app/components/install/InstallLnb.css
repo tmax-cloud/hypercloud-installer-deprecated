@@ -1,13 +1,27 @@
 .wrap {
   /* background: yellow; */
   width: 25%;
-  height: 100vh;
+  height: calc(100vh - 60px);
+}
+
+.selectEnv {
+  height:32px;
+}
+.lnb {
+  /* selectEnv 높이 만큼 빼준다. */
+  height: calc(100% - 32px);
+}
+.lnb nav {
+  padding: 0 !important;
 }
 
 @media (max-width: 600px) {
   .wrap {
     width: 100vw;
     height: 20%;
-    /* overflow: auto */
+    overflow: auto
+  }
+  .lnb {
+    /* height: 20%; */
   }
 }

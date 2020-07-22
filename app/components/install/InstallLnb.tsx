@@ -53,42 +53,31 @@ function InstallLnb(props: any) {
   };
 
   const goProductInstallPage = productName => {
-    if (productName === 'Kubernetes') {
+    if (productName === CONST.PRODUCT.KUBERNETES_TXT) {
       history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
     }
   };
 
   const getInstalledImage = productName => {
-    for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
-      const target = appState.env.installedProducts[i];
-      if (target.name === productName) {
-        return <img src={InstalledImage} alt="Logo" />;
-      }
+    if (env.isInstalled(productName, appState.env)) {
+      return <img src={InstalledImage} alt="Logo" />;
     }
     return '';
   };
 
   const isAllRequiredProductInstall = () => {
-    for (let i = 0; i < CONST.PRODUCT.REQUIRED.length; i += 1) {
-      const target = CONST.PRODUCT.REQUIRED[i].NAME;
-      let isInstalled = false;
-      for (let j = 0; j < appState.env.installedProducts.length; j += 1) {
-        const target2 = appState.env.installedProducts[j].name;
-        if (target === target2) {
-          isInstalled = true;
-          break;
-        }
-      }
-      if (!isInstalled) {
-        return false;
-      }
-    }
-    return true;
+    return env.isAllRequiredProductInstall(appState.env);
   };
 
   return (
     <div className={[styles.wrap, 'left'].join(' ')}>
-      <div className={['childUpDownCenter', 'childLeftRightCenter'].join(' ')}>
+      <div
+        className={[
+          'childUpDownCenter',
+          'childLeftRightCenter',
+          styles.selectEnv
+        ].join(' ')}
+      >
         <FormControl>
           {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
           <Select
@@ -114,99 +103,101 @@ function InstallLnb(props: any) {
           <SettingsIcon />
         </Link>
       </div>
-      <List
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-        subheader={
-          <ListSubheader
-            component="div"
-            id="nested-list-subheader"
-            onClick={() => {
-              history.push(`${routes.INSTALL.HOME}/${appState.env.name}/main`);
-            }}
-          >
-            제품 목록
-          </ListSubheader>
-        }
-        className={classes.root}
-      >
-        <ListItem>
-          {/* <ListItemIcon>
-            <DraftsIcon />
-          </ListItemIcon> */}
-          <ListItemText primary="필수 제품" />
-        </ListItem>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {CONST.PRODUCT.REQUIRED.map(P => (
-              <ListItem
-                key={P.NAME}
-                button
-                className={classes.nested}
-                onClick={() => {
-                  goProductInstallPage(P.NAME);
-                }}
-              >
-                {/* <ListItemIcon>
-                <StarBorder />
-              </ListItemIcon> */}
-                {/* <CheckCircleIcon /> */}
-                {getInstalledImage(P.NAME)}
-                <ListItemText primary={P.NAME} />
-              </ListItem>
-            ))}
-          </List>
-        </Collapse>
-        <ListItem
-          // button
-          onClick={handleClick}
-        >
-          {/* <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon> */}
-          {isAllRequiredProductInstall() ? (
-            <ListItemText primary="호환 제품" />
-          ) : (
-            <div
-              className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+      <div className={styles.lnb}>
+        <List
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          subheader={
+            <ListSubheader
+              component="div"
+              id="nested-list-subheader"
+              onClick={() => {
+                history.push(`${routes.INSTALL.HOME}/${appState.env.name}/main`);
+              }}
             >
-              <div>
-                <ListItemText primary="호환 제품" />
+              제품 목록
+            </ListSubheader>
+          }
+          className={classes.root}
+        >
+          <ListItem>
+            {/* <ListItemIcon>
+              <DraftsIcon />
+            </ListItemIcon> */}
+            <ListItemText primary="필수 제품" />
+          </ListItem>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {CONST.PRODUCT.REQUIRED.map(P => (
+                <ListItem
+                  key={P.NAME}
+                  button
+                  className={classes.nested}
+                  onClick={() => {
+                    goProductInstallPage(P.NAME);
+                  }}
+                >
+                  {/* <ListItemIcon>
+                  <StarBorder />
+                </ListItemIcon> */}
+                  {/* <CheckCircleIcon /> */}
+                  {getInstalledImage(P.NAME)}
+                  <ListItemText primary={P.NAME} />
+                </ListItem>
+              ))}
+            </List>
+          </Collapse>
+          <ListItem
+            // button
+            onClick={handleClick}
+          >
+            {/* <ListItemIcon>
+              <InboxIcon />
+            </ListItemIcon> */}
+            {isAllRequiredProductInstall() ? (
+              <ListItemText primary="호환 제품" />
+            ) : (
+              <div
+                className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+              >
+                <div>
+                  <ListItemText primary="호환 제품" />
+                </div>
+                <Tooltip
+                  title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
+                  placement="right"
+                >
+                  <HelpIcon fontSize="small" />
+                </Tooltip>
+                <div />
               </div>
-              <Tooltip
-                title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
-                placement="right"
-              >
-                <HelpIcon fontSize="small" />
-              </Tooltip>
-              <div />
-            </div>
-          )}
+            )}
 
-          {/* {open ? <ExpandLess /> : <ExpandMore />} */}
-        </ListItem>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {CONST.PRODUCT.OPTIONAL.map(P => (
-              <ListItem
-                key={P.NAME}
-                button
-                className={classes.nested}
-                onClick={() => {
-                  goProductInstallPage(P.NAME);
-                }}
-                disabled={!isAllRequiredProductInstall()}
-              >
-                {/* <ListItemIcon>
-                <StarBorder />
-              </ListItemIcon> */}
-                {getInstalledImage(P.NAME)}
-                <ListItemText primary={P.NAME} />
-              </ListItem>
-            ))}
-          </List>
-        </Collapse>
-      </List>
+            {/* {open ? <ExpandLess /> : <ExpandMore />} */}
+          </ListItem>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {CONST.PRODUCT.OPTIONAL.map(P => (
+                <ListItem
+                  key={P.NAME}
+                  button
+                  className={classes.nested}
+                  onClick={() => {
+                    goProductInstallPage(P.NAME);
+                  }}
+                  disabled={!isAllRequiredProductInstall()}
+                >
+                  {/* <ListItemIcon>
+                  <StarBorder />
+                </ListItemIcon> */}
+                  {getInstalledImage(P.NAME)}
+                  <ListItemText primary={P.NAME} />
+                </ListItem>
+              ))}
+            </List>
+          </Collapse>
+        </List>
+      </div>
     </div>
   );
 }

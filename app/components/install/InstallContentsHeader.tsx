@@ -15,9 +15,10 @@ function InstallContentsHeader(props: any) {
 
   const getComponent = () => {
     let component;
-    if (location.pathname === routes.INSTALL.MAIN) {
+    console.log(location.pathname);
+    if (location.pathname.indexOf('main') !== -1) {
       component = <div></div>;
-    } else if (location.pathname === routes.INSTALL.KUBERNETES) {
+    } else if (location.pathname.indexOf('kubernetes') !== -1) {
       component = <strong>쿠버네티스</strong>;
     }
 

@@ -6,6 +6,7 @@ import InstallContentsKubernetes3 from './InstallContentsKubernetes3';
 import InstallContentsKubernetes4 from './InstallContentsKubernetes4';
 import InstallContentsKubernetesAlready from './InstallContentsKubernetesAlready';
 import { AppContext } from '../../containers/HomePage';
+import CONST from '../../utils/constants/constant';
 
 const initialState = {
   version: '1.17.3',
@@ -31,10 +32,11 @@ function InstallContentsKubernetes() {
   const getComponent = () => {
     let component;
 
+    // 설치 여부 판단
     let isInstalled = false;
     for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
       const target = appState.env.installedProducts[i];
-      if (target.name === 'Kubernetes') {
+      if (target.name === CONST.PRODUCT.KUBERNETES_TXT) {
         isInstalled = true;
         break;
       }

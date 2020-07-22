@@ -6,6 +6,7 @@ import styles from './InstallContentsMain.css';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
+import * as env from '../../utils/common/env';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,17 +33,9 @@ function InstallContentsMain(props: any) {
 
   const classes = useStyles();
 
-  const products = CONST.PRODUCT.REQUIRED.concat(CONST.PRODUCT.OPTIONAL);
-
   const goProductInstallPage = (name) => {
     console.log('goProductInstallPage');
-    if (name === 'Kubernetes') {
-      // dispatchInstallPage({
-      //   type: 'SET_MODE',
-      //   data: {
-      //     mode: CONST.INSTALL.KUBERNETES
-      //   }
-      // });
+    if (name === CONST.PRODUCT.KUBERNETES_TXT) {
       history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
     }
   };
@@ -67,7 +60,7 @@ function InstallContentsMain(props: any) {
       <div>
         <Grid item xs={12}>
           <Grid container justify="center" spacing={2}>
-            {products.map(P => (
+            {CONST.PRODUCT.REQUIRED.map(P => (
               <Grid key={P.NAME} item>
                 <Paper
                   className={classes.paper}
@@ -77,6 +70,34 @@ function InstallContentsMain(props: any) {
                   variant="outlined"
                 >
                   <div className={['childUpDownCenter', 'childLeftRightCenter', styles.productBox].join(' ')}>
+                    <div>
+                      <div>
+                        <strong>{P.NAME}</strong>
+                      </div>
+                      <div>
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                </Paper>
+              </Grid>
+            ))}
+            {CONST.PRODUCT.OPTIONAL.map(P => (
+              <Grid key={P.NAME} item>
+                <Paper
+                  className={classes.paper}
+                  onClick={() => {
+                    // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
+                    if (env.isAllRequiredProductInstall(appState.env)) {
+                      goProductInstallPage(P.NAME);
+                    }
+                  }}
+                  variant="outlined"
+                >
+                  <div style={{
+                    'pointer-events': 'none',
+                    'opacity': '0.4'
+                  }} className={['childUpDownCenter', 'childLeftRightCenter', styles.productBox].join(' ')}>
                     <div>
                       <div>
                         <strong>{P.NAME}</strong>

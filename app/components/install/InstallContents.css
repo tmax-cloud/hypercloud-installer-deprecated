@@ -1,12 +1,12 @@
 .wrap {
   width: 75%;
-  height: 100vh;
+  height: calc(100vh - 60px);
 }
 
 @media (max-width: 600px) {
   .wrap {
     width: 100vw;
     height: 80%;
-    /* overflow: auto */
+    overflow: auto
   }
 }

@@ -34,26 +34,26 @@ function InstallPage(props: any) {
     dispatchAppState({
       env: env.getEnvByName(props.match.params.envName)
     });
-    console.log(appState);
+    // console.log(appState);
   }, []);
 
   const getCompenent = () => {
     if (appState.env) {
       return (
-        <div>
+        <>
           <InstallLnb history={history} location={location} match={match} />
           <InstallContents
             history={history}
             location={location}
             match={match}
           />
-        </div>
+        </>
       );
     } else {
-      return <div></div>
+      return <></>
     }
   }
-  return <div>{getCompenent()}</div>;
+  return <>{getCompenent()}</>;
 }
 
 export default InstallPage;

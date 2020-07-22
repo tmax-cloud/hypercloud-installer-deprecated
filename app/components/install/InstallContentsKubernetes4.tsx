@@ -20,7 +20,7 @@ function InstallContentsKubernetes4(props) {
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === appState.env.name) {
       envList[i].installedProducts.push({
-        name: 'Kubernetes',
+        name: CONST.PRODUCT.KUBERNETES_TXT,
         version: kubeInstallState.version,
         registry: kubeInstallState.registry
       });

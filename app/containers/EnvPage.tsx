@@ -9,10 +9,10 @@ function EnvPage(props: any) {
   const { history, location, match } = props;
 
   return (
-    <div>
+    <>
       <EnvHeader history={history} location={location} match={match} />
       <EnvContents history={history} location={location} match={match} />
-    </div>
+    </>
   );
 }
 

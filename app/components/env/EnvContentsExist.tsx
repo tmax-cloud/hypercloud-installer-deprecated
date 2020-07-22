@@ -35,11 +35,12 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import styles from './EnvContentsExist.css';
-import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
 import { Role } from '../../utils/class/Node';
 import routes from '../../utils/constants/routes.json';
+
+import TestImage from '../../../resources/assets/logo_installer.svg';
 
 // interface Data {
 //   calories: number;
@@ -327,9 +328,6 @@ export default function EnvContentsExist(props: any) {
 
   const [rows, setRows] = useState(env.loadEnv());
 
-  const appContext = useContext(AppContext);
-  const { dispatchAppState } = appContext;
-
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('desc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('updatedTime');
@@ -461,11 +459,10 @@ export default function EnvContentsExist(props: any) {
       if (products.length === 0) {
         component = <span>설치된 제품이 없습니다.</span>;
       } else {
-        console.log(products);
         component = (
           <div>
             {products.map(p => {
-              return <span key={p}>{p}</span>;
+              return <span key={p.name}>{p.name}</span>;
             })}
           </div>
         );
@@ -519,15 +516,7 @@ export default function EnvContentsExist(props: any) {
             }}
           >
             <Link to={`${routes.INSTALL.HOME}/${row.name}`}>
-              <span
-                onClick={() => {
-                  dispatchAppState({
-                    env: env.getEnvByName(row.name)
-                  });
-                }}
-              >
-                {row.name}
-              </span>
+              <span>{row.name}</span>
             </Link>
           </TableCell>
           <TableCell>{row.nodes.length}</TableCell>

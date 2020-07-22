@@ -3,6 +3,7 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
 /*
 h2 {
@@ -29,10 +30,14 @@ a:hover {
 } */
 
 body {
-  margin:0;
+  background-color: #ebebf730;
   position: relative;
   height: 100vh;
-  font-family: Arial, Helvetica, Helvetica Neue, serif;
+  width: 100vw;
+  /* min-width: 800px;
+  min-height: 600px; */
+  /* font-family: Arial, Helvetica, Helvetica Neue, serif, "Noto Sans KR", sans-serif; */
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 h1 {
@@ -136,3 +141,35 @@ span.left{
 span.right{
   text-align: right;
 }
+
+/*
+title bar
+*/
+/* title bar 설정*/
+.titlebar {
+  background-color: #363A41 !important;
+  background-image: url("../resources/assets/lnb_logo_bg.svg");
+  background-repeat: no-repeat;
+  height: 60px !important;
+  position: relative !important;
+}
+/* title bar icon 설정*/
+.titlebar > .window-appicon {
+  width: 250px !important;
+  height: inherit !important;
+  background-size: auto !important;
+}
+/* 최소화, 최대화, 닫기 높이 설정 */
+.titlebar .window-controls-container {
+  height: inherit !important;
+}
+/* title bar 밑에서 부터 container 설정*/
+.container-after-titlebar{
+  top: 0px !important;
+  height: calc(100vh - 60px);
+  position: relative !important;
+}
+
+/*
+font
+*/

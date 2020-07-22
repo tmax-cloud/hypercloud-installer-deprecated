@@ -3,6 +3,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogAc
 import MuiBox from '@material-ui/core/Box';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
+import CONST from '../../utils/constants/constant';
 
 function InstallContentsKubernetesAlready() {
   const appContext = useContext(AppContext);
@@ -11,7 +12,7 @@ function InstallContentsKubernetesAlready() {
   const getVersion = () => {
     for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
       const target = appState.env.installedProducts[i];
-      if (target.name === 'Kubernetes') {
+      if (target.name === CONST.PRODUCT.KUBERNETES_TXT) {
         return target.version;
       }
     }

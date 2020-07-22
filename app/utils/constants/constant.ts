@@ -12,6 +12,7 @@ const CONST = {
     ADD: 'add'
   },
   PRODUCT: {
+    KUBERNETES_TXT: 'Kubernetes',
     REQUIRED: [
       {
         NAME: 'Kubernetes'

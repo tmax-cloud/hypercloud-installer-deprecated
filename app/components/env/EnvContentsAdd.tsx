@@ -30,7 +30,6 @@ import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
 import * as Common from '../../utils/common/ssh';
 import routes from '../../utils/constants/routes.json';
-import { AppContext } from '../../containers/HomePage';
 import { Role } from '../../utils/class/Node';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -69,12 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function EnvContentsAdd(props: any) {
   console.debug('EnvContentsAdd');
-  console.log(props);
 
   const { history, location, match } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
 
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
