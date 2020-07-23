@@ -28,7 +28,7 @@ function InstallContents(props: any) {
   // };
 
   return (
-    <div className={[styles.wrap, 'left'].join(' ')}>
+    <div className={[styles.wrap].join(' ')}>
       <InstallContentsHeader
         history={history}
         location={location}

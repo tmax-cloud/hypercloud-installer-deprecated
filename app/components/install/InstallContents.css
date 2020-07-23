@@ -1,12 +1,13 @@
 .wrap {
-  width: 75%;
-  height: calc(100vh - 60px);
+  /* width: 75%; */
+  /* height: calc(100vh - 60px); */
+  /* height: 100%; */
 }
 
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .wrap {
     width: 100vw;
     height: 80%;
     overflow: auto
   }
-}
+} */

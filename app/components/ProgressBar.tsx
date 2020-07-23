@@ -1,5 +1,6 @@
 import React from 'react';
 import { LinearProgress, LinearProgressProps, Box, Typography } from '@material-ui/core';
+import { makeStyles, createStyles, withStyles, Theme } from '@material-ui/core/styles';
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
   return (
@@ -16,8 +17,25 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
   );
 }
 
+const BorderLinearProgress = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      height: 10,
+      borderRadius: 5
+    },
+    colorPrimary: {
+      backgroundColor:
+        theme.palette.grey[theme.palette.type === 'light' ? 200 : 700]
+    },
+    bar: {
+      borderRadius: 5,
+      backgroundColor: '#1a90ff'
+    }
+  })
+)(LinearProgressWithLabel);
+
 function ProgressBar(props) {
-  const { progress } =  props;
+  const { progress } = props;
   // const [progress, setProgress] = React.useState(0);
 
   // React.useEffect(() => {
@@ -39,7 +57,8 @@ function ProgressBar(props) {
   return (
     <div>
       {/* <LinearProgress variant="determinate" value={progress} /> */}
-      <LinearProgressWithLabel value={progress} />
+      {/* <LinearProgressWithLabel value={progress} /> */}
+      <BorderLinearProgress value={progress} />
     </div>
   );
 }

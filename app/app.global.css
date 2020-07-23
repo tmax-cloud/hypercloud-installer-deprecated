@@ -29,6 +29,8 @@ a:hover {
   cursor: pointer;
 } */
 
+
+
 body {
   background-color: #ebebf730;
   position: relative;
@@ -38,6 +40,17 @@ body {
   min-height: 600px; */
   /* font-family: Arial, Helvetica, Helvetica Neue, serif, "Noto Sans KR", sans-serif; */
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+a {
+  /* opacity: 0.75; */
+  text-decoration: none;
+}
+
+a:hover {
+  /* opacity: 1; */
+  text-decoration: none;
+  cursor: pointer;
 }
 
 h1 {
@@ -52,6 +65,13 @@ ul {
   padding: 0
 }
 
+svg{
+  cursor: pointer;
+}
+
+#root{
+  height: 100%;
+}
 
 /*
 공통
@@ -173,3 +193,143 @@ title bar
 /*
 font
 */
+/* size */
+.verLarge {
+  font-size: 22px;
+}
+.large {
+  font-size: 20px;
+}
+.medium {
+  font-size: 16px;
+}
+.small {
+  font-size: 14px;
+}
+.verySmall {
+  font-size: 12px;
+}
+/* brightness */
+.dark {
+  color:#4F5257;
+}
+.lightDark {
+  color:#6A6A6A;
+}
+.indicator{
+  color: #2165B4
+}
+/* weight */
+.thick {
+  font-weight: bold;
+}
+.thin {
+  font-weight: lighter;
+}
+
+/*
+button
+*/
+/* size */
+button.verLarge {
+}
+button.large {
+}
+button.medium {
+}
+button.small {
+}
+button.verySmall {
+}
+
+/* color */
+button.pink {
+  background-color: #EC3854;
+  color:white;
+  border-radius: 2px;
+}
+button.pink:hover {
+  background-color: #D22D46;
+  color:white;
+  border-radius: 2px;
+}
+button.pink:active {
+  background-color: #BA2E44;
+  color:white;
+  border-radius: 2px;
+}
+
+button.white {
+  background-color: #FFFFFF;
+  color:#536882;
+  border: 1px solid #C4C4C4;
+  border-radius: 2px;
+
+}
+button.white:hover {
+  background-color: #E9F0F8;
+  color:#536882;
+  border: 1px solid #C4C4C4;
+  border-radius: 2px;
+}
+button.white:active {
+  background-color: #DDE8F7;
+  color:#536882;
+  border: 1px solid #C4C4C4;
+  border-radius: 2px;
+}
+
+button.blue {
+  background-color: #1E6CB9;
+  color:white;
+  border-radius: 2px;
+}
+button.blue:hover {
+  background-color: #175B9E;
+  color:white;
+  border-radius: 2px;
+}
+button.blue:active {
+  background-color: #0F4B86;
+  color:white;
+  border-radius: 2px;
+}
+
+/*
+table
+*/
+/* header */
+thead.primaryTableHeader {
+  background-color: #31475E;
+}
+thead.primaryTableHeader span{
+  color: white !important;
+}
+thead.primaryTableHeader svg{
+  color: white !important;
+}
+
+/*
+textfiled
+*/
+.long input {
+  width: 400px;
+  padding: 8px 0 8px 5px;
+}
+.long > div {
+  border-radius: 0px;
+}
+.medium input {
+  width: 200px;
+  padding: 8px 0 8px 5px;
+}
+.medium > div {
+  border-radius: 0px;
+}
+.short input {
+  width: 100px;
+  padding: 8px 0 8px 5px;
+}
+.short > div {
+  border-radius: 0px;
+}

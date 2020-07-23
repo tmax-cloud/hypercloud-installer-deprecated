@@ -30,9 +30,8 @@ function EnvHeader(props: any) {
     ) {
       return (
         <Button
-          className={styles.addButton}
+          className={['pink'].join(' ')}
           variant="contained"
-          color="primary"
           startIcon={<AddIcon />}
           size="small"
           onClick={()=>{
@@ -47,7 +46,7 @@ function EnvHeader(props: any) {
   };
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
-      <span className={styles.title}>{title}</span>
+      <span className={[styles.title, 'large'].join(' ')}>{title}</span>
       {getButton()}
     </div>
   );

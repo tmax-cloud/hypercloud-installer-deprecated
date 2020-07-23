@@ -16,6 +16,7 @@ import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
 import EditIcon from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
 
 import {
   Collapse,
@@ -160,6 +161,10 @@ const useStyles = makeStyles((theme: Theme) =>
     // root: {
     //   width: '100%'
     // },
+    head: {
+      backgroundColor: '#000',
+      color: '#fff'
+    },
     paper: {
       width: '100%',
       marginBottom: theme.spacing(2)
@@ -211,7 +216,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   };
 
   return (
-    <TableHead>
+    <TableHead className={['primaryTableHeader'].join(' ')}>
       <TableRow>
         <TableCell padding="checkbox">
           <Checkbox
@@ -411,7 +416,10 @@ export default function EnvContentsExist(props: any) {
   const getDeleteDialogContents = () => {
     if (selected.length > 1) {
       return (
-        <div>
+        <div
+          style={{ marginBottom: '20px' }}
+          className={['dark', 'medium'].join(' ')}
+        >
           선택한&nbsp;
           {selected.length}
           개의 환경을 삭제하시겠습니까?
@@ -419,10 +427,12 @@ export default function EnvContentsExist(props: any) {
       );
     }
     return (
-      <div>
-        <div>선택한 환경을 삭제하시겠습니까?</div>
-        <div>
-          <strong>{selected[0]}</strong>
+      <div style={{ marginBottom: '20px' }}>
+        <div className={['dark', 'medium'].join(' ')}>
+          선택한 환경을 삭제하시겠습니까?
+        </div>
+        <div className={['indicator', 'medium', 'thick'].join(' ')}>
+          <span>{selected[0]}</span>
         </div>
       </div>
     );
@@ -441,7 +451,7 @@ export default function EnvContentsExist(props: any) {
           <Tooltip title="Master" placement="top" arrow>
             <div className={['left'].join(' ')}>
               <img
-                style={{ margin: '3px 3px 0 0' }}
+                style={{ margin: '3px 5px 0 0' }}
                 src={MasterImage}
                 alt="Logo"
               />
@@ -457,10 +467,12 @@ export default function EnvContentsExist(props: any) {
     const getProductJsx = products => {
       let component = null;
       if (products.length === 0) {
-        component = <span>설치된 제품이 없습니다.</span>;
+        component = (
+          <span className={['small'].join(' ')}>설치된 제품이 없습니다.</span>
+        );
       } else {
         component = (
-          <div>
+          <div className={['small'].join(' ')}>
             {products.map(p => {
               return <span key={p.name}>{p.name}</span>;
             })}
@@ -523,19 +535,29 @@ export default function EnvContentsExist(props: any) {
           <TableCell>{row.installedProducts.length}</TableCell>
           <TableCell>{new Date(row.updatedTime).toString()}</TableCell>
           <TableCell>
-            <EditIcon
+            <IconButton
+              aria-label="delete"
               onClick={() => {
                 history.push(`${routes.ENV.EDIT}/${row.name}`);
               }}
-            />
+            >
+              <EditIcon />
+            </IconButton>
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <TableCell
+            style={{
+              paddingBottom: 0,
+              paddingTop: 0,
+              backgroundColor: '#F9F8F8'
+            }}
+            colSpan={7}
+          >
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={2}>
                 <Typography variant="h6" gutterBottom component="div">
-                  <span>노드</span>
+                  <span className={['small', 'thick'].join(' ')}>노드</span>
                 </Typography>
                 <Table size="small" aria-label="purchases">
                   <TableHead>
@@ -544,7 +566,11 @@ export default function EnvContentsExist(props: any) {
                       <TableCell>Port</TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
+                  <TableBody
+                    style={{
+                      backgroundColor: '#F2F8FF'
+                    }}
+                  >
                     {row.nodes.map((nodeRow: any) => (
                       <TableRow key={nodeRow.ip}>
                         <TableCell component="th" scope="row">
@@ -559,7 +585,9 @@ export default function EnvContentsExist(props: any) {
               </Box>
               <Box margin={2}>
                 <Typography variant="h6" gutterBottom component="div">
-                  <span>설치 제품</span>
+                  <span className={['small', 'thick'].join(' ')}>
+                    설치 제품
+                  </span>
                 </Typography>
                 {getProductJsx(row.installedProducts)}
               </Box>
@@ -571,13 +599,13 @@ export default function EnvContentsExist(props: any) {
   }
   return (
     <div className={styles.wrap}>
-      <div className={styles.tableToolBar}>
+      <div className={[styles.tableToolBar, 'childUpDownDown'].join(' ')}>
         <span className={['left'].join(' ')}>
           <Button
             variant="contained"
-            color="secondary"
             startIcon={<DeleteIcon />}
             size="small"
+            className={['white'].join(' ')}
             onClick={() => {
               handleClickOpen();
             }}
@@ -591,17 +619,31 @@ export default function EnvContentsExist(props: any) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">환경 삭제</DialogTitle>
+            <DialogTitle id="alert-dialog-title">
+              환경 삭제
+              <IconButton
+                style={{
+                  position: 'absolute',
+                  right: '5px',
+                  top: '5px'
+                }}
+                aria-label="close"
+                onClick={handleClose}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
             <DialogContent>
-              {/* <DialogContentText id="alert-dialog-description">
-                {getDeleteDialogContents()}
-                <div>해당 환경에 설치된 제품 기능도 모두 삭제 됩니다.</div>
-              </DialogContentText> */}
               {getDeleteDialogContents()}
-              <div>해당 환경에 설치된 제품 기능도 모두 삭제 됩니다.</div>
+              <div>
+                <span className={['lightDark', 'small'].join(' ')}>
+                  해당 환경에 설치된 제품 기능도 모두 삭제 됩니다.
+                </span>
+              </div>
             </DialogContent>
             <DialogActions>
               <Button
+                className={['blue'].join(' ')}
                 onClick={() => {
                   // dialog 닫기
                   handleClose();
@@ -620,11 +662,17 @@ export default function EnvContentsExist(props: any) {
                     history.push(routes.ENV.NOT_EXIST);
                   }
                 }}
-                color="primary"
+                size="small"
               >
                 삭제
               </Button>
-              <Button onClick={handleClose} color="primary" autoFocus>
+              <Button
+                className={['white'].join(' ')}
+                onClick={handleClose}
+                color="primary"
+                size="small"
+                autoFocus
+              >
                 취소
               </Button>
             </DialogActions>
@@ -647,10 +695,16 @@ export default function EnvContentsExist(props: any) {
                 setRows(searchResultEnv);
               }}
             /> */}
-            <span style={{ marginRight: '15px' }}>{rows.length}
-개
-</span>
-            <FormControl className={styles.select}>
+            <span className={['indicator', 'verySmall'].join(' ')}>
+              {rows.length}
+            </span>
+            <span
+              style={{ marginRight: '10px' }}
+              className={['', 'verySmall'].join(' ')}
+            >
+              개
+            </span>
+            <FormControl variant="outlined" className={styles.select}>
               {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
               <Select
                 native
@@ -667,6 +721,8 @@ export default function EnvContentsExist(props: any) {
             </FormControl>
             <TextField
               id="input-with-icon-textfield"
+              className={[styles.search].join(' ')}
+              variant="outlined"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

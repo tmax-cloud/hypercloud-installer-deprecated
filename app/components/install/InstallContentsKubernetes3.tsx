@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import LinearProgress from '@material-ui/core/LinearProgress/LinearProgress';
@@ -21,6 +21,12 @@ function InstallContentsKubernetes3() {
   const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   const [progress, setProgress] = React.useState(0);
+  // test용
+  // useEffect(() => {
+  //   setInterval(()=>{
+  //     setProgress(p=>p+1)
+  //   }, 1000);
+  // }, [])
 
   const [open, setOpen] = React.useState(false);
 
@@ -114,7 +120,7 @@ function InstallContentsKubernetes3() {
   };
 
   React.useEffect(() => {
-    install();
+    // install();
 
     return () => {};
   }, []);
@@ -131,22 +137,26 @@ function InstallContentsKubernetes3() {
       <div className={['childLeftRightCenter'].join(' ')}>
         <Button
           variant="contained"
-          color="primary"
-          size="small"
+          style={{marginRight: '10px'}}
+          className={['blue'].join(' ')}
+          size="large"
           onClick={() => {
             dispatchKubeInstall({
               page: 2
             });
           }}
         >
-          이전
+          &lt; 이전
         </Button>
         <Button
           variant="contained"
-          color="secondary"
-          size="small"
+          className={['white'].join(' ')}
+          size="large"
           onClick={() => {
-            handleClickOpen();
+            // handleClickOpen();
+            dispatchKubeInstall({
+              page: 4
+            });
           }}
         >
           취소

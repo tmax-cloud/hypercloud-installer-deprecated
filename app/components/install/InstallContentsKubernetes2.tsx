@@ -9,12 +9,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  IconButton
 } from '@material-ui/core';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
 import styles from './InstallContentsKubernetes2.css';
+import CloseIcon from '@material-ui/icons/Close';
 
 function InstallContentsKubernetes2() {
   const kubeInstallContext = useContext(KubeInstallContext);
@@ -39,10 +41,10 @@ function InstallContentsKubernetes2() {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span>쿠버네티스 버전</span>
+          <span className={['medium'].join(' ')}>쿠버네티스 버전</span>
         </div>
         <div>
-          <FormControl className={styles.select}>
+          <FormControl variant="outlined" className={styles.select}>
             {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
             <Select
               native
@@ -61,11 +63,12 @@ function InstallContentsKubernetes2() {
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span>도커 레지스트리 주소</span>
+          <span className={['medium'].join(' ')}>도커 레지스트리 주소</span>
         </div>
         <div>
           <TextField
             id="outlined"
+            className={['long'].join(' ')}
             label="예:192.168.6.169:5000"
             variant="outlined"
             size="small"
@@ -76,15 +79,16 @@ function InstallContentsKubernetes2() {
             }}
           />
           <div>
-            <span>미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.</span>
+            <span className={['small', 'lightDark'].join(' ')}>미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.</span>
           </div>
         </div>
       </div>
-      <div className={['childLeftRightCenter'].join(' ')}>
+      <div style={{marginTop: '50px'}}className={['childLeftRightCenter'].join(' ')}>
         <Button
           variant="contained"
-          color="primary"
-          size="small"
+          style={{marginRight: '10px'}}
+          className={['pink'].join(' ')}
+          size="large"
           onClick={() => {
             dispatchKubeInstall({
               version,
@@ -93,12 +97,12 @@ function InstallContentsKubernetes2() {
             });
           }}
         >
-          다음
+          설치
         </Button>
         <Button
           variant="contained"
-          color="secondary"
-          size="small"
+          className={['white'].join(' ')}
+          size="large"
           onClick={() => {
             handleClickOpen();
           }}
@@ -111,26 +115,48 @@ function InstallContentsKubernetes2() {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            나가기
+            <IconButton
+              style={{
+                position: 'absolute',
+                right: '5px',
+                top: '5px'
+              }}
+              aria-label="close"
+              onClick={handleClose}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-            쿠버네티스 설정 화면에서 나가시겠습니까?
-            설정 내용은 저장되지 않습니다.
+              <span className={['lightDark', 'small'].join(' ')}>
+                쿠버네티스 설정 화면에서 나가시겠습니까?
+                설정 내용은 저장되지 않습니다.
+              </span>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button
+              className={['blue'].join(' ')}
+              size="small"
               onClick={() => {
                 handleClose();
                 dispatchKubeInstall({
                   page: 1
                 });
               }}
-              color="primary"
             >
               나가기
             </Button>
-            <Button onClick={handleClose} color="primary" autoFocus>
+            <Button
+              className={['white'].join(' ')}
+              onClick={handleClose}
+              color="primary"
+              size="small"
+              autoFocus
+            >
               취소
             </Button>
           </DialogActions>

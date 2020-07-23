@@ -17,19 +17,18 @@ function InstallContentsHeader(props: any) {
     let component;
     console.log(location.pathname);
     if (location.pathname.indexOf('main') !== -1) {
-      component = <div></div>;
+      component = <div />;
     } else if (location.pathname.indexOf('kubernetes') !== -1) {
-      component = <strong>쿠버네티스</strong>;
+      component = (
+        <div className={[styles.wrap, 'large', 'lightDark'].join(' ')}>
+          <strong>쿠버네티스</strong>
+        </div>
+      );
     }
 
     return component;
   };
-  return (
-    <div className={[styles.wrap].join(' ')}>
-      <pre>{appState.env.name}</pre>
-      {getComponent()}
-    </div>
-  );
+  return <>{getComponent()}</>;
 }
 
 export default InstallContentsHeader;

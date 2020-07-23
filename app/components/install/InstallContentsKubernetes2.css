@@ -10,9 +10,16 @@
   width:200px;
 }
 
-.select {
-  margin-right: 10px !important;
+.select > div {
+  height: 30px;
+  border-radius: 0px;
 }
 .select > div > select {
-  padding-top: 3px;
+  padding: 5px 0 5px 10px;
 }
+
+.search > div{
+  height: 30px;
+  border-radius: 0px;
+}
+

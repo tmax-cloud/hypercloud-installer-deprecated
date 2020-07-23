@@ -18,8 +18,10 @@ const reducer = (state, action) => {
   return { ...state, ...action };
 };
 
-function InstallContentsKubernetes() {
+function InstallContentsKubernetes(props: any) {
   console.log('InstallContentsKubernetes');
+
+  const { history, location, match } = props;
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
@@ -50,7 +52,7 @@ function InstallContentsKubernetes() {
       } else if (kubeInstallState.page === 3) {
         component = <InstallContentsKubernetes3 />;
       } else if (kubeInstallState.page === 4) {
-        component = <InstallContentsKubernetes4 />;
+        component = <InstallContentsKubernetes4 history={history} />;
       }
     } else {
       component = <InstallContentsKubernetesAlready />;

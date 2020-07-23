@@ -1,9 +1,20 @@
 import React, { useContext } from 'react';
-import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  IconButton
+} from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
+import CloseIcon from '@material-ui/icons/Close';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
 import CONST from '../../utils/constants/constant';
+import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import FinishImage from '../../../resources/assets/img_finish.svg';
 
 function InstallContentsKubernetesAlready() {
   const appContext = useContext(AppContext);
@@ -40,63 +51,110 @@ function InstallContentsKubernetesAlready() {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className="childUpDownCenter"
+              className={['childUpDownCenter', styles.installedCircle].join(
+                ' '
+              )}
               borderRadius="50%"
               {...defaultProps}
             >
-              <div>
+              <div className={[styles.insideCircle].join(' ')}>
+                <img
+                  style={{
+                    heigh: '50px',
+                    width: '50px',
+                    position: 'relative',
+                    left: '-125px'
+                  }}
+                  src={FinishImage}
+                  alt="Logo"
+                />
                 <div>
-                  <span>[이미지]</span>
-                  <span>Kubernetes</span>
+                  <img src={KubernetesImage} alt="Logo" />
                 </div>
-                <span>
-                  컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스
-                </span>
+                <div>
+                  <span className={['large', 'thick'].join(' ')}>
+                    Kubernetes
+                  </span>
+                </div>
+                <div>
+                  <span className={['small', 'lightDark'].join(' ')}>
+                    컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스
+                  </span>
+                </div>
               </div>
             </MuiBox>
           </div>
           <div>
-            <div>버전</div>
-            <div>{getVersion()}</div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>버전</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {getVersion()}
+              </span>
+            </div>
           </div>
           <div>
-            <span>더 이상 사용하지 않는다면?</span>
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => {
-                handleClickOpen();
-              }}
+            <span
+              style={{ marginRight: '5px' }}
+              className={['small', 'lightDark'].join(' ')}
             >
-              삭제
-            </Button>
+              더 이상 사용하지 않는다면?
+            </span>
+            <span className={['small', 'indicator'].join(' ')}>
+              <a
+                onClick={() => {
+                  handleClickOpen();
+                }}
+              >
+                삭제
+              </a>
+            </span>
+          </div>
+          <div>
             <Dialog
               open={open}
               onClose={handleClose}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
             >
-              <DialogTitle id="alert-dialog-title">삭제</DialogTitle>
+              <DialogTitle id="alert-dialog-title">
+                삭제
+                <IconButton
+                  style={{
+                    position: 'absolute',
+                    right: '5px',
+                    top: '5px'
+                  }}
+                  aria-label="close"
+                  onClick={handleClose}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                쿠버네티스를 삭제하시겠습니까?
-                삭제 시, 호환 제품의 기능도 모두 삭제됩니다.
+                  <span className={['lightDark', 'small'].join(' ')}>
+                    쿠버네티스를 삭제하시겠습니까? 삭제 시, 호환 제품의 기능도
+                    모두 삭제됩니다.
+                  </span>
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button
+                  className={['blue'].join(' ')}
                   onClick={() => {
                     handleClose();
                     // TODO:delete kubernetes
                   }}
-                  color="primary"
                 >
                   삭제
                 </Button>
-                <Button onClick={handleClose} color="primary" autoFocus>
+                <Button
+                  className={['white'].join(' ')}
+                  onClick={handleClose}
+                  autoFocus
+                >
                   취소
                 </Button>
               </DialogActions>

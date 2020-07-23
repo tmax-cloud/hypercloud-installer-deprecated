@@ -9,7 +9,7 @@ import Collapse from '@material-ui/core/Collapse';
 import { FormControl, Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
-import HelpIcon from '@material-ui/icons/Help';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import styles from './InstallLnb.css';
 import { AppContext } from '../../containers/HomePage';
 // import { InstallPageContext } from '../../containers/InstallPage';
@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       height: '100%',
       // maxWidth: 360,
-      backgroundColor: '#E8F5FF'
     },
     nested: {
       paddingLeft: theme.spacing(4)
@@ -60,7 +59,9 @@ function InstallLnb(props: any) {
 
   const getInstalledImage = productName => {
     if (env.isInstalled(productName, appState.env)) {
-      return <img src={InstalledImage} alt="Logo" />;
+      return (
+        <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
+      );
     }
     return '';
   };
@@ -70,35 +71,26 @@ function InstallLnb(props: any) {
   };
 
   return (
-    <div className={[styles.wrap, 'left'].join(' ')}>
-      <div
-        className={[
-          'childUpDownCenter',
-          'childLeftRightCenter',
-          styles.selectEnv
-        ].join(' ')}
-      >
-        <FormControl>
-          {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
-          <Select
-            native
-            value={appState.env.name}
-            onChange={handleChange}
-            inputProps={{
-              name: 'age',
-              id: 'age-native-simple'
-            }}
-          >
-            {/* <option aria-label="None" value="" /> */}
-            {env.loadEnv().map(e => {
-              return (
-                <option key={e.name} value={e.name}>
-                  {e.name}
-                </option>
-              );
-            })}
-          </Select>
-        </FormControl>
+    <div className={[styles.wrap].join(' ')}>
+      <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
+        <Select
+          native
+          value={appState.env.name}
+          onChange={handleChange}
+          inputProps={{
+            name: 'age',
+            id: 'age-native-simple'
+          }}
+        >
+          {/* <option aria-label="None" value="" /> */}
+          {env.loadEnv().map(e => {
+            return (
+              <option key={e.name} value={e.name}>
+                {e.name}
+              </option>
+            );
+          })}
+        </Select>
         <Link to={routes.HOME}>
           <SettingsIcon />
         </Link>
@@ -111,11 +103,12 @@ function InstallLnb(props: any) {
             <ListSubheader
               component="div"
               id="nested-list-subheader"
+              disableSticky
               onClick={() => {
                 history.push(`${routes.INSTALL.HOME}/${appState.env.name}/main`);
               }}
             >
-              제품 목록
+              <span style={{color: 'white'}}>제품 목록</span>
             </ListSubheader>
           }
           className={classes.root}
@@ -132,7 +125,7 @@ function InstallLnb(props: any) {
                 <ListItem
                   key={P.NAME}
                   button
-                  className={classes.nested}
+                  className={[classes.nested, styles.listItemBox].join(' ')}
                   onClick={() => {
                     goProductInstallPage(P.NAME);
                   }}
@@ -167,7 +160,7 @@ function InstallLnb(props: any) {
                   title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
                   placement="right"
                 >
-                  <HelpIcon fontSize="small" />
+                  <HelpOutlineIcon fontSize="small" />
                 </Tooltip>
                 <div />
               </div>
@@ -181,7 +174,7 @@ function InstallLnb(props: any) {
                 <ListItem
                   key={P.NAME}
                   button
-                  className={classes.nested}
+                  className={[classes.nested, styles.listItemBox].join(' ')}
                   onClick={() => {
                     goProductInstallPage(P.NAME);
                   }}

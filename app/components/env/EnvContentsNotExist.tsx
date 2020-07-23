@@ -9,35 +9,32 @@ import routes from '../../utils/constants/routes.json';
 function EnvContentsNotExist() {
   console.debug('EnvContentsNotExist');
 
-  // const IMG_PATH = './constants/empty.png';
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
       <div className={styles.box}>
-        {/* <img className="small" src={IMG_PATH} alt="" />
-        <br /> */}
-        <div className={styles.textBox}>
-          {/* <NotInterestedIcon fontSize="large" /> */}
+        <div>
           <img src={EmptyImage} alt="Logo" />
         </div>
-        <div className={styles.textBox}>
-          <span>환경을 추가할 수 있습니다.</span>
-        </div>
-        <div className={styles.textBox}>
-          <span>추가하려면, 아래의 버튼을 클릭해 주세요.</span>
+        <div className={[styles.mainTextBox, 'dark', 'medium'].join(' ')}>
+          <span>
+            환경을 추가할 수 있습니다.
+            <br />
+            추가하려면, 아래의 버튼을 클릭해 주세요.
+          </span>
         </div>
         <div>
           <Link to={routes.ENV.ADD}>
             <Button
               variant="contained"
-              color="primary"
+              className={['pink'].join(' ')}
               startIcon={<AddIcon />}
-              size="small"
+              size="large"
             >
               환경 추가
             </Button>
           </Link>
         </div>
-        <div className={styles.textBox}>
+        <div className={[styles.subTextBox, 'lightDark', 'small'].join(' ')}>
           <span>추가한 환경에 제품을 설치할 수 있습니다.</span>
         </div>
       </div>

@@ -1,14 +1,19 @@
 import React, { useContext } from 'react';
+import { Button } from '@material-ui/core';
 import styles from './InstallContentsKubernetes4.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
-import { Button } from '@material-ui/core';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import * as env from '../../utils/common/env';
+import { AppContext } from '../../containers/HomePage';
+import FinishImage from '../../../resources/assets/img_finish.svg';
+import routes from '../../utils/constants/routes.json';
 
 function InstallContentsKubernetes4(props) {
-  // const installPageContext = useContext(InstallPageContext);
-  // const { installPageState, dispatchInstallPage } = installPageContext;
+  console.log('InstallContentsKubernetes4');
+
+  const { history } = props;
+
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
@@ -31,30 +36,48 @@ function InstallContentsKubernetes4(props) {
 
   const getRegistryJsx = () => {
     if (kubeInstallState.registry) {
-      return <span>레지스트리 : {kubeInstallState.registry}</span>;
+      return (
+        <div style={{marginBottom: '30px'}}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>
+              도커 레지스트리 주소
+            </span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {kubeInstallState.registry}
+            </span>
+          </div>
+        </div>
+      );
     }
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      <div>
-        <div>이미지</div>
-        <div>설치가 완료되었습니다.</div>
-        <div>
-          버전:{kubeInstallState.version}
-          {getRegistryJsx()}
+      <div style={{textAlign: 'center'}}>
+        <div style={{marginBottom: '50px'}}>
+          <img src={FinishImage} alt="Logo" />
         </div>
+        <div style={{marginBottom: '30px'}}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>버전</span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {kubeInstallState.version}
+            </span>
+          </div>
+        </div>
+        {getRegistryJsx()}
         <div>
           <Button
             variant="contained"
-            color="primary"
-            size="small"
+            className={['white'].join(' ')}
+            size="large"
             onClick={() => {
-              dispatchInstallPage({
-                type: 'SET_MODE',
-                data: {
-                  mode: CONST.INSTALL.MAIN
-                }
-              });
+              history.push(
+                `${routes.INSTALL.HOME}/main`
+              );
             }}
           >
             완료

@@ -15,15 +15,18 @@ const CONST = {
     KUBERNETES_TXT: 'Kubernetes',
     REQUIRED: [
       {
-        NAME: 'Kubernetes'
+        NAME: 'Kubernetes',
+        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
       }
     ],
     OPTIONAL: [
       {
-        NAME: 'Helm'
+        NAME: 'Helm',
+        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
       },
       {
-        NAME: 'HyperCloud Operator'
+        NAME: 'HyperCloud Operator',
+        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
       }
     ]
   }

@@ -11,10 +11,10 @@
   text-align: center;
 }
 
-.textBox{
-  margin: 10px 0px;
+.mainTextBox{
+  margin: 60px 0px 25px 0px;
 }
-.textBox > svg{
-  font-size: 10.1875rem;
+.subTextBox{
+  margin: 15px 0px 0px 0px;
 }
 

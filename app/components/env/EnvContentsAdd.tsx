@@ -19,6 +19,7 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  IconButton,
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
@@ -26,6 +27,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { green } from '@material-ui/core/colors';
 import clsx from 'clsx';
+import CloseIcon from '@material-ui/icons/Close';
 import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
 import * as Common from '../../utils/common/ssh';
@@ -334,26 +336,23 @@ function EnvContentsAdd(props: any) {
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
       <div className={styles.box}>
         <div className={['childLeftRightRight'].join(' ')}>
-          <span>* 필수입력</span>
+          <span className={['dark', 'medium'].join(' ')}>
+            <span style={{ color: 'red' }}>*</span>
+            <span>필수입력</span>
+          </span>
         </div>
         <div className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}>
           <div className={styles.titleBox}>
-            <span>이름 *</span>
+            <span className={['dark', 'medium'].join(' ')}>이름</span>
+            <span style={{ color: 'red' }}>*</span>
           </div>
           <div>
-            {/* <input
-              type="text"
-              value={name}
-              onChange={e => {
-                setName(e.target.value);
-                hasNameError(e.target.value);
-              }}
-            /> */}
             <TextField
               required
-              className={[styles.input].join(' ')}
+              className={['long'].join(' ')}
               id="outlined-required"
               label="Name"
+              placeholder="최소 2자, 최대 32자, 영문 소문자, 숫자, 특수문자(“-”)"
               variant="outlined"
               size="small"
               value={name}
@@ -367,33 +366,21 @@ function EnvContentsAdd(props: any) {
               error={nameError.length !== 0}
               helperText={nameError}
             />
-            {/* <span className={nameError ? 'visible red' : 'hidden'}>
-              {nameError}
-            </span> */}
           </div>
         </div>
         <div className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}>
           <div className={styles.titleBox}>
-            <span>노드 *</span>
+            <span className={['dark', 'medium'].join(' ')}>노드</span>
+            <span style={{ color: 'red' }}>*</span>
           </div>
           <div>
-            {/* <div>
-              <span>IP</span>
-            </div> */}
             <div>
-              {/* <input
-                type="text"
-                value={ip}
-                onChange={e => {
-                  setIp(e.target.value);
-                  hasIpError(e.target.value);
-                }}
-              /> */}
               <TextField
                 required
-                className={[styles.input].join(' ')}
+                className={['medium'].join(' ')}
                 id="outlined-required"
                 label="IP"
+                placeholder="예: 192.168.32.128"
                 variant="outlined"
                 size="small"
                 disabled={loading}
@@ -409,35 +396,15 @@ function EnvContentsAdd(props: any) {
                 helperText={ipError}
               />
             </div>
-            {/* <div
-              className={[
-                ipError ? 'visible red' : 'hidden',
-                styles.errorBox
-              ].join(' ')}
-            >
-              <span>{ipError}</span>
-            </div> */}
           </div>
           <div className="left">
-            {/* <div>
-              <span>포트</span>
-            </div> */}
             <div>
-              {/* <input
-                type="number"
-                min="0"
-                max="65535"
-                value={port}
-                onChange={e => {
-                  setPort(e.target.value);
-                  hasPortError(e.target.value);
-                }}
-              /> */}
               <TextField
                 required
-                className={[styles.input].join(' ')}
+                className={['medium'].join(' ')}
                 id="outlined-required"
                 label="Port"
+                placeholder="0~65535"
                 variant="outlined"
                 size="small"
                 disabled={loading}
@@ -453,33 +420,9 @@ function EnvContentsAdd(props: any) {
                 helperText={portError}
               />
             </div>
-            {/* <div
-              className={[
-                portError ? 'visible red' : 'hidden',
-                styles.errorBox
-              ].join(' ')}
-            >
-              <span>{portError}</span>
-            </div> */}
           </div>
           <div className="left">
-            {/* <div>
-              <Tooltip
-                title="root 계정 비밀번호를 입력해 주세요."
-                placement="top"
-              >
-                <span>사용자 비밀번호</span>
-              </Tooltip>
-            </div> */}
             <div className="left">
-              {/* <input
-                type={isShowPassword ? 'password' : 'text'}
-                value={password}
-                onChange={e => {
-                  setPassword(e.target.value);
-                  hasPasswordError(e.target.value);
-                }}
-              /> */}
               <Tooltip
                 title="root 계정 비밀번호를 입력해 주세요."
                 placement="top"
@@ -487,10 +430,11 @@ function EnvContentsAdd(props: any) {
               >
                 <TextField
                   required
-                  className={[styles.input].join(' ')}
+                  className={['medium'].join(' ')}
                   type={isShowPassword ? 'password' : 'text'}
                   id="outlined-required"
-                  label="Password"
+                  label="사용자 비밀번호"
+                  placeholder="Text"
                   variant="outlined"
                   size="small"
                   disabled={loading}
@@ -513,65 +457,16 @@ function EnvContentsAdd(props: any) {
                   }}
                 />
               </Tooltip>
-
-              {/* <FormControl
-                // className={clsx(classes.margin, classes.textField)}
-                variant="outlined"
-                size="small"
-              >
-                <InputLabel htmlFor="outlined-adornment-password">
-                  Password *
-                </InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-password"
-                  type={isShowPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => {
-                    setPassword(e.target.value);
-                    hasPasswordError(e.target.value);
-                  }}
-                  error={passwordError.length !== 0}
-                  helperText={passwordError}
-                  endAdornment={(
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={e => {
-                          isShowPassword
-                            ? setisShowPassword(false)
-                            : setisShowPassword(true);
-                        }}
-                        onMouseDown={e => {
-                          isShowPassword
-                            ? setisShowPassword(false)
-                            : setisShowPassword(true);
-                        }}
-                        edge="end"
-                      >
-                        {isShowPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  )}
-                  labelWidth={70}
-                />
-              </FormControl> */}
             </div>
-            {/* <div
-              className={[
-                passwordError ? 'visible red' : 'hidden',
-                styles.errorBox
-              ].join(' ')}
-            >
-              <span>{passwordError}</span>
-            </div> */}
           </div>
-          <div className="left">
+          <div>
             <Button
-              className={[styles.addRemoveButton, buttonClassname].join(' ')}
+              className={['white', 'indicator'].join(' ')}
               variant="contained"
               color="primary"
               size="small"
               disabled={loading}
+              startIcon={<AddIcon />}
               onClick={() => {
                 let hasError = false;
                 if (hasIpError()) hasError = true;
@@ -627,7 +522,7 @@ function EnvContentsAdd(props: any) {
                   });
               }}
             >
-              <AddIcon />
+              추가
             </Button>
             {loading && (
               <CircularProgress size={24} className={classes.buttonProgress} />
@@ -645,31 +540,31 @@ function EnvContentsAdd(props: any) {
         <div className={[styles.table, 'clear'].join(' ')}>
           <TableContainer component={Paper} variant="outlined">
             <Table aria-label="simple table">
-              <TableHead>
+              <TableHead className={['primaryTableHeader'].join(' ')}>
                 <TableRow>
                   <TableCell
                     align="center"
                     style={{ padding: '0px', width: '20%' }}
                   >
-                    마스터 노드
+                    <span>마스터 노드</span>
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{ padding: '0px', width: '40%' }}
                   >
-                    IP
+                    <span>IP</span>
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{ padding: '0px', width: '20%' }}
                   >
-                    포트
+                    <span>포트</span>
                   </TableCell>
                   <TableCell
                     align="center"
                     style={{ padding: '0px', width: '20%' }}
                   >
-                    제거
+                    <span>제거</span>
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -705,12 +600,8 @@ function EnvContentsAdd(props: any) {
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <Button
-                        className={styles.addRemoveButton}
-                        variant="contained"
-                        color="secondary"
-                        size="small"
-                        disabled={row.role === Role.MASTER}
+                      <IconButton
+                        aria-label="delete"
                         onClick={e => {
                           // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
                           e.stopPropagation();
@@ -739,7 +630,7 @@ function EnvContentsAdd(props: any) {
                         }}
                       >
                         <RemoveIcon />
-                      </Button>
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -757,8 +648,9 @@ function EnvContentsAdd(props: any) {
         >
           <Button
             variant="contained"
-            color="primary"
-            size="small"
+            style={{marginRight: '10px'}}
+            className={['pink'].join(' ')}
+            size="large"
             onClick={() => {
               let hasError = false;
               if (hasNameError()) hasError = true;
@@ -830,8 +722,8 @@ function EnvContentsAdd(props: any) {
           </Button>
           <Button
             variant="contained"
-            color="secondary"
-            size="small"
+            className={['white'].join(' ')}
+            size="large"
             onClick={() => {
               handleClickOpen();
             }}
@@ -844,22 +736,41 @@ function EnvContentsAdd(props: any) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
+            <DialogTitle id="alert-dialog-title">
+              나가기
+              <IconButton
+                style={{
+                  position: 'absolute',
+                  right: '5px',
+                  top: '5px'
+                }}
+                aria-label="close"
+                onClick={handleClose}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
             <DialogContent>
               {editTargetEnv ? (
                 <DialogContentText id="alert-dialog-description">
-                  환경 수정 화면에서 나가시겠습니까? 설정 내용은 저장되지
-                  않습니다.
+                  <span className={['dark', 'medium'].join(' ')}>
+                    환경 수정 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                    않습니다.
+                  </span>
                 </DialogContentText>
               ) : (
                 <DialogContentText id="alert-dialog-description">
-                  환경 추가 화면에서 나가시겠습니까? 설정 내용은 저장되지
-                  않습니다.
+                  <span className={['dark', 'medium'].join(' ')}>
+                    환경 추가 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                    않습니다.
+                  </span>
                 </DialogContentText>
               )}
             </DialogContent>
             <DialogActions>
               <Button
+                className={['blue'].join(' ')}
+                size="small"
                 onClick={() => {
                   handleClose();
                   if (!env.isEmpty()) {
@@ -868,11 +779,15 @@ function EnvContentsAdd(props: any) {
                     history.push(routes.ENV.NOT_EXIST);
                   }
                 }}
-                color="primary"
               >
                 나가기
               </Button>
-              <Button onClick={handleClose} color="primary" autoFocus>
+              <Button
+                className={['white'].join(' ')}
+                size="small"
+                onClick={handleClose}
+                autoFocus
+              >
                 취소
               </Button>
             </DialogActions>

@@ -1,12 +1,15 @@
 /* eslint-disable import/no-cycle */
 import React, { useContext } from 'react';
-import { Grid, Paper } from '@material-ui/core';
+import { Grid, Paper, Tooltip } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import styles from './InstallContentsMain.css';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
+import CloudImage from '../../../resources/assets/ic_logo_hypercloud.svg';
+import InstalledImage from '../../../resources/assets/ic_finish.svg';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,8 +17,8 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1
     },
     paper: {
-      height: 200,
-      width: 200
+      height: 220,
+      width: 220
     },
     control: {
       padding: theme.spacing(2)
@@ -33,26 +36,64 @@ function InstallContentsMain(props: any) {
 
   const classes = useStyles();
 
-  const goProductInstallPage = (name) => {
+  const goProductInstallPage = name => {
     console.log('goProductInstallPage');
     if (name === CONST.PRODUCT.KUBERNETES_TXT) {
       history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
     }
   };
 
+  const getInstalledImage = productName => {
+    if (env.isInstalled(productName, appState.env)) {
+      return (
+        <span>
+          <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
+          <span>설치 됨</span>
+        </span>
+      );
+    }
+    return '';
+  };
+
+  const getInstalledLogo = productName => {
+    const path = `../resources/assets/${productName}_logo.png`;
+    return (
+      <span>
+        <img src={path} alt="Logo" style={{ marginRight: '5px' }} />
+      </span>
+    );
+  };
+
   return (
     <div className={[styles.wrap].join(' ')}>
       <div className={[styles.textBox].join(' ')}>
         <div className={['childLeftRightCenter', styles.textBoxRow].join(' ')}>
-          <strong className={[styles.title].join(' ')}>HyperCloud Installer</strong>
+          <img src={CloudImage} alt="Logo" />
+          <strong className={[styles.title, 'indicator'].join(' ')}>
+            HyperCloud Installer
+          </strong>
         </div>
-        <div className={['childLeftRightCenter', styles.textBoxRow].join(' ')}>
+        <div
+          className={[
+            'childLeftRightCenter',
+            styles.textBoxRow,
+            'mediun',
+            'lightDark'
+          ].join(' ')}
+        >
           <span>
             HyperCloud Installer는 쿠버네티스 및 다양한 호환 제품 설치를
             제공합니다.
           </span>
         </div>
-        <div className={['childLeftRightCenter', styles.textBoxRow].join(' ')}>
+        <div
+          className={[
+            'childLeftRightCenter',
+            styles.textBoxRow,
+            'mediun',
+            'lightDark'
+          ].join(' ')}
+        >
           <br />
           <span>설치할 제품을 선택해 주세요.</span>
         </div>
@@ -60,8 +101,17 @@ function InstallContentsMain(props: any) {
       <div>
         <Grid item xs={12}>
           <Grid container justify="center" spacing={2}>
-            {CONST.PRODUCT.REQUIRED.map(P => (
+            {CONST.PRODUCT.REQUIRED.map((P, index) => (
               <Grid key={P.NAME} item>
+                {index === 0 ? (
+                  <div style={{ height: '25px' }}>
+                    <span className={['small', 'thick'].join(' ')}>
+                      필수 제품
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ height: '25px' }} />
+                )}
                 <Paper
                   className={classes.paper}
                   onClick={() => {
@@ -69,21 +119,56 @@ function InstallContentsMain(props: any) {
                   }}
                   variant="outlined"
                 >
-                  <div className={['childUpDownCenter', 'childLeftRightCenter', styles.productBox].join(' ')}>
-                    <div>
+                  <div
+                    className={[
+                      '',
+                      'childLeftRightCenter',
+                      styles.productBox
+                    ].join(' ')}
+                  >
+                    <div className={[styles.productBoxContents].join(' ')}>
+                      <div
+                        className={[
+                          'childLeftRightRight',
+                          styles.installedImageBox
+                        ].join(' ')}
+                      >
+                        {getInstalledImage(P.NAME)}
+                      </div>
+                      <div>{getInstalledLogo(P.NAME)}</div>
                       <div>
                         <strong>{P.NAME}</strong>
                       </div>
                       <div>
-                        <span></span>
+                        <span className={['small', 'lightDark'].join(' ')}>
+                          {P.DESC}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </Paper>
               </Grid>
             ))}
-            {CONST.PRODUCT.OPTIONAL.map(P => (
+            {CONST.PRODUCT.OPTIONAL.map((P, index) => (
               <Grid key={P.NAME} item>
+                {index === 0 ? (
+                  <div
+                    style={{ height: '25px' }}
+                    className={['childUpDownCenter'].join(' ')}
+                  >
+                    <span className={['small', 'thick'].join(' ')}>
+                      호환 제품
+                    </span>
+                    <Tooltip
+                      title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
+                      placement="right"
+                    >
+                      <HelpOutlineIcon fontSize="small" />
+                    </Tooltip>
+                  </div>
+                ) : (
+                  <div style={{ height: '25px' }} />
+                )}
                 <Paper
                   className={classes.paper}
                   onClick={() => {
@@ -94,16 +179,39 @@ function InstallContentsMain(props: any) {
                   }}
                   variant="outlined"
                 >
-                  <div style={{
-                    'pointer-events': 'none',
-                    'opacity': '0.4'
-                  }} className={['childUpDownCenter', 'childLeftRightCenter', styles.productBox].join(' ')}>
-                    <div>
+                  <div
+                    style={
+                      env.isAllRequiredProductInstall(appState.env)
+                        ? {
+                          }
+                        : {
+                            pointerEvents: 'none',
+                            opacity: '0.4'
+                          }
+                    }
+                    className={[
+                      '',
+                      'childLeftRightCenter',
+                      styles.productBox
+                    ].join(' ')}
+                  >
+                    <div className={[styles.productBoxContents].join(' ')}>
+                      <div
+                          className={[
+                            'childLeftRightRight',
+                            styles.installedImageBox
+                          ].join(' ')}
+                        >
+                        {getInstalledImage(P.NAME)}
+                      </div>
+                      <div>{getInstalledLogo(P.NAME)}</div>
                       <div>
                         <strong>{P.NAME}</strong>
                       </div>
                       <div>
-                        <span></span>
+                        <span className={['small', 'lightDark'].join(' ')}>
+                          {P.DESC}
+                        </span>
                       </div>
                     </div>
                   </div>
