@@ -12,20 +12,10 @@ function InstallContents(props: any) {
   console.debug('InstallContents');
 
   const { history, location, match } = props;
+  console.debug(props);
 
   const appContext = useContext(AppContext);
-  const { appState } = appContext;
-
-  // const getComponent = () => {
-  //   let component;
-  //   if (installPageState.mode === CONST.INSTALL.MAIN) {
-  //     component = <InstallContentsMain />;
-  //   } else if (installPageState.mode === CONST.INSTALL.KUBERNETES) {
-  //     component = <InstallContentsKubernetes />;
-  //   }
-
-  //   return component;
-  // };
+  const { appState, dispatchAppState } = appContext;
 
   return (
     <div className={[styles.wrap].join(' ')}>
@@ -34,20 +24,13 @@ function InstallContents(props: any) {
         location={location}
         match={match}
       />
-      {/* {getComponent()} */}
       <Switch>
+        <Route path={`${match.path}/main`} component={InstallContentsMain} />
         <Route
-          path={`${routes.INSTALL.HOME}/${appState.env.name}/main`}
-          component={InstallContentsMain}
-        />
-        <Route
-          path={`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`}
+          path={`${match.path}/kubernetes`}
           component={InstallContentsKubernetes}
         />
-        <Redirect
-          path="*"
-          to={`${routes.INSTALL.HOME}/${appState.env.name}/main`}
-        />
+        <Redirect path="*" to={`${match.url}/main`} />
       </Switch>
     </div>
   );

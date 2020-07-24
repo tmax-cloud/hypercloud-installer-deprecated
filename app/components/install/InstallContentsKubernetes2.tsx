@@ -12,17 +12,28 @@ import {
   DialogActions,
   IconButton
 } from '@material-ui/core';
-import { KubeInstallContext } from './InstallContentsKubernetes';
+// import { KubeInstallContext } from './InstallContentsKubernetes';
+import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
 import styles from './InstallContentsKubernetes2.css';
-import CloseIcon from '@material-ui/icons/Close';
+import { AppContext } from '../../containers/HomePage';
 
-function InstallContentsKubernetes2() {
-  const kubeInstallContext = useContext(KubeInstallContext);
-  const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+function InstallContentsKubernetes2(props: any) {
+  console.log('InstallContentsKubernetes2');
 
-  const [version, setVersion] = React.useState(kubeInstallState.version);
+  const { history, location, match } = props;
+  console.debug(props);
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
+  // const kubeInstallContext = useContext(KubeInstallContext);
+  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+
+  const [version, setVersion] = React.useState(
+    appState.kubeinstallState.version
+  );
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setVersion(event.target.value as string);
   };
@@ -69,7 +80,8 @@ function InstallContentsKubernetes2() {
           <TextField
             id="outlined"
             className={['long'].join(' ')}
-            label="예:192.168.6.169:5000"
+            label="도커 레지스트리 주소"
+            placeholder="예:192.168.6.169:5000"
             variant="outlined"
             size="small"
             value={registry}
@@ -79,22 +91,32 @@ function InstallContentsKubernetes2() {
             }}
           />
           <div>
-            <span className={['small', 'lightDark'].join(' ')}>미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.</span>
+            <span className={['small', 'lightDark'].join(' ')}>
+              미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.
+            </span>
           </div>
         </div>
       </div>
-      <div style={{marginTop: '50px'}}className={['childLeftRightCenter'].join(' ')}>
+      <div
+        style={{ marginTop: '50px' }}
+        className={['childLeftRightCenter'].join(' ')}
+      >
         <Button
           variant="contained"
-          style={{marginRight: '10px'}}
+          style={{ marginRight: '10px' }}
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
-            dispatchKubeInstall({
-              version,
-              registry,
-              page: 3
+            dispatchAppState({
+              type: 'set_kubeinstallState',
+              kubeinstallState: {
+                version,
+                registry
+              }
             });
+            history.push(
+              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step3`
+            );
           }}
         >
           설치
@@ -132,8 +154,8 @@ function InstallContentsKubernetes2() {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                쿠버네티스 설정 화면에서 나가시겠습니까?
-                설정 내용은 저장되지 않습니다.
+                쿠버네티스 설정 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                않습니다.
               </span>
             </DialogContentText>
           </DialogContent>
@@ -143,9 +165,9 @@ function InstallContentsKubernetes2() {
               size="small"
               onClick={() => {
                 handleClose();
-                dispatchKubeInstall({
-                  page: 1
-                });
+                history.push(
+                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+                );
               }}
             >
               나가기

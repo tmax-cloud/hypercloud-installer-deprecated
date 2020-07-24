@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
-      height: '100%',
+      height: '100%'
       // maxWidth: 360,
     },
     nested: {
@@ -34,7 +34,8 @@ const useStyles = makeStyles((theme: Theme) =>
 function InstallLnb(props: any) {
   console.debug('InstallLnb');
 
-  const { history } = props;
+  const { history, location, match } = props;
+  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
@@ -46,19 +47,28 @@ function InstallLnb(props: any) {
   };
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    dispatchAppState({
-      env: env.getEnvByName(event.target.value as string)
-    });
+    // dispatchAppState({
+    //   env: env.getEnvByName(event.target.value as string)
+    // });
+    history.push(`${routes.INSTALL.HOME}/${appState.nowEnv.name}`);
   };
 
-  const goProductInstallPage = productName => {
+  const goProductInstallPage = (productName: string) => {
     if (productName === CONST.PRODUCT.KUBERNETES_TXT) {
-      history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
+      if (env.isInstalled(productName, appState.nowEnv)) {
+        history.push(
+          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/already`
+        );
+      } else {
+        history.push(
+          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+        );
+      }
     }
   };
 
-  const getInstalledImage = productName => {
-    if (env.isInstalled(productName, appState.env)) {
+  const getInstalledImage = (productName: string) => {
+    if (env.isInstalled(productName, appState.nowEnv)) {
       return (
         <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
       );
@@ -67,7 +77,7 @@ function InstallLnb(props: any) {
   };
 
   const isAllRequiredProductInstall = () => {
-    return env.isAllRequiredProductInstall(appState.env);
+    return env.isAllRequiredProductInstall(appState.nowEnv);
   };
 
   return (
@@ -75,7 +85,7 @@ function InstallLnb(props: any) {
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
         <Select
           native
-          value={appState.env.name}
+          value={appState.nowEnv.name}
           onChange={handleChange}
           inputProps={{
             name: 'age',
@@ -83,7 +93,7 @@ function InstallLnb(props: any) {
           }}
         >
           {/* <option aria-label="None" value="" /> */}
-          {env.loadEnv().map(e => {
+          {env.loadEnv().map((e: { name: {} | null | undefined }) => {
             return (
               <option key={e.name} value={e.name}>
                 {e.name}
@@ -99,18 +109,20 @@ function InstallLnb(props: any) {
         <List
           component="nav"
           aria-labelledby="nested-list-subheader"
-          subheader={
+          subheader={(
             <ListSubheader
               component="div"
               id="nested-list-subheader"
               disableSticky
               onClick={() => {
-                history.push(`${routes.INSTALL.HOME}/${appState.env.name}/main`);
+                history.push(
+                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
+                );
               }}
             >
-              <span style={{color: 'white'}}>제품 목록</span>
+              <span style={{ color: 'white' }}>제품 목록</span>
             </ListSubheader>
-          }
+          )}
           className={classes.root}
         >
           <ListItem>
@@ -151,7 +163,9 @@ function InstallLnb(props: any) {
               <ListItemText primary="호환 제품" />
             ) : (
               <div
-                className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+                className={['childLeftRightLeft', 'childUpDownCenter'].join(
+                  ' '
+                )}
               >
                 <div>
                   <ListItemText primary="호환 제품" />

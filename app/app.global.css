@@ -115,6 +115,7 @@ div.right {
 div.clear {
   clear: both;
 }
+/* full size */
 div.fullHeight {
   height: 100%;
 }
@@ -147,8 +148,6 @@ div.childLeftRightRight {
   display: flex;
   justify-content: flex-end;
 }
-
-
 
 /*
 span
@@ -299,13 +298,13 @@ button.blue:active {
 table
 */
 /* header */
-thead.primaryTableHeader {
+thead.primary {
   background-color: #31475E;
 }
-thead.primaryTableHeader span{
+thead.primary span{
   color: white !important;
 }
-thead.primaryTableHeader svg{
+thead.primary svg{
   color: white !important;
 }
 

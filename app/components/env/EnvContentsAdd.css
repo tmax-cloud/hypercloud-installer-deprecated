@@ -1,6 +1,7 @@
 .wrap {
+  padding: 50px 50px;
   /* 영역 확인용 background-color */
-  background-color: white;
+  /* background-color: white; */
 }
 
 .box{

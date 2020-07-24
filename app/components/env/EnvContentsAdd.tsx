@@ -333,7 +333,7 @@ function EnvContentsAdd(props: any) {
   };
 
   return (
-    <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
+    <div className={[styles.wrap].join(' ')}>
       <div className={styles.box}>
         <div className={['childLeftRightRight'].join(' ')}>
           <span className={['dark', 'medium'].join(' ')}>
@@ -540,7 +540,7 @@ function EnvContentsAdd(props: any) {
         <div className={[styles.table, 'clear'].join(' ')}>
           <TableContainer component={Paper} variant="outlined">
             <Table aria-label="simple table">
-              <TableHead className={['primaryTableHeader'].join(' ')}>
+              <TableHead className={['primary'].join(' ')}>
                 <TableRow>
                   <TableCell
                     align="center"

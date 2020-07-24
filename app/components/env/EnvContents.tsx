@@ -13,7 +13,9 @@ function EnvContents(props: any) {
 
   const { history } = props;
 
+  // 처음 마운트 시에만 조건에 따라 라우팅 해줌
   useEffect(() => {
+    console.debug('useEffect');
     if (!env.isEmpty()) {
       history.push(routes.ENV.EXIST);
     } else {
@@ -22,7 +24,7 @@ function EnvContents(props: any) {
   }, []);
 
   return (
-    <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
+    <div className={[styles.wrap].join(' ')}>
       <Switch>
         <Route path={routes.ENV.EXIST} component={EnvContentsExist} />
         <Route path={routes.ENV.NOT_EXIST} component={EnvContentsNotExist} />

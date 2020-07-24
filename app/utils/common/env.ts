@@ -118,3 +118,24 @@ export const isAllRequiredProductInstall = (env: any) => {
   }
   return true;
 };
+
+/**
+ * @param envName 환경 이름
+ * @param productName 제품 이름
+ * @description 해당 환경에서 해당 제품을 삭제한다.
+ */
+export const deleteProductByName = (envName: string, productName: string) => {
+  const envList = loadEnv();
+  for (let i = 0; i < envList.length; i += 1) {
+    if (envList[i].name === envName) {
+      const targetEnv = envList[i];
+      for (let j = 0; i < targetEnv.installedProducts.length; j += 1) {
+        if (targetEnv.installedProducts[j].name === productName) {
+          targetEnv.installedProducts.splice(j, 1);
+          saveEnv(envList);
+          return;
+        }
+      }
+    }
+  }
+};

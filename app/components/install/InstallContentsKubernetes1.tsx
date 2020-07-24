@@ -2,14 +2,19 @@ import MuiBox from '@material-ui/core/Box';
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
 import styles from './InstallContentsKubernetes1.css';
+import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
+import routes from '../../utils/constants/routes.json';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 
-function InstallContentsKubernetes1() {
+function InstallContentsKubernetes1(props: any) {
   console.log('InstallContentsKubernetes1');
 
-  const kubeInstallContext = useContext(KubeInstallContext);
-  const { dispatchKubeInstall } = kubeInstallContext;
+  const { history, location, match } = props;
+  console.debug(props);
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const defaultProps = {
     bgcolor: 'background.paper',
@@ -55,9 +60,10 @@ function InstallContentsKubernetes1() {
               className={['blue'].join(' ')}
               size="large"
               onClick={() => {
-                dispatchKubeInstall({
-                  page: 2
-                });
+                // dispatchKubeInstall({
+                //   page: 2
+                // });
+                history.push(`${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step2`);
               }}
             >
               다음 >

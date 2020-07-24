@@ -30,21 +30,30 @@ function InstallContentsMain(props: any) {
   console.debug('InstallContentsMain');
 
   const { history, location, match } = props;
+  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
   const classes = useStyles();
 
-  const goProductInstallPage = name => {
+  const goProductInstallPage = (name: string) => {
     console.log('goProductInstallPage');
     if (name === CONST.PRODUCT.KUBERNETES_TXT) {
-      history.push(`${routes.INSTALL.HOME}/${appState.env.name}/kubernetes`);
+      if (env.isInstalled(name, appState.nowEnv)) {
+        history.push(
+          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/already`
+        );
+      } else {
+        history.push(
+          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+        );
+      }
     }
   };
 
-  const getInstalledImage = productName => {
-    if (env.isInstalled(productName, appState.env)) {
+  const getInstalledImage = (productName: string) => {
+    if (env.isInstalled(productName, appState.nowEnv)) {
       return (
         <span>
           <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
@@ -55,7 +64,7 @@ function InstallContentsMain(props: any) {
     return '';
   };
 
-  const getInstalledLogo = productName => {
+  const getInstalledLogo = (productName: string) => {
     const path = `../resources/assets/${productName}_logo.png`;
     return (
       <span>
@@ -173,7 +182,7 @@ function InstallContentsMain(props: any) {
                   className={classes.paper}
                   onClick={() => {
                     // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
-                    if (env.isAllRequiredProductInstall(appState.env)) {
+                    if (env.isAllRequiredProductInstall(appState.nowEnv)) {
                       goProductInstallPage(P.NAME);
                     }
                   }}
@@ -181,9 +190,8 @@ function InstallContentsMain(props: any) {
                 >
                   <div
                     style={
-                      env.isAllRequiredProductInstall(appState.env)
-                        ? {
-                          }
+                      env.isAllRequiredProductInstall(appState.nowEnv)
+                        ? {}
                         : {
                             pointerEvents: 'none',
                             opacity: '0.4'
@@ -197,11 +205,11 @@ function InstallContentsMain(props: any) {
                   >
                     <div className={[styles.productBoxContents].join(' ')}>
                       <div
-                          className={[
-                            'childLeftRightRight',
-                            styles.installedImageBox
-                          ].join(' ')}
-                        >
+                        className={[
+                          'childLeftRightRight',
+                          styles.installedImageBox
+                        ].join(' ')}
+                      >
                         {getInstalledImage(P.NAME)}
                       </div>
                       <div>{getInstalledLogo(P.NAME)}</div>

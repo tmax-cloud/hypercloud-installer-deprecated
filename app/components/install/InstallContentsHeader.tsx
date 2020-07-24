@@ -6,16 +6,17 @@ import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
 
 function InstallContentsHeader(props: any) {
+  console.debug('InstallContentsHeader');
   // const installPageContext = useContext(InstallPageContext);
   // const { installPageState } = installPageContext;
   const { history, location, match } = props;
+  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
   const getComponent = () => {
     let component;
-    console.log(location.pathname);
     if (location.pathname.indexOf('main') !== -1) {
       component = <div />;
     } else if (location.pathname.indexOf('kubernetes') !== -1) {

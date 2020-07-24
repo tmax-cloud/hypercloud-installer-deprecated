@@ -4,7 +4,7 @@ import { AppContainer as ReactHotAppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
-import { Titlebar, Color } from 'custom-electron-titlebar';
+import { Titlebar } from 'custom-electron-titlebar';
 
 const store = configureStore();
 

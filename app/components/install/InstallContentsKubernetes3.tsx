@@ -9,16 +9,20 @@ import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
 import ProgressBar from '../ProgressBar';
+import routes from '../../utils/constants/routes.json';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsKubernetes3() {
-  // const installPageContext = useContext(InstallPageContext);
-  // const { installPageState, dispatchInstallPage } = installPageContext;
+function InstallContentsKubernetes3(props: any) {
+  console.log('InstallContentsKubernetes3');
+
+  const { history, location, match } = props;
+  console.debug(props);
+
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const kubeInstallContext = useContext(KubeInstallContext);
-  const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+  // const kubeInstallContext = useContext(KubeInstallContext);
+  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   const [progress, setProgress] = React.useState(0);
   // test용
@@ -39,8 +43,8 @@ function InstallContentsKubernetes3() {
   };
 
   const install = () => {
-    console.log(installPageState.env.nodes);
-    const nodeInfo = installPageState.env.nodes;
+    console.log(appState.nowEnv.nodes);
+    const nodeInfo = appState.nowEnv.nodes;
     // logRef.current!.value = '';
     for (let i = 0; i < nodeInfo.length; i += 1) {
       if (nodeInfo[i].role === Role.MASTER) {
@@ -98,9 +102,12 @@ function InstallContentsKubernetes3() {
               // 완료 후 3초 뒤, 페이지 이동
               setTimeout(()=>{
                 if (String(data).split('%%%')[1] === '100') {
-                  dispatchKubeInstall({
-                    page: 4
-                  });
+                  // dispatchKubeInstall({
+                  //   page: 4
+                  // });
+                  history.push(
+                    `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
+                  );
                 }
               }, 3000);
             }
@@ -141,9 +148,12 @@ function InstallContentsKubernetes3() {
           className={['blue'].join(' ')}
           size="large"
           onClick={() => {
-            dispatchKubeInstall({
-              page: 2
-            });
+            // dispatchKubeInstall({
+            //   page: 2
+            // });
+            history.push(
+              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step2`
+            );
           }}
         >
           &lt; 이전
@@ -154,9 +164,12 @@ function InstallContentsKubernetes3() {
           size="large"
           onClick={() => {
             // handleClickOpen();
-            dispatchKubeInstall({
-              page: 4
-            });
+            // dispatchKubeInstall({
+            //   page: 4
+            // });
+            history.push(
+              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
+            );
           }}
         >
           취소
@@ -178,9 +191,12 @@ function InstallContentsKubernetes3() {
             <Button
               onClick={() => {
                 handleClose();
-                dispatchKubeInstall({
-                  page: 1
-                });
+                // dispatchKubeInstall({
+                //   page: 1
+                // });
+                history.push(
+                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+                );
               }}
               color="primary"
             >

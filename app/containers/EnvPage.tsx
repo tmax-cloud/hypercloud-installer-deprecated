@@ -7,6 +7,7 @@ function EnvPage(props: any) {
   console.debug('EnvPage');
 
   const { history, location, match } = props;
+  console.debug(props);
 
   return (
     <>

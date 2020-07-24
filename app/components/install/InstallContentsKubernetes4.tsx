@@ -12,22 +12,23 @@ import routes from '../../utils/constants/routes.json';
 function InstallContentsKubernetes4(props) {
   console.log('InstallContentsKubernetes4');
 
-  const { history } = props;
+  const { history, location, match } = props;
+  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const kubeInstallContext = useContext(KubeInstallContext);
-  const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+  // const kubeInstallContext = useContext(KubeInstallContext);
+  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   // json 파일 저장
   const envList = env.loadEnv();
   for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === appState.env.name) {
+    if (envList[i].name === appState.nowEnv.name) {
       envList[i].installedProducts.push({
         name: CONST.PRODUCT.KUBERNETES_TXT,
-        version: kubeInstallState.version,
-        registry: kubeInstallState.registry
+        version: appState.kubeinstallState.version,
+        registry: appState.kubeinstallState.registry
       });
       break;
     }
@@ -35,7 +36,7 @@ function InstallContentsKubernetes4(props) {
   env.saveEnv(envList);
 
   const getRegistryJsx = () => {
-    if (kubeInstallState.registry) {
+    if (appState.kubeinstallState.registry) {
       return (
         <div style={{marginBottom: '30px'}}>
           <div>
@@ -45,7 +46,7 @@ function InstallContentsKubernetes4(props) {
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {kubeInstallState.registry}
+              {appState.kubeinstallState.registry}
             </span>
           </div>
         </div>
@@ -64,7 +65,7 @@ function InstallContentsKubernetes4(props) {
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {kubeInstallState.version}
+              {appState.kubeinstallState.version}
             </span>
           </div>
         </div>
@@ -76,7 +77,7 @@ function InstallContentsKubernetes4(props) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/main`
+                `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
               );
             }}
           >

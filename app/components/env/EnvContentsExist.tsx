@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -34,14 +34,11 @@ import {
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { Link } from 'react-router-dom';
 import styles from './EnvContentsExist.css';
 import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
 import { Role } from '../../utils/class/Node';
 import routes from '../../utils/constants/routes.json';
-
-import TestImage from '../../../resources/assets/logo_installer.svg';
 
 // interface Data {
 //   calories: number;
@@ -156,22 +153,22 @@ const headCells: HeadCell[] = [
   // { id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
 ];
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     // root: {
     //   width: '100%'
     // },
-    head: {
-      backgroundColor: '#000',
-      color: '#fff'
-    },
-    paper: {
-      width: '100%',
-      marginBottom: theme.spacing(2)
-    },
-    table: {
-      minWidth: 750
-    },
+    // head: {
+    //   backgroundColor: '#000',
+    //   color: '#fff'
+    // },
+    // paper: {
+    //   width: '100%',
+    //   marginBottom: theme.spacing(2)
+    // },
+    // table: {
+    //   minWidth: 750
+    // },
     visuallyHidden: {
       border: 0,
       clip: 'rect(0 0 0 0)',
@@ -216,7 +213,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   };
 
   return (
-    <TableHead className={['primaryTableHeader'].join(' ')}>
+    <TableHead className={['primary'].join(' ')}>
       <TableRow>
         <TableCell padding="checkbox">
           <Checkbox
@@ -329,7 +326,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 export default function EnvContentsExist(props: any) {
   console.debug('EnvContentsExist');
 
-  const { history, location, match } = props;
+  const { history } = props;
+  console.debug(props);
 
   const [rows, setRows] = useState(env.loadEnv());
 
@@ -512,24 +510,14 @@ export default function EnvContentsExist(props: any) {
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           </TableCell>
-          <TableCell
-            component="th"
-            id={labelId}
-            scope="row"
-            padding="none"
-            onClick={() => {
-              // dispatchHomePage({
-              //   type: 'SET_MODE',
-              //   data: {
-              //     mode: CONST.HOME.INSTALL,
-              //     env: env.getEnvByName(row.name)
-              //   }
-              // });
-            }}
-          >
-            <Link to={`${routes.INSTALL.HOME}/${row.name}`}>
-              <span>{row.name}</span>
-            </Link>
+          <TableCell component="th" id={labelId} scope="row" padding="none">
+            <a className={['indicator'].join(' ')}
+              onClick={() => {
+                history.push(`${routes.INSTALL.HOME}/${row.name}`);
+              }}
+            >
+              {row.name}
+            </a>
           </TableCell>
           <TableCell>{row.nodes.length}</TableCell>
           <TableCell>{row.installedProducts.length}</TableCell>

@@ -59,7 +59,9 @@ const createWindow = async () => {
     // backgroundColor: '#363A41',
     show: false,
     width: 1024,
-    height: 728,
+    height: 768,
+    minWidth: 720,
+    minHeight: 480,
     // icon: path.join(__dirname, './resource/assets/logo_installer.png'),
     webPreferences:
       process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'

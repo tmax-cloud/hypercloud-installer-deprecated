@@ -15,14 +15,21 @@ import { AppContext } from '../../containers/HomePage';
 import CONST from '../../utils/constants/constant';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
+import * as env from '../../utils/common/env';
+import routes from '../../utils/constants/routes.json';
 
-function InstallContentsKubernetesAlready() {
+function InstallContentsKubernetesAlready(props: any) {
+  console.log('InstallContentsKubernetesAlready');
+
+  const { history, location, match } = props;
+  console.debug(props);
+
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
   const getVersion = () => {
-    for (let i = 0; i < appState.env.installedProducts.length; i += 1) {
-      const target = appState.env.installedProducts[i];
+    for (let i = 0; i < appState.nowEnv.installedProducts.length; i += 1) {
+      const target = appState.nowEnv.installedProducts[i];
       if (target.name === CONST.PRODUCT.KUBERNETES_TXT) {
         return target.version;
       }
@@ -146,6 +153,13 @@ function InstallContentsKubernetesAlready() {
                   onClick={() => {
                     handleClose();
                     // TODO:delete kubernetes
+                    env.deleteProductByName(
+                      appState.nowEnv.name,
+                      CONST.PRODUCT.KUBERNETES_TXT
+                    );
+                    history.push(
+                      `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
+                    );
                   }}
                 >
                   삭제

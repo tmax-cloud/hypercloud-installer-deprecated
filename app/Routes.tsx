@@ -2,16 +2,14 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import routes from './utils/constants/routes.json';
 import App from './containers/App';
-import HomePage from './containers/HomePage';
 import CounterPage from './containers/CounterPage';
-import EnvPage from './containers/EnvPage';
-import InstallPage from './containers/InstallPage';
+import HomePage from './containers/HomePage';
 
 export default function Routes() {
   return (
     <App>
       <Switch>
-        <Route path={routes.COUNTER} component={CounterPage} />
+        {/* <Route path={routes.COUNTER} component={CounterPage} /> */}
         <Route path={routes.HOME} component={HomePage} />
       </Switch>
     </App>
