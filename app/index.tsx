@@ -5,6 +5,7 @@ import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
 import { Titlebar } from 'custom-electron-titlebar';
+import MasterImage from '../resources/assets/logo_installer.svg';
 
 const store = configureStore();
 
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   new Titlebar({
     // backgroundColor: Color.fromHex('#363A41'),
     // backgroundColor: Color.fromHex('#fff'),
-    icon: '../resources/assets/logo_installer.svg',
+    icon: MasterImage,
     menu: null
   });
   render(

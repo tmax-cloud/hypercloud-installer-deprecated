@@ -1,4 +1,5 @@
 import CONST from '../constants/constant';
+import TEST from '../constants/env.json';
 
 /**
  * 파일 작업은 모두 sync로 수행
@@ -10,7 +11,21 @@ import CONST from '../constants/constant';
 export function loadEnv() {
   const fs = require('fs');
 
-  const envList = fs.readFileSync('./app/utils/constants/env.json');
+  try {
+    if (fs.existsSync('env.json')) {
+      //file exists
+    } else {
+      fs.writeFileSync('env.json', '[]', function(err) {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+  } catch(err) {
+
+  }
+
+  const envList = fs.readFileSync('env.json');
   return JSON.parse(envList);
 }
 
@@ -21,7 +36,7 @@ export function loadEnv() {
 export function saveEnv(envList: any) {
   const jsonData = JSON.stringify(envList);
   const fs = require('fs');
-  fs.writeFileSync('./app/utils/constants/env.json', jsonData, function(err) {
+  fs.writeFileSync('env.json', jsonData, function(err) {
     if (err) {
       console.log(err);
     }

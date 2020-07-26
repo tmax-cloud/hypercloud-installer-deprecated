@@ -63,14 +63,17 @@ const createWindow = async () => {
     minWidth: 720,
     minHeight: 480,
     // icon: path.join(__dirname, './resource/assets/logo_installer.png'),
-    webPreferences:
-      process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
-        ? {
-            nodeIntegration: true
-          }
-        : {
-            preload: path.join(__dirname, 'dist/renderer.prod.js')
-          }
+    // webPreferences:
+    //   process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
+    //     ? {
+    //         nodeIntegration: true
+    //       }
+    //     : {
+    //         preload: path.join(__dirname, 'dist/renderer.prod.js')
+    //       }
+    webPreferences: {
+        nodeIntegration: true
+      }
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
