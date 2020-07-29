@@ -172,17 +172,19 @@ EOF
   sudo sed -i "s|{podSubnet}|\"${podSubnet}\"|g" ${yaml_dir}/kubeadm-config.yaml
   sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" ${yaml_dir}/kubeadm-config.yaml
 
-  if [ ${type} -eq "mainMaster" ];then
+  if [ "${type}" == "mainMaster" ];then
     # kube init
     sudo kubeadm init --config=${yaml_dir}/kubeadm-config.yaml --upload-certs
 
     mkdir -p $HOME/.kube
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
-  elif [ ${type} -eq "master" ]; then
+  elif [ "${type}" == "master" ]; then
     # master type
-  elif [ ${type} -eq "worker" ]; then
+    echo "master"
+  elif [ "${type}" == "worker" ]; then
     # worker type
+    echo "worker"
   fi
 
   echo  "========================================================================="

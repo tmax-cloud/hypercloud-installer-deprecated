@@ -82,6 +82,7 @@ function InstallContentsKubernetes3(props: any) {
         logRef.current!.scrollTop = logRef.current!.scrollHeight;
       }
     });
+    console.error(joinCmd);
     console.error('mainMaster install end');
 
     console.error('masterArr install start');
@@ -115,7 +116,7 @@ function InstallContentsKubernetes3(props: any) {
         worker,
         index + 1
       );
-      command += joinCmd;
+      command += `${joinCmd} --cri-socket=/var/run/crio/crio.sock`;
       worker.cmd = command;
       console.error(worker.cmd);
       Common.send(worker, {

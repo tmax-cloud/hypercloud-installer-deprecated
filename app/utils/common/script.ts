@@ -44,11 +44,11 @@ chmod 755 k8s_infra_installer.sh;
 ./k8s_infra_installer.sh up mainMaster;`;
 }
 
-export function getK8sMasterInstallScript(master: any, index: number): string {
+export function getK8sMasterInstallScript(mainMaster: any, master: any, index: number): string {
   const IMAGE_REGISTRY = ``;
   const CRIO_VERSION = `1.17`;
   const KUBERNETES_VERSION = `1.17.6`;
-  const API_SERVER = master.ip;
+  const API_SERVER = mainMaster.ip;
 
   const setHostName = `sudo hostnamectl set-hostname master-${index};`;
   const registHostName = `echo \`hostname -I\` master-${index} >> /etc/hosts`;
