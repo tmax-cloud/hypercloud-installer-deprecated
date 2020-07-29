@@ -5,7 +5,7 @@ install_dir=$(dirname "$0")
 
 yaml_dir="${install_dir}/yaml"
 
-sudo yum update -y
+#sudo yum update -y
 
 os_check=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
 
