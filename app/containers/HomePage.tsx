@@ -14,7 +14,7 @@ export const AppContext = React.createContext('');
 
 const initialState = {
   kubeinstallState: {
-    version: '1.17.3',
+    version: '1.17.6',
     registry: ''
   }
 };

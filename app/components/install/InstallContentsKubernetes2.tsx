@@ -67,7 +67,7 @@ function InstallContentsKubernetes2(props: any) {
               }}
             >
               {/* <option aria-label="None" value="" /> */}
-              <option value="1.17.3">1.17.3</option>
+              <option value="1.17.6">1.17.6</option>
             </Select>
           </FormControl>
         </div>

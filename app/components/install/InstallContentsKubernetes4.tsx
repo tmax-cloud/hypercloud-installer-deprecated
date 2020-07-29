@@ -22,6 +22,7 @@ function InstallContentsKubernetes4(props) {
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   // json 파일 저장
+  env.deleteProductByName(appState.nowEnv.name, CONST.PRODUCT.KUBERNETES_TXT);
   const envList = env.loadEnv();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === appState.nowEnv.name) {
@@ -38,7 +39,7 @@ function InstallContentsKubernetes4(props) {
   const getRegistryJsx = () => {
     if (appState.kubeinstallState.registry) {
       return (
-        <div style={{marginBottom: '30px'}}>
+        <div style={{ marginBottom: '30px' }}>
           <div>
             <span className={['medium', 'thick'].join(' ')}>
               도커 레지스트리 주소
@@ -55,11 +56,11 @@ function InstallContentsKubernetes4(props) {
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      <div style={{textAlign: 'center'}}>
-        <div style={{marginBottom: '50px'}}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ marginBottom: '50px' }}>
           <img src={FinishImage} alt="Logo" />
         </div>
-        <div style={{marginBottom: '30px'}}>
+        <div style={{ marginBottom: '30px' }}>
           <div>
             <span className={['medium', 'thick'].join(' ')}>버전</span>
           </div>

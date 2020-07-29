@@ -10,32 +10,34 @@ function EnvContentsNotExist() {
   console.debug('EnvContentsNotExist');
 
   return (
-    <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
-      <div className={styles.box}>
+    <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
+      <div className={[styles.box, 'childUpDownCenter'].join(' ')}>
         <div>
-          <img src={EmptyImage} alt="Logo" />
-        </div>
-        <div className={[styles.mainTextBox, 'dark', 'medium'].join(' ')}>
-          <span>
-            환경을 추가할 수 있습니다.
-            <br />
-            추가하려면, 아래의 버튼을 클릭해 주세요.
-          </span>
-        </div>
-        <div>
-          <Link to={routes.ENV.ADD}>
-            <Button
-              variant="contained"
-              className={['pink'].join(' ')}
-              startIcon={<AddIcon />}
-              size="large"
-            >
-              환경 추가
-            </Button>
-          </Link>
-        </div>
-        <div className={[styles.subTextBox, 'lightDark', 'small'].join(' ')}>
-          <span>추가한 환경에 제품을 설치할 수 있습니다.</span>
+          <div>
+            <img src={EmptyImage} alt="Logo" />
+          </div>
+          <div className={[styles.mainTextBox, 'dark', 'medium'].join(' ')}>
+            <span>
+              환경을 추가할 수 있습니다.
+              <br />
+              추가하려면, 아래의 버튼을 클릭해 주세요.
+            </span>
+          </div>
+          <div>
+            <Link to={routes.ENV.ADD}>
+              <Button
+                variant="contained"
+                className={['pink'].join(' ')}
+                startIcon={<AddIcon />}
+                size="large"
+              >
+                환경 추가
+              </Button>
+            </Link>
+          </div>
+          <div className={[styles.subTextBox, 'lightDark', 'small'].join(' ')}>
+            <span>추가한 환경에 제품을 설치할 수 있습니다.</span>
+          </div>
         </div>
       </div>
     </div>

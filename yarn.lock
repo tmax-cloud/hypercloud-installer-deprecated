@@ -1409,6 +1409,13 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.13.0.tgz#fcb113d1aca4b471b709e8c9c168674fbd6e06d9"
   integrity sha512-xKOeQEl5O47GPZYIMToj6uuA2syyFlq9EMSl2ui0uytjY9xbe8XS0pexNWmxrdcCyNGyDmLyYw5FtKsalBUeOg==
 
+"@heroku/socksv5@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@heroku/socksv5/-/socksv5-0.0.9.tgz#7a3905921136b2666979a0f86bb4f062f657f793"
+  integrity sha1-ejkFkhE2smZpeaD4a7TwYvZX95M=
+  dependencies:
+    ip-address "^5.8.8"
+
 "@hot-loader/react-dom@^16.13.0":
   version "16.13.0"
   resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-16.13.0.tgz#de245b42358110baf80aaf47a0592153d4047997"
@@ -8293,6 +8300,15 @@ invert-kv@^2.0.0:
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-2.0.0.tgz#7393f5afa59ec9ff5f67a27620d11c226e3eec02"
   integrity sha512-wPVv/y/QQ/Uiirj/vh3oP+1Ww+AWehmi1g5fFWGPF6IpCBCDVrhgHRMvrLfdYcwDh3QJbGXDW4JAuzxElLSqKA==
 
+ip-address@^5.8.8:
+  version "5.9.4"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-5.9.4.tgz#4660ac261ad61bd397a860a007f7e98e4eaee386"
+  integrity sha512-dHkI3/YNJq4b/qQaz+c8LuarD3pY24JqZWfjB8aZx1gtpc2MDILu9L9jpZe1sHpzo/yWFweQVn+U//FhazUxmw==
+  dependencies:
+    jsbn "1.1.0"
+    lodash "^4.17.15"
+    sprintf-js "1.1.2"
+
 ip-regex@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ip-regex/-/ip-regex-2.1.0.tgz#fa78bf5d2e6913c911ce9f819ee5146bb6d844e9"
@@ -9266,6 +9282,11 @@ js-yaml@^3.13.1:
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
+
+jsbn@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-1.1.0.tgz#b01307cb29b618a1ed26ec79e911f803c4da0040"
+  integrity sha1-sBMHyym2GKHtJux56RH4A8TaAEA=
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -13753,7 +13774,7 @@ split@^1.0.0:
   dependencies:
     through "2"
 
-sprintf-js@^1.1.2:
+sprintf-js@1.1.2, sprintf-js@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.2.tgz#da1765262bf8c0f571749f2ad6c26300207ae673"
   integrity sha512-VE0SOVEHCk7Qc8ulkWw3ntAzXuqf7S2lvwQaDLRnUeIEaKNQJzV6BwmLKhOqT61aGhfUMrXeaBk+oDGCzvhcug==
@@ -13762,6 +13783,14 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
+
+ssh2-promise@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/ssh2-promise/-/ssh2-promise-0.1.7.tgz#b5a73870a683aae1d596a75d12c48486714f97a0"
+  integrity sha512-7iaFJQmTKekBzM/nbWZGaC472mqmgqSkz5qAlU8Hj4QIpTHgml/HCMKUX0mc7tOrqNlgwrginURoe+OG+PxnEg==
+  dependencies:
+    "@heroku/socksv5" "^0.0.9"
+    ssh2 "^0.8.9"
 
 ssh2-streams@~0.4.10:
   version "0.4.10"

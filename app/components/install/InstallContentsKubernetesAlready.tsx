@@ -6,17 +6,36 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton
+  IconButton,
+  CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles
 } from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
+import * as Script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
+import { Role } from '../../utils/class/Node';
+import * as Common from '../../utils/common/ssh';
+import { green } from '@material-ui/core/colors';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    buttonSuccess: {
+      backgroundColor: green[500],
+      '&:hover': {
+        backgroundColor: green[700]
+      }
+    }
+  })
+);
 
 function InstallContentsKubernetesAlready(props: any) {
   console.log('InstallContentsKubernetesAlready');
@@ -24,8 +43,12 @@ function InstallContentsKubernetesAlready(props: any) {
   const { history, location, match } = props;
   console.debug(props);
 
+  const classes = useStyles();
+
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
+
+  const [loading, setLoading] = React.useState(false);
 
   const getVersion = () => {
     for (let i = 0; i < appState.nowEnv.installedProducts.length; i += 1) {
@@ -52,8 +75,71 @@ function InstallContentsKubernetesAlready(props: any) {
     style: { width: '20rem', height: '20rem' }
   };
 
+  const remove = async () => {
+    setLoading(true);
+    console.log(appState.nowEnv.nodes);
+    const nodeInfo = appState.nowEnv.nodes;
+
+    // master, worker로 분리
+    const masterArr = [];
+    const workerArr = [];
+    for (let i = 0; i < nodeInfo.length; i += 1) {
+      if (nodeInfo[i].role === Role.MASTER) {
+        masterArr.push(nodeInfo[i]);
+      } else if (nodeInfo[i].role === Role.WORKER) {
+        workerArr.push(nodeInfo[i]);
+      }
+    }
+    await Promise.all(
+      masterArr.map((master, index) => {
+        if (index === 0) {
+          // TODO: image registry 분기 처리
+        }
+
+        let command = '';
+        command += Script.getK8sMasterRemoveScript();
+        master.cmd = command;
+        console.log(master.cmd);
+        return Common.send(master, {
+          close: () => {},
+          stdout: (data: string) => {
+            console.log('stdout!!');
+          },
+          stderr: (data: string) => {
+            console.log('stderr!!');
+          }
+        });
+      })
+    );
+    // TODO:
+    // workerArr.map((worker, index) => {
+    //   const joinCmd = logRef.current!.value.split('@@@')[1];
+    //   for (let j = 0; j < nodeInfo.length; j += 1) {
+    //     if (nodeInfo[j].role === Role.WORKER) {
+    //       const worker = nodeInfo[j];
+    //       console.log('worker!!!', worker);
+    //       // install docker
+    //       // install kubelet, kubectl, kubeadm
+    //       // join cluster
+    //       command = Script.runScriptAsFile(Script.getDockerInstallScript());
+    //       command += Script.getK8sToolsInstallScript();
+    //       command += joinCmd;
+    //       worker.cmd = command;
+    //       Common.send(worker, {
+    //         close: () => {},
+    //         stdout: () => {},
+    //         stderr: () => {}
+    //       });
+    //     }
+    //   }
+    // });
+    setLoading(false);
+  };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
+      {loading && (
+        <CircularProgress size={24} className={classes.buttonProgress} />
+      )}
       <div>
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
@@ -157,6 +243,7 @@ function InstallContentsKubernetesAlready(props: any) {
                       appState.nowEnv.name,
                       CONST.PRODUCT.KUBERNETES_TXT
                     );
+                    remove();
                     history.push(
                       `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
                     );

@@ -1,10 +1,15 @@
-import React, { useContext, useEffect } from 'react';
-import { KubeInstallContext } from './InstallContentsKubernetes';
+import React, { useContext } from 'react';
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
+} from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
-import LinearProgress from '@material-ui/core/LinearProgress/LinearProgress';
 import styles from './InstallContentsKubernetes3.css';
-import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import Node, { Role } from '../../utils/class/Node';
+import { Role } from '../../utils/class/Node';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
@@ -15,119 +20,105 @@ const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3(props: any) {
   console.log('InstallContentsKubernetes3');
 
-  const { history, location, match } = props;
+  const { history } = props;
   console.debug(props);
 
   const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
-
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+  const { appState } = appContext;
 
   const [progress, setProgress] = React.useState(0);
-  // test용
-  // useEffect(() => {
-  //   setInterval(()=>{
-  //     setProgress(p=>p+1)
-  //   }, 1000);
-  // }, [])
 
   const [open, setOpen] = React.useState(false);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
 
-  const install = () => {
+  const install = async () => {
     console.log(appState.nowEnv.nodes);
     const nodeInfo = appState.nowEnv.nodes;
-    // logRef.current!.value = '';
+
+    // master, worker로 분리
+    const masterArr = [];
+    const workerArr = [];
     for (let i = 0; i < nodeInfo.length; i += 1) {
       if (nodeInfo[i].role === Role.MASTER) {
-        const master = nodeInfo[i];
-        console.log('master!!!', master);
-        // install docker
-        // init cluster
-        // install CNI
-        // get cluster join command
-        let command = Script.runScriptAsFile(Script.getDockerInstallScript());
-        command += `echo %%%30%%%`;
-        command += Script.runScriptAsFile(Script.getK8sClusterInitScript());
-        command += `echo %%%60%%%`;
-        command += Script.getCniInstallScript();
+        masterArr.push(nodeInfo[i]);
+      } else if (nodeInfo[i].role === Role.WORKER) {
+        workerArr.push(nodeInfo[i]);
+      }
+    }
+    await Promise.all(
+      masterArr.map((master, index) => {
+        if (index === 0) {
+          // TODO: image registry 분기 처리
+        }
+
+        let command = '';
+        command += `echo %%%10%%%;`;
+        command += Script.getK8sMasterInstallScript(master, index + 1);
+        command += `echo %%%30%%%;`;
         command += Script.getK8sClusterJoinScript(master.ip);
-        command += `echo %%%100%%%`;
+        command += `echo %%%100%%%;`;
         master.cmd = command;
-        Common.send(master, {
-          close: () => {
-            // console.log('close!!');
-            // TODO: 마스터 개수만큼 돌았을 때 워커 실행 해야 함..??
-            // if 문 추가??
-            const joinCmd = logRef.current!.value.split('@@@')[1];
-            for (let j = 0; j < nodeInfo.length; j += 1) {
-              if (nodeInfo[j].role === Role.WORKER) {
-                const worker = nodeInfo[j];
-                console.log('worker!!!', worker);
-                // install docker
-                // install kubelet, kubectl, kubeadm
-                // join cluster
-                command = Script.runScriptAsFile(
-                  Script.getDockerInstallScript()
-                );
-                command += Script.getK8sToolsInstallScript();
-                command += joinCmd;
-                worker.cmd = command;
-                Common.send(worker, {
-                  close: () => {},
-                  stdout: () => {},
-                  stderr: () => {}
-                });
-              }
-            }
-          },
+        console.log(master.cmd);
+        return Common.send(master, {
+          close: () => {},
           stdout: (data: string) => {
             console.log('stdout!!');
-            // setLog(pre => {
-            //   return pre + data;
-            // });
             logRef.current!.value += data;
             logRef.current!.scrollTop = logRef.current!.scrollHeight;
             if (String(data).split('%%%')[1]) {
-              setProgress(String(data).split('%%%')[1]);
+              setProgress(Number(String(data).split('%%%')[1]));
 
-              // 완료 후 3초 뒤, 페이지 이동
-              setTimeout(()=>{
-                if (String(data).split('%%%')[1] === '100') {
-                  // dispatchKubeInstall({
-                  //   page: 4
-                  // });
-                  history.push(
-                    `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
-                  );
-                }
-              }, 3000);
+              // 완료 버튼 표기
+              if (String(data).split('%%%')[1] === '100') {
+                // dispatchKubeInstall({
+                //   page: 4
+                // });
+                // history.push(
+                //   `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
+                // );
+              }
             }
           },
           stderr: (data: string) => {
             console.log('stderr!!');
-            // setLog(pre => {
-            //   return pre + data;
-            // });
             console.log(logRef.current!);
             logRef.current!.value += data;
             logRef.current!.scrollTop = logRef.current!.scrollHeight;
           }
         });
-      }
-    }
+      })
+    );
+    // TODO:
+    // workerArr.map((worker, index) => {
+    //   const joinCmd = logRef.current!.value.split('@@@')[1];
+    //   for (let j = 0; j < nodeInfo.length; j += 1) {
+    //     if (nodeInfo[j].role === Role.WORKER) {
+    //       const worker = nodeInfo[j];
+    //       console.log('worker!!!', worker);
+    //       // install docker
+    //       // install kubelet, kubectl, kubeadm
+    //       // join cluster
+    //       command = Script.runScriptAsFile(Script.getDockerInstallScript());
+    //       command += Script.getK8sToolsInstallScript();
+    //       command += joinCmd;
+    //       worker.cmd = command;
+    //       Common.send(worker, {
+    //         close: () => {},
+    //         stdout: () => {},
+    //         stderr: () => {}
+    //       });
+    //     }
+    //   }
+    // });
   };
 
   React.useEffect(() => {
-    // install();
+    install();
 
     return () => {};
   }, []);
@@ -144,7 +135,7 @@ function InstallContentsKubernetes3(props: any) {
       <div className={['childLeftRightCenter'].join(' ')}>
         <Button
           variant="contained"
-          style={{marginRight: '10px'}}
+          style={{ marginRight: '10px' }}
           className={['blue'].join(' ')}
           size="large"
           onClick={() => {
@@ -158,22 +149,32 @@ function InstallContentsKubernetes3(props: any) {
         >
           &lt; 이전
         </Button>
-        <Button
-          variant="contained"
-          className={['white'].join(' ')}
-          size="large"
-          onClick={() => {
-            // handleClickOpen();
-            // dispatchKubeInstall({
-            //   page: 4
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
-            );
-          }}
-        >
-          취소
-        </Button>
+        {progress === 100 ? (
+          <Button
+            variant="contained"
+            className={['white'].join(' ')}
+            size="large"
+            onClick={() => {
+              history.push(
+                `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
+              );
+            }}
+          >
+            완료
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            className={['white'].join(' ')}
+            size="large"
+            onClick={() => {
+              handleClickOpen();
+            }}
+          >
+            취소
+          </Button>
+        )}
+
         <Dialog
           open={open}
           onClose={handleClose}
@@ -183,8 +184,7 @@ function InstallContentsKubernetes3(props: any) {
           <DialogTitle id="alert-dialog-title">나가기</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-            설치를 종료하시겠습니까?
-            설정 내용은 저장되지 않습니다.
+              설치를 종료하시겠습니까? 설정 내용은 저장되지 않습니다.
             </DialogContentText>
           </DialogContent>
           <DialogActions>

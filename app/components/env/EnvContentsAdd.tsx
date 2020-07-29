@@ -476,6 +476,7 @@ function EnvContentsAdd(props: any) {
 
                 handleButtonClick();
                 setTotalError('');
+
                 Common.connectionTest({
                   ip,
                   port,

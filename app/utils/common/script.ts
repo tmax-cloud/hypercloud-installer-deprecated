@@ -1,4 +1,57 @@
 // eslint-disable-next-line import/prefer-default-export
+export function getK8sMasterRemoveScript(): string {
+  return `yum install -y git;
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd hypercloud-install-guide/K8S_Master/installer;
+chmod 755 k8s_infra_installer.sh;
+./k8s_infra_installer.sh delete;
+./k8s_infra_installer.sh delete;
+yum remove -y kubeadm;
+yum remove -y kubelet;
+yum remove -y kubectl;
+yum remove -y cri-o;`;
+}
+
+export function getK8sMasterInstallScript(master, index): string {
+  const KUBERNETES_VERSION = `1.17.6`;
+  const setHostName = `sudo hostnamectl set-hostname master-${index};`;
+  const registHostName = `echo ${master.ip} master-${index} >> /etc/hosts`;
+  const crioVersion = `1.17`;
+//   const addCrioRepo = `curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo \
+// https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
+// curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo \
+// https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crioVersion}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo`;
+
+  // TODO:
+  // 공식 홈페이지에 나와 있는
+  // exclude=kubelet kubeadm kubectl
+  // 부분 뺌
+  // yum update 명령 시, version update에서 제외 시키는 부분
+//   const addKubeRepo = `cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+// [kubernetes]
+// name=Kubernetes
+// baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+// enabled=1
+// gpgcheck=1
+// repo_gpgcheck=1
+// gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+// EOF`;
+  // TODO:
+  // imageRepository 주석 처리
+  // 현재 스크립트에서 crio에 imageRegistry 등록해주는 부분 제거 해주어야 함
+  return `${setHostName}
+${registHostName}
+yum install -y git
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd hypercloud-install-guide/K8S_Master/installer;
+chmod 755 k8s_infra_installer.sh;
+. k8s.config;
+sudo sed -i "s|$crioVersion|${crioVersion}|g" ./k8s.config;
+sudo sed -i "s|$apiServer|${master.ip}|g" ./k8s.config;
+sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
+./k8s_infra_installer.sh up;`;
+}
+
 export function getDockerInstallScript(): string {
   const MGT_DOCKER_VERSION = '5:19.03.2~3-0~ubuntu-bionic';
 
@@ -26,7 +79,7 @@ fi
 }
 
 export function getK8sToolsInstallScript(): string {
-  const KUBERNETES_VERSION = '1.17.3';
+  const KUBERNETES_VERSION = '1.17.6';
   return `sudo apt-get update;
           sudo swapoff -a;
           sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -35,8 +88,8 @@ export function getK8sToolsInstallScript(): string {
           sudo apt update;
           sudo apt install -y kubelet=${KUBERNETES_VERSION}-00;
           sudo apt install -y kubeadm=${KUBERNETES_VERSION}-00;
-          sudo apt install -y kubectl=${KUBERNETES_VERSION}-00;
-          sudo apt-mark hold kubelet kubeadm kubectl;`;
+          sudo apt install -y kubectl=${KUBERNETES_VERSION}-00;`;
+  // sudo apt-mark hold kubelet kubeadm kubectl;`
 }
 
 export function getK8sClusterInitScript(): string {

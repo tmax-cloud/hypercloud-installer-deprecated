@@ -72,8 +72,8 @@ const createWindow = async () => {
     //         preload: path.join(__dirname, 'dist/renderer.prod.js')
     //       }
     webPreferences: {
-        nodeIntegration: true
-      }
+      nodeIntegration: true
+    }
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);

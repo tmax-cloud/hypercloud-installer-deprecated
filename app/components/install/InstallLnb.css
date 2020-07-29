@@ -2,6 +2,7 @@
   background: #4E4C4C;
   color: white;
   font-weight: bold;
+  padding: 10px;
   /* width: 25%; */
   /* height: calc(100vh - 60px); */
 }
@@ -14,11 +15,15 @@
   color: white !important;
   border-bottom: 1px solid white;
 }
+.selectBox > div::before{
+  border-bottom: 0px !important
+}
 .selectBox svg{
   color: white;
 }
 .selectBox > a {
-  margin-top: 5px;
+  margin-top: 10px;
+  margin-left: 10px;
 }
 
 .listItemBox:hover{

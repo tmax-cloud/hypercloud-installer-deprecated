@@ -19,6 +19,9 @@
   height: 100%;
   width: 100%;
 }
+.productBox:hover {
+  cursor: pointer;
+}
 .productBoxContents {
   padding: 5px 20px;
 }

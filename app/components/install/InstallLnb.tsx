@@ -120,7 +120,9 @@ function InstallLnb(props: any) {
                 );
               }}
             >
-              <span style={{ color: 'white' }}>제품 목록</span>
+              <span style={{ color: 'white' }}>
+                <a>제품 목록</a>
+              </span>
             </ListSubheader>
           )}
           className={classes.root}

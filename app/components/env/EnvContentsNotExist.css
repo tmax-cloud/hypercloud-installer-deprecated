@@ -1,6 +1,7 @@
 .wrap {
   /* 영역 확인용 background-color */
   /* background-color:yellow; */
+  height: 100%;
 }
 
 .box{
