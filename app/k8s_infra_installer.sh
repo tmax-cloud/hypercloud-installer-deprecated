@@ -19,7 +19,6 @@ function set_env() {
 
   # centos
   if [[ ${os_check} == "\"CentOS Linux\"" ]]; then
-
     # disable firewall
     sudo systemctl disable firewalld
     sudo systemctl stop firewalld
@@ -45,7 +44,6 @@ EOF
 
   # ubuntu
   elif [[ ${os_check} = "\"Ubuntu\"" ]]; then
-
     #swapoff
     sudo swapoff -a
     sudo sed s/\\/swap.img/#\ \\/swap.img/g -i /etc/fstab
@@ -72,7 +70,6 @@ function install_crio() {
 
   #centos
   if [[ ${os_check} == "\"CentOS Linux\"" ]]; then
-
     # set repo
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo \
     https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
@@ -96,6 +93,9 @@ function install_crio() {
     sudo sed -i 's/\"\/usr\/libexec\/cni\"/\"\/usr\/libexec\/cni\"\,\"\/opt\/cni\/bin\"/g' /etc/crio/crio.conf
 
     if [[ -z ${imageRegistry} ]]; then
+      echo "image registry is not set"
+    else
+      # set crio registry config
       sudo sed -i 's/\#insecure\_registries = \"\[\]\"/\insecure\_registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
       sudo sed -i 's/\#registries = \[/registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
       sed -i 's/k8s.gcr.io/{imageRegistry}\/k8s.gcr.io/g' /etc/crio/crio.conf
