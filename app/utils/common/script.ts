@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export function getK8sMasterRemoveScript(): string {
-  return `yum install -y git;
+  return `cd ~;
+yum install -y git;
 git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
 cd hypercloud-install-guide/K8S_Master/installer;
 chmod 755 k8s_infra_installer.sh;
@@ -9,21 +10,26 @@ chmod 755 k8s_infra_installer.sh;
 yum remove -y kubeadm;
 yum remove -y kubelet;
 yum remove -y kubectl;
-yum remove -y cri-o;`;
+yum remove -y cri-o;
+rm -rf ~/hypercloud-install-guide/;`;
 }
 
-export function getK8sMasterInstallScript(master: any, index: number): string {
+export function getK8sMainMasterInstallScript(
+  mainMaster: any,
+  index: number
+): string {
   const IMAGE_REGISTRY = ``;
   const CRIO_VERSION = `1.17`;
   const KUBERNETES_VERSION = `1.17.6`;
-  const API_SERVER = master.ip;
+  const API_SERVER = mainMaster.ip;
 
   const setHostName = `sudo hostnamectl set-hostname master-${index};`;
-  const registHostName = `echo ${API_SERVER} master-${index} >> /etc/hosts`;
+  const registHostName = `echo \`hostname -I\` master-${index} >> /etc/hosts`;
 
   return `${setHostName}
 ${registHostName}
-yum install -y git
+cd ~;
+yum install -y git;
 git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
 cd hypercloud-install-guide/K8S_Master/installer;
 . k8s.config;
@@ -35,7 +41,67 @@ sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
 git clone https://github.com/tmax-cloud/hypercloud-installer.git;
 mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
 chmod 755 k8s_infra_installer.sh;
-./k8s_infra_installer.sh`;
+./k8s_infra_installer.sh up mainMaster;`;
+}
+
+export function getK8sMasterInstallScript(master: any, index: number): string {
+  const IMAGE_REGISTRY = ``;
+  const CRIO_VERSION = `1.17`;
+  const KUBERNETES_VERSION = `1.17.6`;
+  const API_SERVER = master.ip;
+
+  const setHostName = `sudo hostnamectl set-hostname master-${index};`;
+  const registHostName = `echo \`hostname -I\` master-${index} >> /etc/hosts`;
+
+  return `${setHostName}
+${registHostName}
+cd ~;
+yum install -y git;
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd hypercloud-install-guide/K8S_Master/installer;
+. k8s.config;
+sudo sed -i "s|$imageRegistry|${IMAGE_REGISTRY}|g" ./k8s.config;
+sudo sed -i "s|$crioVersion|${CRIO_VERSION}|g" ./k8s.config;
+sudo sed -i "s|$k8sVersion|${KUBERNETES_VERSION}|g" ./k8s.config;
+sudo sed -i "s|$apiServer|${API_SERVER}|g" ./k8s.config;
+sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
+git clone https://github.com/tmax-cloud/hypercloud-installer.git;
+mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
+chmod 755 k8s_infra_installer.sh;
+./k8s_infra_installer.sh up master;`;
+}
+
+export function getK8sWorkerInstallScript(mainMaster: any, worker: any, index: number): string {
+  const IMAGE_REGISTRY = ``;
+  const CRIO_VERSION = `1.17`;
+  const KUBERNETES_VERSION = `1.17.6`;
+  const API_SERVER = mainMaster.ip;
+
+  const setHostName = `sudo hostnamectl set-hostname worker-${index};`;
+  const registHostName = `echo \`hostname -I\` worker-${index} >> /etc/hosts`;
+
+  return `${setHostName}
+${registHostName}
+cd ~;
+yum install -y git;
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd hypercloud-install-guide/K8S_Master/installer;
+. k8s.config;
+sudo sed -i "s|$imageRegistry|${IMAGE_REGISTRY}|g" ./k8s.config;
+sudo sed -i "s|$crioVersion|${CRIO_VERSION}|g" ./k8s.config;
+sudo sed -i "s|$k8sVersion|${KUBERNETES_VERSION}|g" ./k8s.config;
+sudo sed -i "s|$apiServer|${API_SERVER}|g" ./k8s.config;
+sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
+git clone https://github.com/tmax-cloud/hypercloud-installer.git;
+mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
+chmod 755 k8s_infra_installer.sh;
+./k8s_infra_installer.sh up worker;`;
+}
+
+export function getK8sClusterJoinScript(mainMaster: any): string {
+  return `export joinToken=\`kubeadm token list -o jsonpath='{.token}'\`;
+          export joinHash=\`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'\`
+          echo "@@@kubeadm join ${mainMaster.ip}:6443 --token $joinToken --discovery-token-ca-cert-hash sha256:$joinHash"`;
 }
 
 export function getDockerInstallScript(): string {
@@ -108,8 +174,33 @@ export function runScriptAsFile(script: string): string {
           ./script.sh;`;
 }
 
-export function getK8sClusterJoinScript(masterIp: string): string {
-  return `export joinToken=\`kubeadm token list -o jsonpath='{.token}'\`;
-          export joinHash=\`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'\`
-          echo "@@@kubeadm join ${masterIp}:6443 --token $joinToken --discovery-token-ca-cert-hash sha256:$joinHash"`;
+
+const installOne = (target) => {
+  return new Promise(async (resolve,reject) => {
+        setTimeout(() => {
+            if (true) {
+              // 성공 시
+              resolve(`install complete at ${target}`)
+            } else {
+              // 실패 시
+              reject(`install err at ${target}`);
+            }
+        },3000)
+  })
 }
+const installAll = async () => {
+    const targets = ['node1','node2','node3'];
+    const status = await Promise.all(targets.map(async (target) => {
+      // 한개 씩 프로미스 리턴
+      await installOne(target)
+      .then((result)=>{
+        console.log(result);
+      })
+      .catch((err)=>{
+        console.error(err)
+      })
+    }));
+    console.log("Status =>",status);
+    console.log('install compelte')
+}
+installAll();

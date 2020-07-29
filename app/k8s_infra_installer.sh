@@ -5,6 +5,8 @@ install_dir=$(dirname "$0")
 
 yaml_dir="${install_dir}/yaml"
 
+type=$2
+
 #sudo yum update -y
 
 os_check=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
@@ -92,13 +94,15 @@ function install_crio() {
 
     # edit crio config
     sudo sed -i 's/\"\/usr\/libexec\/cni\"/\"\/usr\/libexec\/cni\"\,\"\/opt\/cni\/bin\"/g' /etc/crio/crio.conf
-    #sudo sed -i 's/\#insecure\_registries = \"\[\]\"/\insecure\_registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
-    #sudo sed -i 's/\#registries = \[/registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
-    #sed -i 's/k8s.gcr.io/{imageRegistry}\/k8s.gcr.io/g' /etc/crio/crio.conf
-    #sed -i 's/registry.fedoraproject.org/{imageRegistry}/g' /etc/containers/registries.conf
-    #sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" /etc/crio/crio.conf
-    #sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" /etc/containers/registries.conf
 
+    if [[ -z ${imageRegistry} ]]; then
+      sudo sed -i 's/\#insecure\_registries = \"\[\]\"/\insecure\_registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
+      sudo sed -i 's/\#registries = \[/registries = \[\"{imageRegistry}\"\]/g' /etc/crio/crio.conf
+      sed -i 's/k8s.gcr.io/{imageRegistry}\/k8s.gcr.io/g' /etc/crio/crio.conf
+      sed -i 's/registry.fedoraproject.org/{imageRegistry}/g' /etc/containers/registries.conf
+      sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" /etc/crio/crio.conf
+      sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" /etc/containers/registries.conf
+    fi
 	  sudo systemctl restart crio
 
   else
@@ -126,32 +130,30 @@ EOF
 
   #install kubernetes
   if [[ -z ${k8sVersion} ]]; then
-	k8sVersion=1.17.6
+	  k8sVersion=1.17.6
   else
-	k8sVersion=${k8sVersion}
+	  k8sVersion=${k8sVersion}
   fi
 
   if [[ -z ${apiServer} ]]; then
-	apiServer=127.0.0.1
+	  apiServer=127.0.0.1
   else
-    	apiServer=${apiServer}
+    apiServer=${apiServer}
   fi
 
   if [[ -z ${podSubnet} ]]; then
-    	podSubnet=10.244.0.0/16
+    podSubnet=10.244.0.0/16
   else
    	podSubnet=${podSubnet}
   fi
 
   # centos
   if [[ ${os_check} == "\"CentOS Linux\"" ]]; then
-
     #install kubernetes components
     sudo yum install -y kubeadm-${k8sVersion}-0 kubelet-${k8sVersion}-0 kubectl-${k8sVersion}-0
     sudo systemctl enable --now kubelet
   # ubuntu
   elif [[ ${os_check} = "\"Ubuntu\"" ]]; then
-
     #install kubernetes components
     sudo apt-get install -y kubeadm=${k8sVersion}-00 kubelet=${k8sVersion}-00 kubectl=${k8sVersion}-00
     sudo systemctl enable kubelet
@@ -170,12 +172,18 @@ EOF
   sudo sed -i "s|{podSubnet}|\"${podSubnet}\"|g" ${yaml_dir}/kubeadm-config.yaml
   sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" ${yaml_dir}/kubeadm-config.yaml
 
-  # kube init
-  sudo kubeadm init --config=${yaml_dir}/kubeadm-config.yaml --upload-certs
+  if [ ${type} -eq "mainMaster" ];then
+    # kube init
+    sudo kubeadm init --config=${yaml_dir}/kubeadm-config.yaml --upload-certs
 
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  elif [ ${type} -eq "master" ]; then
+    # master type
+  elif [ ${type} -eq "worker" ]; then
+    # worker type
+  fi
 
   echo  "========================================================================="
   echo  "======================  complete install kubernetes  ===================="

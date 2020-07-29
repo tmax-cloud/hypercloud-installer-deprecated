@@ -30,12 +30,11 @@ export function send(node: Node, cb: SendCb) {
             })
             .on('data', data => {
               cb.stdout(data);
-              // console.log(`STDOUT: ${data}`);
+              console.log(`STDOUT: ${data}`);
             })
             .stderr.on('data', data => {
               cb.stderr(data);
               console.error(`STDERR: ${data}`);
-              reject();
             });
         });
       })
