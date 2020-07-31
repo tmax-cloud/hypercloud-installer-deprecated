@@ -18,6 +18,7 @@ import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
 import styles from './InstallContentsKubernetes2.css';
 import { AppContext } from '../../containers/HomePage';
+import * as env from '../../utils/common/env';
 
 function InstallContentsKubernetes2(props: any) {
   console.log('InstallContentsKubernetes2');
@@ -27,6 +28,8 @@ function InstallContentsKubernetes2(props: any) {
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
+
+  const nowEnv = env.getEnvByName(match.params.envName);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
@@ -115,7 +118,7 @@ function InstallContentsKubernetes2(props: any) {
               }
             });
             history.push(
-              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step3`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step3`
             );
           }}
         >
@@ -166,7 +169,7 @@ function InstallContentsKubernetes2(props: any) {
               onClick={() => {
                 handleClose();
                 history.push(
-                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
                 );
               }}
             >

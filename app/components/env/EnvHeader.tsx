@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react/prop-types */
+/* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import { Link } from 'react-router-dom';
 import styles from './EnvHeader.css';
 import routes from '../../utils/constants/routes.json';
 
@@ -34,7 +36,7 @@ function EnvHeader(props: any) {
           variant="contained"
           startIcon={<AddIcon />}
           size="small"
-          onClick={()=>{
+          onClick={() => {
             history.push(routes.ENV.ADD);
           }}
         >

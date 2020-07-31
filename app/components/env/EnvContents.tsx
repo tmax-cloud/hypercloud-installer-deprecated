@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
 import React, { useEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';

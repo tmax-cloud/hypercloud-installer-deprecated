@@ -43,7 +43,6 @@ export function send(node: Node, cb: SendCb) {
         port: node.port,
         username: node.user,
         password: node.password
-        // privateKey: require('fs').readFileSync('/here/is/my/key')
       });
   });
 }

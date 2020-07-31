@@ -1,42 +1,75 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-console */
+/* eslint-disable global-require */
 import CONST from '../constants/constant';
-import TEST from '../constants/env.json';
+import Node, { Role } from '../class/Node';
+import Env from '../class/Env';
 
 /**
  * 파일 작업은 모두 sync로 수행
  */
 
 /**
- * @description json 파일에서 환경 리스트를 리턴
+ * @description Node객체 생성하여 리턴
  */
-export function loadEnv() {
+function makeNodeObject(object: any) {
+  return new Node(
+    object._ip,
+    object._port,
+    object._user,
+    object._password,
+    object._role,
+    object._hostName
+  );
+}
+
+/**
+ * @description Env객체 생성하여 리턴
+ */
+function makeEnvObject(object: any) {
+  return new Env(
+    object._name,
+    object._nodeList.map((node: any) => {
+      return makeNodeObject(node);
+    }),
+    object._productList,
+    object._updatedTime
+  );
+}
+
+export function loadEnvList() {
   const fs = require('fs');
 
   try {
     if (fs.existsSync('env.json')) {
-      //file exists
+      // file exists
     } else {
-      fs.writeFileSync('env.json', '[]', function(err) {
+      fs.writeFileSync('env.json', '[]', (err: any) => {
         if (err) {
-          console.log(err);
+          console.debug(err);
         }
       });
     }
-  } catch(err) {
-
+  } catch (err) {
+    throw Error(err);
   }
 
   const envList = fs.readFileSync('env.json');
-  return JSON.parse(envList);
+  const envObjList = JSON.parse(envList).map((env: any) => {
+    return makeEnvObject(env);
+  });
+
+  return envObjList;
 }
 
 /**
  * @param envList 환경 리스트
  * @description 환경 리스트 json 파일에 저장
  */
-export function saveEnv(envList: any) {
+export function saveEnvList(envList: Env[]) {
   const jsonData = JSON.stringify(envList);
   const fs = require('fs');
-  fs.writeFileSync('env.json', jsonData, function(err) {
+  fs.writeFileSync('env.json', jsonData, (err: any) => {
     if (err) {
       console.log(err);
     }
@@ -48,10 +81,10 @@ export function saveEnv(envList: any) {
  * @description 해당 환경 정보 리턴
  */
 export function getEnvByName(envName: string) {
-  const envList = loadEnv();
+  const envList = loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === envName) {
-      return envList[i];
+      return makeEnvObject(envList[i]);
     }
   }
   return null;
@@ -62,31 +95,31 @@ export function getEnvByName(envName: string) {
  * @description 해당 환경 정보 삭제
  */
 export function deleteEnvByName(envName: string) {
-  const envList = loadEnv();
+  const envList = loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === envName) {
       envList.splice(i, 1);
       break;
     }
   }
-  saveEnv(envList);
+  saveEnvList(envList);
 }
 
 /**
  * @param newEnv 새 환경
  * @description 새로운 환경 정보를 넣어준다.
  */
-export function appendEnv(newEnv: any) {
-  const envList = loadEnv();
-  envList.push(newEnv);
-  saveEnv(envList);
+export function addEnv(env: Env) {
+  const envList = loadEnvList();
+  envList.push(env);
+  saveEnvList(envList);
 }
 
 /**
  * @description 저장 된 환경 정보가 있는지, 없는지 여부
  */
 export function isEmpty() {
-  const envList = loadEnv();
+  const envList = loadEnvList();
   if (envList.length > 0) {
     // 환경 정보 없음
     return false;
@@ -101,8 +134,8 @@ export function isEmpty() {
  * @description 해당 환경에 해당 제품이 설치 되어 있는지 여부
  */
 export function isInstalled(productName: any, env: any) {
-  for (let i = 0; i < env.installedProducts.length; i += 1) {
-    const target = env.installedProducts[i];
+  for (let i = 0; i < env.productList.length; i += 1) {
+    const target = env.productList[i];
     if (target.name === productName) {
       // 설치 됨
       return true;
@@ -120,8 +153,8 @@ export const isAllRequiredProductInstall = (env: any) => {
   for (let i = 0; i < CONST.PRODUCT.REQUIRED.length; i += 1) {
     const target = CONST.PRODUCT.REQUIRED[i].NAME;
     let installed = false;
-    for (let j = 0; j < env.installedProducts.length; j += 1) {
-      const target2 = env.installedProducts[j].name;
+    for (let j = 0; j < env.productList.length; j += 1) {
+      const target2 = env.productList[j].name;
       if (target === target2) {
         installed = true;
         break;
@@ -140,17 +173,44 @@ export const isAllRequiredProductInstall = (env: any) => {
  * @description 해당 환경에서 해당 제품을 삭제한다.
  */
 export const deleteProductByName = (envName: string, productName: string) => {
-  const envList = loadEnv();
+  const envList = loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === envName) {
       const targetEnv = envList[i];
-      for (let j = 0; i < targetEnv.installedProducts.length; j += 1) {
-        if (targetEnv.installedProducts[j].name === productName) {
-          targetEnv.installedProducts.splice(j, 1);
-          saveEnv(envList);
+      for (let j = 0; i < targetEnv.productList.length; j += 1) {
+        if (targetEnv.productList[j].name === productName) {
+          targetEnv.productList.splice(j, 1);
+          saveEnvList(envList);
           return;
         }
       }
     }
   }
+};
+
+/**
+ * @param nodeInfo 한 환경의 노드 리스트
+ * @description 노드 리스트를, mainMaster, master, worker로 분리하여 리턴
+ */
+export const getArrSortedByRole = (nodeInfo: any) => {
+  // mainMaster, master, worker로 분리
+  let mainMaster: any = null;
+  const masterArr: any[] = [];
+  const workerArr: any[] = [];
+
+  for (let i = 0; i < nodeInfo.length; i += 1) {
+    if (nodeInfo[i].role === Role.MAIN_MASTER) {
+      mainMaster = nodeInfo[i];
+    } else if (nodeInfo[i].role === Role.MASTER) {
+      masterArr.push(nodeInfo[i]);
+    } else if (nodeInfo[i].role === Role.WORKER) {
+      workerArr.push(nodeInfo[i]);
+    }
+  }
+
+  return {
+    mainMaster,
+    masterArr,
+    workerArr
+  };
 };

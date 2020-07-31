@@ -39,9 +39,9 @@ function InstallContentsKubernetes(props: any) {
 
   //   // 설치 여부 판단
   //   let isInstalled = false;
-  //   for (let i = 0; i < appState.nowEnv.installedProducts.length; i += 1) {
-  //     const target = appState.nowEnv.installedProducts[i];
-  //     if (target.name === CONST.PRODUCT.KUBERNETES_TXT) {
+  //   for (let i = 0; i < appState.nowEnv.productList.length; i += 1) {
+  //     const target = appState.nowEnv.productList[i];
+  //     if (target.name === CONST.PRODUCT.KUBERNETES.NAME) {
   //       isInstalled = true;
   //       break;
   //     }

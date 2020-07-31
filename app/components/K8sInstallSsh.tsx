@@ -18,7 +18,7 @@ interface Props {
 
 function K8sInstallSsh(props: Props) {
   console.log('K8sInstallSsh props : ', props);
-  const { saveEnv } = props;
+  const { saveEnvList } = props;
   const [sshInfo, setSshInfo] = React.useState(() => {
     // const temp = [];
     // for (let i = 0; i < nodeCnt; i += 1) {

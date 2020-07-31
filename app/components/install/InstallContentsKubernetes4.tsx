@@ -9,7 +9,7 @@ import { AppContext } from '../../containers/HomePage';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
 
-function InstallContentsKubernetes4(props) {
+function InstallContentsKubernetes4(props: any) {
   console.log('InstallContentsKubernetes4');
 
   const { history, location, match } = props;
@@ -18,23 +18,25 @@ function InstallContentsKubernetes4(props) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
+  const nowEnv = env.getEnvByName(match.params.envName);
+
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   // json 파일 저장
-  env.deleteProductByName(appState.nowEnv.name, CONST.PRODUCT.KUBERNETES_TXT);
-  const envList = env.loadEnv();
+  env.deleteProductByName(nowEnv.name, CONST.PRODUCT.KUBERNETES.NAME);
+  const envList = env.loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === appState.nowEnv.name) {
-      envList[i].installedProducts.push({
-        name: CONST.PRODUCT.KUBERNETES_TXT,
+    if (envList[i].name === nowEnv.name) {
+      envList[i].productList.push({
+        name: CONST.PRODUCT.KUBERNETES.NAME,
         version: appState.kubeinstallState.version,
         registry: appState.kubeinstallState.registry
       });
       break;
     }
   }
-  env.saveEnv(envList);
+  env.saveEnvList(envList);
 
   const getRegistryJsx = () => {
     if (appState.kubeinstallState.registry) {
@@ -78,7 +80,7 @@ function InstallContentsKubernetes4(props) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/main`
               );
             }}
           >

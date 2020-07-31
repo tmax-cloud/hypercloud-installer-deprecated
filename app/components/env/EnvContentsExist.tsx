@@ -37,7 +37,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import styles from './EnvContentsExist.css';
 import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
-import { Role } from '../../utils/class/Node';
+import Node, { Role } from '../../utils/class/Node';
 import routes from '../../utils/constants/routes.json';
 
 // interface Data {
@@ -50,16 +50,10 @@ import routes from '../../utils/constants/routes.json';
 
 interface Data {
   name: string;
-  nodeCnt: number;
+  // nodeCnt: number;
   updatedTime: string;
-  installedProducts: Array;
-  nodes: Array<{
-    ip: string;
-    port: number;
-    user: string;
-    password: number;
-    role: number;
-  }>;
+  productList: Array<string>;
+  nodeList: Node[];
 }
 
 // function createData(
@@ -329,7 +323,7 @@ export default function EnvContentsExist(props: any) {
   const { history } = props;
   console.debug(props);
 
-  const [rows, setRows] = useState(env.loadEnv());
+  const [rows, setRows] = useState(env.loadEnvList());
 
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('desc');
@@ -444,7 +438,7 @@ export default function EnvContentsExist(props: any) {
 
     const getMasterWorkerImage = role => {
       let component = null;
-      if (role === Role.MASTER) {
+      if (role === Role.MASTER || role === Role.MAIN_MASTER) {
         component = (
           <Tooltip title="Master" placement="top" arrow>
             <div className={['left'].join(' ')}>
@@ -519,8 +513,8 @@ export default function EnvContentsExist(props: any) {
               {row.name}
             </a>
           </TableCell>
-          <TableCell>{row.nodes.length}</TableCell>
-          <TableCell>{row.installedProducts.length}</TableCell>
+          <TableCell>{row.nodeList.length}</TableCell>
+          <TableCell>{row.productList.length}</TableCell>
           <TableCell>{new Date(row.updatedTime).toString()}</TableCell>
           <TableCell>
             <IconButton
@@ -559,7 +553,7 @@ export default function EnvContentsExist(props: any) {
                       backgroundColor: '#F2F8FF'
                     }}
                   >
-                    {row.nodes.map((nodeRow: any) => (
+                    {row.nodeList.map((nodeRow: any) => (
                       <TableRow key={nodeRow.ip}>
                         <TableCell component="th" scope="row">
                           {getMasterWorkerImage(nodeRow.role)}
@@ -577,7 +571,7 @@ export default function EnvContentsExist(props: any) {
                     설치 제품
                   </span>
                 </Typography>
-                {getProductJsx(row.installedProducts)}
+                {getProductJsx(row.productList)}
               </Box>
             </Collapse>
           </TableCell>
@@ -642,7 +636,7 @@ export default function EnvContentsExist(props: any) {
                   });
 
                   // 모두 지워졌으면 not exist 화면으로
-                  const envList = env.loadEnv();
+                  const envList = env.loadEnvList();
                   if (envList.length > 0) {
                     setRows(envList);
                   } else {
@@ -722,7 +716,7 @@ export default function EnvContentsExist(props: any) {
               onChange={e => {
                 console.log(rows);
                 const searchResultEnv = [];
-                env.loadEnv().map(environment => {
+                env.loadEnvList().map(environment => {
                   if (environment.name.indexOf(e.target.value) !== -1) {
                     searchResultEnv.push(environment);
                   }

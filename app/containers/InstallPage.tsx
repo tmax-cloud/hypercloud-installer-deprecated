@@ -15,10 +15,10 @@ function InstallPage(props: any) {
   const { appState, dispatchAppState } = appContext;
 
   console.log(env.getEnvByName(match.params.envName));
-  dispatchAppState({
-    type: 'set_nowEnv',
-    nowEnv: env.getEnvByName(match.params.envName)
-  });
+  // dispatchAppState({
+  //   type: 'set_nowEnv',
+  //   nowEnv: env.getEnvByName(match.params.envName)
+  // });
 
   return (
     <div className={[layout.wrap].join(' ')}>

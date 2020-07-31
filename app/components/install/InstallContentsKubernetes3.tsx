@@ -16,19 +16,32 @@ import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
 import ProgressBar from '../ProgressBar';
 import routes from '../../utils/constants/routes.json';
+import * as env from '../../utils/common/env';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3(props: any) {
   console.log('InstallContentsKubernetes3');
 
-  const { history } = props;
+  const { history, location, match } = props;
   console.debug(props);
 
-  const appContext = useContext(AppContext);
-  const { appState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState } = appContext;
+
+  const nowEnv = env.getEnvByName(match.params.envName);
 
   // progress bar
   const [progress, setProgress] = React.useState(0);
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress(prevProgress =>
+        prevProgress >= 100 ? 100 : prevProgress + 1
+      );
+    }, 10000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   // dialog
   const [open, setOpen] = React.useState(false);
@@ -39,61 +52,68 @@ function InstallContentsKubernetes3(props: any) {
     setOpen(false);
   };
 
+  const appendToProgressScreen = (ref: any, data: string) => {
+    if (ref) {
+      ref.current!.value += data;
+      ref.current!.scrollTop = ref.current!.scrollHeight;
+    }
+  };
+
   const installKubernetes = async () => {
-    console.log(appState.nowEnv.nodes);
-    const nodeInfo = appState.nowEnv.nodes;
+    console.log(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
-    let mainMaster: any = null;
-    const masterArr: any[] = [];
-    const workerArr: any[] = [];
-    for (let i = 0; i < nodeInfo.length; i += 1) {
-      if (nodeInfo[i].role === Role.MASTER) {
-        if (mainMaster === null) {
-          mainMaster = nodeInfo[i];
-        } else {
-          masterArr.push(nodeInfo[i]);
-        }
-      } else if (nodeInfo[i].role === Role.WORKER) {
-        workerArr.push(nodeInfo[i]);
-      }
-    }
+    const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(
+      nowEnv.nodeList
+    );
 
     console.error('mainMaster install start');
     let joinCmd = '';
     let command = '';
-    command += Script.getK8sMainMasterInstallScript(mainMaster, 0);
-    command += Script.getK8sClusterJoinScript(mainMaster.ip);
+    command += Script.getK8sMainMasterInstallScript(mainMaster);
+    command += Script.getK8sClusterJoinScript(mainMaster);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
       close: () => {
         joinCmd = logRef.current!.value.split('@@@')[1];
       },
-      stdout: (data: string) => {
-        // if (String(data).split('%%%')[1]) {
-        //   setProgress(Number(String(data).split('%%%')[1]));
-        // }
-        logRef.current!.value += data;
-        logRef.current!.scrollTop = logRef.current!.scrollHeight;
-      },
-      stderr: (data: string) => {
-        logRef.current!.value += data;
-        logRef.current!.scrollTop = logRef.current!.scrollHeight;
-      }
+      stdout: (data: string) => appendToProgressScreen(logRef, data),
+      stderr: (data: string) => appendToProgressScreen(logRef, data)
     });
     console.error(joinCmd);
     console.error('mainMaster install end');
+    setProgress(30);
 
     console.error('masterArr install start');
+    // 각각은 동시에, 전체 완료는 대기
     await Promise.all(
-      masterArr.map(async (master, index) => {
+      masterArr.map((master, index) => {
         command = '';
-        command += Script.getK8sMasterInstallScript(master, index + 1);
+        command += Script.getK8sMasterInstallScript(mainMaster, master);
         command += joinCmd;
         master.cmd = command;
         console.error(master.cmd);
-        await Common.send(master, {
+        return Common.send(master, {
+          close: () => {},
+          stdout: (data: string) => appendToProgressScreen(logRef, data),
+          stderr: (data: string) => appendToProgressScreen(logRef, data)
+        });
+      })
+    );
+    console.error('masterArr install end');
+    setProgress(70);
+
+    console.error('workerArr install start');
+    // 각각은 동시에, 전체 완료는 대기
+    await Promise.all(
+      workerArr.map((worker, index) => {
+        command = '';
+        command += Script.getK8sWorkerInstallScript(mainMaster, worker);
+        command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
+        worker.cmd = command;
+        console.error(worker.cmd);
+        return Common.send(worker, {
           close: () => {},
           stdout: (data: string) => {
             logRef.current!.value += data;
@@ -106,33 +126,7 @@ function InstallContentsKubernetes3(props: any) {
         });
       })
     );
-    console.error('masterArr install end');
-
-    console.error('workerArr install start');
-    workerArr.map((worker, index) => {
-      command = '';
-      command += Script.getK8sWorkerInstallScript(
-        mainMaster,
-        worker,
-        index + 1
-      );
-      command += `${joinCmd} --cri-socket=/var/run/crio/crio.sock`;
-      worker.cmd = command;
-      console.error(worker.cmd);
-      Common.send(worker, {
-        close: () => {},
-        stdout: (data: string) => {
-          logRef.current!.value += data;
-          logRef.current!.scrollTop = logRef.current!.scrollHeight;
-        },
-        stderr: (data: string) => {
-          logRef.current!.value += data;
-          logRef.current!.scrollTop = logRef.current!.scrollHeight;
-        }
-      });
-    });
     console.error('workerArr install end');
-
     setProgress(100);
   };
 
@@ -162,7 +156,7 @@ function InstallContentsKubernetes3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step2`
             );
           }}
         >
@@ -175,7 +169,7 @@ function InstallContentsKubernetes3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step4`
               );
             }}
           >
@@ -214,7 +208,7 @@ function InstallContentsKubernetes3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
                 );
               }}
               color="primary"

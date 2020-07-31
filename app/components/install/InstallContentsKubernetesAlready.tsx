@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
   Button,
@@ -14,6 +15,7 @@ import {
 } from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
+import { green } from '@material-ui/core/colors';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
@@ -24,15 +26,21 @@ import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 import { Role } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
-import { green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    buttonSuccess: {
-      backgroundColor: green[500],
-      '&:hover': {
-        backgroundColor: green[700]
-      }
+    // buttonSuccess: {
+    //   backgroundColor: green[500],
+    //   '&:hover': {
+    //     backgroundColor: green[700]
+    //   }
+    // },
+    buttonProgress: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginTop: -40,
+      marginLeft: -40
     }
   })
 );
@@ -48,12 +56,16 @@ function InstallContentsKubernetesAlready(props: any) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const [loading, setLoading] = React.useState(false);
+  const nowEnv = env.getEnvByName(match.params.envName);
+
+  // loading bar
+  // const [loading, setLoading] = React.useState(false);
 
   const getVersion = () => {
-    for (let i = 0; i < appState.nowEnv.installedProducts.length; i += 1) {
-      const target = appState.nowEnv.installedProducts[i];
-      if (target.name === CONST.PRODUCT.KUBERNETES_TXT) {
+    // nowEnv 있을 경우만 실행
+    for (let i = 0; i < nowEnv.productList.length; i += 1) {
+      const target = nowEnv.productList[i];
+      if (target.name === CONST.PRODUCT.KUBERNETES.NAME) {
         return target.version;
       }
     }
@@ -76,70 +88,80 @@ function InstallContentsKubernetesAlready(props: any) {
   };
 
   const remove = async () => {
-    setLoading(true);
-    console.log(appState.nowEnv.nodes);
-    const nodeInfo = appState.nowEnv.nodes;
+    dispatchAppState({
+      type: 'set_loading',
+      loading: true
+    });
+    // setLoading(true);
+    console.log(nowEnv.nodeList);
 
-    // master, worker로 분리
-    const masterArr = [];
-    const workerArr = [];
-    for (let i = 0; i < nodeInfo.length; i += 1) {
-      if (nodeInfo[i].role === Role.MASTER) {
-        masterArr.push(nodeInfo[i]);
-      } else if (nodeInfo[i].role === Role.WORKER) {
-        workerArr.push(nodeInfo[i]);
-      }
-    }
+    // mainMaster, master, worker로 분리
+    const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(
+      nowEnv.nodeList
+    );
+
+    console.error('worker remove start');
+    // 각각은 동시에, 전체 완료는 대기
     await Promise.all(
-      masterArr.map((master, index) => {
-        if (index === 0) {
-          // TODO: image registry 분기 처리
-        }
-
+      workerArr.map((worker, index) => {
         let command = '';
         command += Script.getK8sMasterRemoveScript();
-        master.cmd = command;
-        console.log(master.cmd);
-        return Common.send(master, {
+        worker.cmd = command;
+        console.error(worker.cmd);
+        return Common.send(worker, {
           close: () => {},
-          stdout: (data: string) => {
-            console.log('stdout!!');
-          },
-          stderr: (data: string) => {
-            console.log('stderr!!');
-          }
+          stdout: (data: string) => {},
+          stderr: (data: string) => {}
         });
       })
     );
-    // TODO:
-    // workerArr.map((worker, index) => {
-    //   const joinCmd = logRef.current!.value.split('@@@')[1];
-    //   for (let j = 0; j < nodeInfo.length; j += 1) {
-    //     if (nodeInfo[j].role === Role.WORKER) {
-    //       const worker = nodeInfo[j];
-    //       console.log('worker!!!', worker);
-    //       // install docker
-    //       // install kubelet, kubectl, kubeadm
-    //       // join cluster
-    //       command = Script.runScriptAsFile(Script.getDockerInstallScript());
-    //       command += Script.getK8sToolsInstallScript();
-    //       command += joinCmd;
-    //       worker.cmd = command;
-    //       Common.send(worker, {
-    //         close: () => {},
-    //         stdout: () => {},
-    //         stderr: () => {}
-    //       });
-    //     }
-    //   }
-    // });
-    setLoading(false);
+    console.error('worker remove end');
+
+    console.error('master remove start');
+    await Promise.all(
+      masterArr.map((master, index) => {
+        let command = '';
+        command += Script.getK8sMasterRemoveScript();
+        master.cmd = command;
+        console.error(master.cmd);
+        return Common.send(worker, {
+          close: () => {},
+          stdout: (data: string) => {},
+          stderr: (data: string) => {}
+        });
+      })
+    );
+    console.error('master remove end');
+
+    console.error('mainMaster remove start');
+    let command = '';
+    command += Script.getK8sMasterRemoveScript();
+    mainMaster.cmd = command;
+    console.error(mainMaster.cmd);
+    await Common.send(mainMaster, {
+      close: () => {},
+      stdout: (data: string) => {},
+      stderr: (data: string) => {}
+    });
+    console.error('mainMaster remove end');
+
+    // setLoading(false);
+    dispatchAppState({
+      type: 'set_loading',
+      loading: false
+    });
+    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
   };
+
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      {loading && (
-        <CircularProgress size={24} className={classes.buttonProgress} />
-      )}
+      {/* {loading && (
+        <CircularProgress
+          color="secondary"
+          size={40}
+          className={classes.buttonProgress}
+        />
+      )} */}
       <div>
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
@@ -240,13 +262,10 @@ function InstallContentsKubernetesAlready(props: any) {
                     handleClose();
                     // TODO:delete kubernetes
                     env.deleteProductByName(
-                      appState.nowEnv.name,
-                      CONST.PRODUCT.KUBERNETES_TXT
+                      nowEnv.name,
+                      CONST.PRODUCT.KUBERNETES.NAME
                     );
                     remove();
-                    history.push(
-                      `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
-                    );
                   }}
                 >
                   삭제

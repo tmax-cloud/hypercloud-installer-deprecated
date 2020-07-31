@@ -12,6 +12,7 @@ const store = configureStore();
 const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.debug('index.tsx');
   new Titlebar({
     // backgroundColor: Color.fromHex('#363A41'),
     // backgroundColor: Color.fromHex('#fff'),

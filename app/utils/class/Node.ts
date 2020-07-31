@@ -1,15 +1,7 @@
-/* eslint-disable no-dupe-class-members */
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
-
 /* eslint-disable no-underscore-dangle */
-export enum State {
-  INIT = 0,
-  WAIT = 1,
-  SUCCESS = 2,
-  FAIL = 3
-}
-
 export enum Role {
+  MAIN_MASTER = 100,
   MASTER = 0,
   WORKER = 1
 }
@@ -23,28 +15,26 @@ export default class Node {
 
   private _password: string;
 
-  private _cmd: string;
+  private _role: Role;
 
-  private _state?: State;
+  private _hostName: string;
 
-  private _role?: Role;
+  private _cmd?: string | undefined;
 
   constructor(
     ip: string,
     port: number,
     user: string,
     password: string,
-    cmd: string,
-    state?: State,
-    role?: Role
+    role: Role,
+    hostName: string
   ) {
     this._ip = ip;
     this._port = port;
     this._user = user;
     this._password = password;
-    this._cmd = cmd;
-    this._state = state;
     this._role = role;
+    this._hostName = hostName;
   }
 
   /**
@@ -83,16 +73,8 @@ export default class Node {
    * Getter cmd
    * @return {string}
    */
-  public get cmd(): string {
+  public get cmd(): string | undefined {
     return this._cmd;
-  }
-
-  /**
-   * Getter state
-   * @return {State}
-   */
-  public get state(): State {
-    return this._state;
   }
 
   /**
@@ -101,6 +83,14 @@ export default class Node {
    */
   public get role(): Role {
     return this._role;
+  }
+
+  /**
+   * Getter hostName
+   * @return {string}
+   */
+  public get hostName(): string {
+    return this._hostName;
   }
 
   /**
@@ -139,16 +129,8 @@ export default class Node {
    * Setter cmd
    * @param {string} value
    */
-  public set cmd(value: string) {
+  public set cmd(value: string | undefined) {
     this._cmd = value;
-  }
-
-  /**
-   * Setter state
-   * @param {State} value
-   */
-  public set state(value: State) {
-    this._state = value;
   }
 
   /**
@@ -157,5 +139,13 @@ export default class Node {
    */
   public set role(value: Role) {
     this._role = value;
+  }
+
+  /**
+   * Setter role
+   * @param {string} value
+   */
+  public set hostName(value: string) {
+    this._hostName = value;
   }
 }

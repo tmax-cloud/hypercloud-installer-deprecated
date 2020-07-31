@@ -37,8 +37,10 @@ function InstallLnb(props: any) {
   const { history, location, match } = props;
   console.debug(props);
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
+
+  const nowEnv = env.getEnvByName(match.params.envName);
 
   const classes = useStyles();
   const [open] = React.useState(true);
@@ -50,25 +52,25 @@ function InstallLnb(props: any) {
     // dispatchAppState({
     //   env: env.getEnvByName(event.target.value as string)
     // });
-    history.push(`${routes.INSTALL.HOME}/${appState.nowEnv.name}`);
+    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}`);
   };
 
   const goProductInstallPage = (productName: string) => {
-    if (productName === CONST.PRODUCT.KUBERNETES_TXT) {
-      if (env.isInstalled(productName, appState.nowEnv)) {
+    if (productName === CONST.PRODUCT.KUBERNETES.NAME) {
+      if (env.isInstalled(productName, nowEnv)) {
         history.push(
-          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/already`
+          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
         );
       } else {
         history.push(
-          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
         );
       }
     }
   };
 
   const getInstalledImage = (productName: string) => {
-    if (env.isInstalled(productName, appState.nowEnv)) {
+    if (env.isInstalled(productName, nowEnv)) {
       return (
         <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
       );
@@ -77,7 +79,7 @@ function InstallLnb(props: any) {
   };
 
   const isAllRequiredProductInstall = () => {
-    return env.isAllRequiredProductInstall(appState.nowEnv);
+    return env.isAllRequiredProductInstall(nowEnv);
   };
 
   return (
@@ -85,7 +87,7 @@ function InstallLnb(props: any) {
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
         <Select
           native
-          value={appState.nowEnv.name}
+          value={nowEnv.name}
           onChange={handleChange}
           inputProps={{
             name: 'age',
@@ -93,7 +95,7 @@ function InstallLnb(props: any) {
           }}
         >
           {/* <option aria-label="None" value="" /> */}
-          {env.loadEnv().map((e: { name: {} | null | undefined }) => {
+          {env.loadEnvList().map((e: { name: {} | null | undefined }) => {
             return (
               <option key={e.name} value={e.name}>
                 {e.name}
@@ -116,7 +118,7 @@ function InstallLnb(props: any) {
               disableSticky
               onClick={() => {
                 history.push(
-                  `${routes.INSTALL.HOME}/${appState.nowEnv.name}/main`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/main`
                 );
               }}
             >

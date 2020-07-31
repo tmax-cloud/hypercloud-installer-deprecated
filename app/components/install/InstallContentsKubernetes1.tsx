@@ -6,6 +6,7 @@ import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import * as env from '../../utils/common/env';
 
 function InstallContentsKubernetes1(props: any) {
   console.log('InstallContentsKubernetes1');
@@ -13,8 +14,10 @@ function InstallContentsKubernetes1(props: any) {
   const { history, location, match } = props;
   console.debug(props);
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
+
+  const nowEnv = env.getEnvByName(match.params.envName);
 
   const defaultProps = {
     bgcolor: 'background.paper',
@@ -63,7 +66,7 @@ function InstallContentsKubernetes1(props: any) {
                 // dispatchKubeInstall({
                 //   page: 2
                 // });
-                history.push(`${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step2`);
+                history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step2`);
               }}
             >
               다음 >

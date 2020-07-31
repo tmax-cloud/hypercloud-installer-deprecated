@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useContext } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -19,20 +20,24 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
-  IconButton,
+  IconButton
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { green } from '@material-ui/core/colors';
-import clsx from 'clsx';
 import CloseIcon from '@material-ui/icons/Close';
+import * as Common from '../../utils/common/common';
+import * as Script from '../../utils/common/script';
 import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
-import * as Common from '../../utils/common/ssh';
+import * as ssh from '../../utils/common/ssh';
 import routes from '../../utils/constants/routes.json';
-import { Role } from '../../utils/class/Node';
+import Node, { Role } from '../../utils/class/Node';
+import Env from '../../utils/class/Env';
+import CONST from '../../utils/constants/constant';
+import { AppContext } from '../../containers/HomePage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,12 +49,12 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       position: 'relative'
     },
-    buttonSuccess: {
-      backgroundColor: green[500],
-      '&:hover': {
-        backgroundColor: green[700]
-      }
-    },
+    // buttonSuccess: {
+    //   backgroundColor: green[500],
+    //   '&:hover': {
+    //     backgroundColor: green[700]
+    //   }
+    // },
     fabProgress: {
       color: green[500],
       position: 'absolute',
@@ -58,12 +63,11 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 1
     },
     buttonProgress: {
-      color: green[500],
       position: 'absolute',
       top: '50%',
       left: '50%',
-      marginTop: -12,
-      marginLeft: -12
+      marginTop: -40,
+      marginLeft: -40
     }
   })
 );
@@ -71,48 +75,55 @@ const useStyles = makeStyles((theme: Theme) =>
 function EnvContentsAdd(props: any) {
   console.debug('EnvContentsAdd');
 
-  const { history, location, match } = props;
-
+  const { history, match } = props;
 
   const classes = useStyles();
-  const [loading, setLoading] = React.useState(false);
-  const timer = React.useRef<number>();
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
+  // ssh connection에 loading bar 표현
+  // const [loading, setLoading] = React.useState(false);
   const handleButtonClick = () => {
-    if (!loading) {
-      // setSuccess(false);
-      setLoading(true);
-      // timer.current = setTimeout(() => {
-      //   // setSuccess(true);
-      //   setLoading(false);
-      // }, 2000);
+    if (!appState.loading) {
+      dispatchAppState({
+        type: 'set_loading',
+        loading: true
+      });
     }
   };
-  const buttonClassname = clsx({
-    // [classes.buttonSuccess]: success
-  });
 
-  const editTargetEnv = env.getEnvByName(match.params.envName);
+  // 수정화면에서 envBeforeEdit에 수정 전 데이터를 저장해 놓음
+  const envBeforeEdit = env.getEnvByName(match.params.envName);
+  // const envBeforeEdit = env.getEnvByName(match.params.envName);
+  console.debug('envBeforeEdit', envBeforeEdit);
+
+  // state.data에 테이블에 표현될 노드들 데이터를 담음
   const [state, setState] = useState(() => {
-    // edit page
-    if (editTargetEnv) {
+    // edit page에서는 해당 환경 데이터로 초기화 해줌
+    if (envBeforeEdit) {
       return {
-        data: editTargetEnv.nodes
+        data: envBeforeEdit.nodeList
       };
     }
 
-    // add page
+    // add page에서는 초기에 추가되어 있는 노드 없음
     return {
       data: []
     };
   });
 
+  // 테이블에서 선택된 것들
   const [selected, setSelected] = React.useState<string[]>(() => {
-    // edit page
-    if (editTargetEnv) {
+    // edit page에서는 기존 마스터 노드들 선택되도록
+    if (envBeforeEdit) {
       const result = [];
-      for (let i = 0; i < editTargetEnv.nodes.length; i += 1) {
-        if (editTargetEnv.nodes[i].role === Role.MASTER) {
-          result.push(editTargetEnv.nodes[i].ip);
+      for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
+        if (
+          envBeforeEdit.nodeList[i].role === Role.MASTER ||
+          envBeforeEdit.nodeList[i].role === Role.MAIN_MASTER
+        ) {
+          result.push(envBeforeEdit.nodeList[i].ip);
         }
       }
       return result;
@@ -121,10 +132,14 @@ function EnvContentsAdd(props: any) {
     // add page
     return [];
   });
+  // 선택되어 있는 지 여부 리턴해주는 함수
+  const isSelected = (clickedIp: string) => {
+    return selected.indexOf(clickedIp) !== -1;
+  };
 
   const [name, setName] = useState(() => {
-    if (editTargetEnv) {
-      return editTargetEnv.name;
+    if (envBeforeEdit) {
+      return envBeforeEdit.name;
     }
     return '';
   });
@@ -135,9 +150,10 @@ function EnvContentsAdd(props: any) {
       return true;
     }
 
-    if (editTargetEnv) {
-      if (target !== editTargetEnv.name) {
-        const envList = env.loadEnv();
+    // edit page에서는 기존 이름과 다른 경우에만 validation check 진행
+    if (envBeforeEdit) {
+      if (target !== envBeforeEdit.name) {
+        const envList = env.loadEnvList();
         for (let i = 0; i < envList.length; i += 1) {
           if (target === envList[i].name) {
             console.debug(target, envList[i].name);
@@ -147,7 +163,7 @@ function EnvContentsAdd(props: any) {
         }
       }
     } else {
-      const envList = env.loadEnv();
+      const envList = env.loadEnvList();
       for (let i = 0; i < envList.length; i += 1) {
         if (target === envList[i].name) {
           console.debug(target, envList[i].name);
@@ -207,10 +223,6 @@ function EnvContentsAdd(props: any) {
       setFunc('0부터 65535 범위 내에서 입력해 주세요.');
       return true;
     }
-    // if (Number(target) < 0 || Number(target) > 65535) {
-    //   setFunc('0부터 65535 범위 내에서 입력해 주세요.');
-    //   return true;
-    // }
 
     setFunc('');
     return false;
@@ -261,6 +273,7 @@ function EnvContentsAdd(props: any) {
     }
   };
 
+  // dialog
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -269,25 +282,8 @@ function EnvContentsAdd(props: any) {
     setOpen(false);
   };
 
-  // const useStyles = makeStyles({
-  //   table: {
-  //     minWidth: 650
-  //   }
-  // });
-  // const classes = useStyles();
-
-  // function createData(
-  //   name: string,
-  //   calories: number,
-  //   fat: number,
-  //   carbs: number,
-  //   protein: number
-  // ) {
-  //   return { name, calories, fat, carbs, protein };
-  // }
-
   const handleClick = (event: React.MouseEvent<unknown>, clickedIp: string) => {
-    // TODO: 추후 다중 마스터 선택 가능 시, checkbox로 변경
+    // TODO: 추후 다중 마스터 선택 가능 시, checkbox로 변경해야 함
     // const selectedIndex = selected.indexOf(clickedIp);
     // let newSelected: string[] = [];
 
@@ -304,15 +300,12 @@ function EnvContentsAdd(props: any) {
     //   );
     // }
     // setSelected(newSelected);
-    if (!editTargetEnv) {
+    if (!envBeforeEdit) {
       setSelected([clickedIp]);
     }
   };
 
-  const isSelected = (clickedIp: string) => {
-    return selected.indexOf(clickedIp) !== -1;
-  };
-
+  // password visible off, on
   const [isShowPassword, setisShowPassword] = useState(true);
   const getPasswordVisibility = () => {
     return isShowPassword ? (
@@ -329,6 +322,49 @@ function EnvContentsAdd(props: any) {
           setisShowPassword(true);
         }}
       />
+    );
+  };
+
+  const getRemoveButton = row => {
+    // 수정 페이지, 마스터면 제거 버튼 없음
+    if (envBeforeEdit && isSelected(row.ip)) {
+      return null;
+    }
+    return (
+      <IconButton
+        aria-label="delete"
+        onClick={e => {
+          // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
+          e.stopPropagation();
+
+          // 제거한 노드가 마스터 노드라면
+          // 첫번째 노드로 마스터 노드 변경
+          if (selected[0] === row.ip) {
+            if (state.data.length > 0) {
+              // 테이블에 남아 있는 노드 있는 경우
+              setSelected([state.data[0].ip]);
+            } else {
+              // 테이블에 남아 있는 노드 없는 경우
+              setSelected([]);
+            }
+          }
+
+          setState(prevState => {
+            const data = [...prevState.data];
+
+            for (let i = 0; i < data.length; i += 1) {
+              if (data[i].ip === row.ip) {
+                // 삭제
+                data.splice(i, 1);
+                break;
+              }
+            }
+            return { ...prevState, data };
+          });
+        }}
+      >
+        <RemoveIcon />
+      </IconButton>
     );
   };
 
@@ -383,7 +419,6 @@ function EnvContentsAdd(props: any) {
                 placeholder="예: 192.168.32.128"
                 variant="outlined"
                 size="small"
-                disabled={loading}
                 value={ip}
                 onChange={e => {
                   setIp(e.target.value);
@@ -407,7 +442,6 @@ function EnvContentsAdd(props: any) {
                 placeholder="0~65535"
                 variant="outlined"
                 size="small"
-                disabled={loading}
                 value={port}
                 onChange={e => {
                   setPort(e.target.value);
@@ -437,7 +471,6 @@ function EnvContentsAdd(props: any) {
                   placeholder="Text"
                   variant="outlined"
                   size="small"
-                  disabled={loading}
                   value={password}
                   onChange={e => {
                     setPassword(e.target.value);
@@ -460,12 +493,18 @@ function EnvContentsAdd(props: any) {
             </div>
           </div>
           <div>
+            {/* {loading && (
+              <CircularProgress
+                color="secondary"
+                size={40}
+                className={classes.buttonProgress}
+              />
+            )} */}
             <Button
               className={['white', 'indicator'].join(' ')}
               variant="contained"
               color="primary"
               size="small"
-              disabled={loading}
               startIcon={<AddIcon />}
               onClick={() => {
                 let hasError = false;
@@ -477,12 +516,13 @@ function EnvContentsAdd(props: any) {
                 handleButtonClick();
                 setTotalError('');
 
-                Common.connectionTest({
-                  ip,
-                  port,
-                  password,
-                  user: 'root'
-                })
+                ssh
+                  .connectionTest({
+                    ip,
+                    port,
+                    password,
+                    user: 'root'
+                  })
                   .then(() => {
                     console.debug('ready');
                     // node.state = State.SUCCESS;
@@ -508,26 +548,23 @@ function EnvContentsAdd(props: any) {
                     initValue();
 
                     setTotalError('');
-                    return null;
                   })
                   .catch(err => {
                     console.debug('error', err);
-                    // node.state = State.FAIL;
-                    // setSshInfo([].concat(sshInfo));
                     setTotalError(
                       '입력 정보를 확인해주세요. (ssh connection error)'
                     );
                   })
                   .finally(() => {
-                    setLoading(false);
+                    dispatchAppState({
+                      type: 'set_loading',
+                      loading: false
+                    });
                   });
               }}
             >
               추가
             </Button>
-            {loading && (
-              <CircularProgress size={24} className={classes.buttonProgress} />
-            )}
           </div>
         </div>
         <div
@@ -581,8 +618,9 @@ function EnvContentsAdd(props: any) {
                       scope="row"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <Radio checked={isSelected(row.ip)}
-                        disabled={editTargetEnv ? true : false}
+                      <Radio
+                        checked={isSelected(row.ip)}
+                        disabled={!!envBeforeEdit}
                       />
                     </TableCell>
                     <TableCell
@@ -601,37 +639,7 @@ function EnvContentsAdd(props: any) {
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <IconButton
-                        aria-label="delete"
-                        onClick={e => {
-                          // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
-                          e.stopPropagation();
-
-                          // 제거한 노드가 마스터 노드라면
-                          // 첫번째 노드로 마스터 노드 변경
-                          if (selected[0] === row.ip) {
-                            if (state.data.length > 0) {
-                              setSelected([state.data[0].ip]);
-                            } else {
-                              setSelected([]);
-                            }
-                          }
-
-                          setState(prevState => {
-                            const data = [...prevState.data];
-
-                            for (let i = 0; i < data.length; i += 1) {
-                              if (data[i].ip === row.ip) {
-                                data.splice(i, 1);
-                                break;
-                              }
-                            }
-                            return { ...prevState, data };
-                          });
-                        }}
-                      >
-                        <RemoveIcon />
-                      </IconButton>
+                      {getRemoveButton(row)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -649,77 +657,231 @@ function EnvContentsAdd(props: any) {
         >
           <Button
             variant="contained"
-            style={{marginRight: '10px'}}
+            style={{ marginRight: '10px' }}
             className={['pink'].join(' ')}
             size="large"
-            onClick={() => {
+            onClick={async () => {
               let hasError = false;
               if (hasNameError()) hasError = true;
               if (hasTotalError()) hasError = true;
               if (hasError) return;
 
               // json 파일 저장
-              if (editTargetEnv) {
+              if (envBeforeEdit) {
                 // 수정
-                const newEnv = {
-                  name,
-                  nodes: [],
-                  installedProducts: editTargetEnv.installedProducts,
-                  updatedTime: new Date().getTime()
-                };
+                // master들은 변경 못함
+                // 그대로 넣어줌
+                const {
+                  mainMaster,
+                  masterArr,
+                  workerArr
+                } = env.getArrSortedByRole(envBeforeEdit.nodeList);
+                masterArr.push(mainMaster);
+
+                // 수정된 worker들 넣어줌
+                const modifiedWorkerArr = [];
                 for (let i = 0; i < state.data.length; i += 1) {
                   const node = state.data[i];
-                  // worker
-                  let role = 1;
-                  console.debug(node.ip);
-                  console.debug(selected);
-                  if (selected.indexOf(node.ip) !== -1) {
-                    // master
-                    role = 0;
+                  if (selected.indexOf(node.ip) === -1) {
+                    // worker
+                    // modifiedWorkerArr.push({
+                    //   ip: node.ip,
+                    //   port: node.port,
+                    //   user: 'root',
+                    //   password: node.password,
+                    //   role: Role.WORKER,
+                    //   hostName: Common.getRandomString()
+                    // });
+                    modifiedWorkerArr.push(
+                      new Node(
+                        node.ip,
+                        node.port,
+                        'root',
+                        node.password,
+                        Role.WORKER,
+                        Common.getRandomString()
+                      )
+                    );
                   }
-                  newEnv.nodes.push({
-                    ip: node.ip,
-                    password: node.password,
-                    port: node.port,
-                    user: 'root',
-                    role
-                  });
                 }
-                // 삭제 후 추가
-                env.deleteEnvByName(editTargetEnv.name);
-                env.appendEnv(newEnv);
+                // const newEnv = {
+                //   name,
+                //   nodeList: masterArr.concat(modifiedWorkerArr),
+                //   productList: envBeforeEdit.productList,
+                //   updatedTime: new Date()
+                // };
+                const newEnv = new Env(
+                  name,
+                  masterArr.concat(modifiedWorkerArr),
+                  envBeforeEdit.productList,
+                  new Date()
+                );
+
+                // kubernetes 설치 되어 있으면, 실제로 워커노드 추가, 삭제 스크립트 실행
+                // 추가된 워커노드 구함
+                if (
+                  env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, envBeforeEdit)
+                ) {
+                  dispatchAppState({
+                    type: 'set_loading',
+                    loading: true
+                  });
+
+                  const addedWorker = [];
+                  for (let i = 0; i < modifiedWorkerArr.length; i += 1) {
+                    let isAdded = true;
+                    for (let j = 0; j < workerArr.length; j += 1) {
+                      if (modifiedWorkerArr[i].ip === workerArr[j].ip) {
+                        isAdded = false;
+                        break;
+                      }
+                    }
+                    if (isAdded) {
+                      addedWorker.push(modifiedWorkerArr[i]);
+                    }
+                  }
+                  console.debug('Added worker nodeList : ', addedWorker);
+
+                  // 삭제된 워커 노드 구함
+                  const deletedWorker = [];
+                  for (let i = 0; i < workerArr.length; i += 1) {
+                    let isDeleted = true;
+                    for (let j = 0; j < modifiedWorkerArr.length; j += 1) {
+                      if (workerArr[i].ip === modifiedWorkerArr[j].ip) {
+                        isDeleted = false;
+                        break;
+                      }
+                    }
+                    if (isDeleted) {
+                      deletedWorker.push(workerArr[i]);
+                    }
+                  }
+                  console.debug('Deleted worker nodeList', deletedWorker);
+
+                  // mainMaster에게서 join command 받아옴
+                  let joinCmd = '';
+                  let command = '';
+                  command += Script.getK8sClusterJoinScript();
+                  mainMaster.cmd = command;
+                  console.error(mainMaster.cmd);
+                  await ssh.send(mainMaster, {
+                    close: () => {},
+                    stdout: (data: string) => {
+                      if (!joinCmd) {
+                        joinCmd = data.toString().split('@@@')[1];
+                      }
+                    },
+                    stderr: (data: string) => {}
+                  });
+                  console.debug('Join Command', joinCmd);
+
+                  // 새로 추가된 노드에 install script 돌려야 함
+                  console.debug('addedWorker install start');
+                  addedWorker.map((worker, index) => {
+                    command = Script.getK8sWorkerInstallScript(
+                      mainMaster,
+                      worker
+                    );
+                    command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
+                    worker.cmd = command;
+                    console.error(worker.cmd);
+                    ssh.send(worker, {
+                      close: () => {},
+                      stdout: (data: string) => {},
+                      stderr: (data: string) => {}
+                    });
+                  });
+                  console.debug('addedWorker install end');
+
+                  // 삭제 된 노드에 마스터 노드에서 kubectl delete 명령어 날림
+                  command = '';
+                  deletedWorker.map(worker => {
+                    command += Script.getDeleteWorkerNodeScript(worker);
+                  });
+                  mainMaster.cmd = command;
+                  console.error(
+                    'Command to delete worker node executed in master',
+                    command
+                  );
+                  await ssh.send(mainMaster, {
+                    close: () => {},
+                    stdout: (data: string) => {},
+                    stderr: (data: string) => {}
+                  });
+
+                  console.debug('deletedWorker remove start');
+                  deletedWorker.map((worker, index) => {
+                    command = Script.getK8sMasterRemoveScript();
+                    worker.cmd = command;
+                    console.debug(worker.cmd);
+                    ssh.send(worker, {
+                      close: () => {},
+                      stdout: (data: string) => {},
+                      stderr: (data: string) => {}
+                    });
+                  });
+                  console.debug('deletedWorker remove end');
+                }
+
+                // 기존 데이터 삭제 후 수정 된 환경 데이터 추가
+                env.deleteEnvByName(envBeforeEdit.name);
+                env.addEnv(newEnv);
+
+                dispatchAppState({
+                  type: 'set_loading',
+                  loading: false
+                });
+                history.push(routes.ENV.EXIST);
               } else {
                 // 추가
-                const newEnv = {
-                  name,
-                  nodes: [],
-                  installedProducts: [],
-                  updatedTime: new Date().getTime()
-                };
+                // const newEnv = {
+                //   name,
+                //   nodeList: [] as any,
+                //   productList: [],
+                //   updatedTime: new Date()
+                // };
+                const newEnv = new Env(name, [], [], new Date());
+                let isSetMainMaster = false;
                 for (let i = 0; i < state.data.length; i += 1) {
                   const node = state.data[i];
                   // worker
-                  let role = 1;
+                  let role = Role.WORKER;
                   console.debug(node.ip);
                   console.debug(selected);
                   if (selected.indexOf(node.ip) !== -1) {
                     // master
-                    role = 0;
+                    if (!isSetMainMaster) {
+                      role = Role.MAIN_MASTER;
+                      isSetMainMaster = true;
+                    } else {
+                      role = Role.MASTER;
+                    }
                   }
-                  newEnv.nodes.push({
-                    ip: node.ip,
-                    password: node.password,
-                    port: node.port,
-                    user: 'root',
-                    role
-                  });
+                  // newEnv.nodeList.push({
+                  //   ip: node.ip,
+                  //   port: node.port,
+                  //   user: 'root',
+                  //   password: node.password,
+                  //   role,
+                  //   hostName: Common.getRandomString()
+                  // });
+                  newEnv.nodeList.push(
+                    new Node(
+                      node.ip,
+                      node.port,
+                      'root',
+                      node.password,
+                      role,
+                      Common.getRandomString()
+                    )
+                  );
                 }
-                env.appendEnv(newEnv);
+                env.addEnv(newEnv);
+                history.push(routes.ENV.EXIST);
               }
-              history.push(routes.ENV.EXIST);
             }}
           >
-            {editTargetEnv ? '저장' : '추가'}
+            {envBeforeEdit ? '저장' : '추가'}
           </Button>
           <Button
             variant="contained"
@@ -752,7 +914,7 @@ function EnvContentsAdd(props: any) {
               </IconButton>
             </DialogTitle>
             <DialogContent>
-              {editTargetEnv ? (
+              {envBeforeEdit ? (
                 <DialogContentText id="alert-dialog-description">
                   <span className={['dark', 'medium'].join(' ')}>
                     환경 수정 화면에서 나가시겠습니까? 설정 내용은 저장되지

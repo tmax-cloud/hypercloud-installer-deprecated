@@ -12,7 +12,12 @@ const CONST = {
     ADD: 'add'
   },
   PRODUCT: {
-    KUBERNETES_TXT: 'Kubernetes',
+    KUBERNETES: {
+      NAME: 'Kubernetes',
+      CATEGORY: 'CO', // Container Orchestration
+      REQUIRED: 'R', // Required
+      DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
+    },
     REQUIRED: [
       {
         NAME: 'Kubernetes',

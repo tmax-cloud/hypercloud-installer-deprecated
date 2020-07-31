@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
 import React from 'react';
 import EnvHeader from '../components/env/EnvHeader';

@@ -32,28 +32,30 @@ function InstallContentsMain(props: any) {
   const { history, location, match } = props;
   console.debug(props);
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
+
+  const nowEnv = env.getEnvByName(match.params.envName);
 
   const classes = useStyles();
 
   const goProductInstallPage = (name: string) => {
     console.log('goProductInstallPage');
-    if (name === CONST.PRODUCT.KUBERNETES_TXT) {
-      if (env.isInstalled(name, appState.nowEnv)) {
+    if (name === CONST.PRODUCT.KUBERNETES.NAME) {
+      if (env.isInstalled(name, nowEnv)) {
         history.push(
-          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/already`
+          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
         );
       } else {
         history.push(
-          `${routes.INSTALL.HOME}/${appState.nowEnv.name}/kubernetes/step1`
+          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
         );
       }
     }
   };
 
   const getInstalledImage = (productName: string) => {
-    if (env.isInstalled(productName, appState.nowEnv)) {
+    if (env.isInstalled(productName, nowEnv)) {
       return (
         <span>
           <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
@@ -182,7 +184,7 @@ function InstallContentsMain(props: any) {
                   className={classes.paper}
                   onClick={() => {
                     // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
-                    if (env.isAllRequiredProductInstall(appState.nowEnv)) {
+                    if (env.isAllRequiredProductInstall(nowEnv)) {
                       goProductInstallPage(P.NAME);
                     }
                   }}
@@ -190,7 +192,7 @@ function InstallContentsMain(props: any) {
                 >
                   <div
                     style={
-                      env.isAllRequiredProductInstall(appState.nowEnv)
+                      env.isAllRequiredProductInstall(nowEnv)
                         ? {}
                         : {
                             pointerEvents: 'none',

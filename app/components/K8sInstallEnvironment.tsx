@@ -10,22 +10,22 @@ import { mapStateToProps, mapDispatchToProps } from '../actions/env';
 
 type Props = {
   env: object;
-  saveEnv: Function;
+  saveEnvList: Function;
 };
 
 function K8sInstallEnvironment(props: Props) {
   console.log('K8sInstallEnvironment props : ', props);
   console.log('routes', routes);
   console.log('nodes:', nodes);
-  const { saveEnv } = props;
+  const { saveEnvList } = props;
 
   function onChangeK8sVersion(e: any) {
-    saveEnv({
+    saveEnvList({
       k8s: e.target.value
     });
   }
   function onChangeRegistryAddr(e: any) {
-    saveEnv({
+    saveEnvList({
       dockerRegistry: e.target.value
     });
   }
