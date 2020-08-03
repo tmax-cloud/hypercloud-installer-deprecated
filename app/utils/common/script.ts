@@ -1,4 +1,45 @@
 // eslint-disable-next-line import/prefer-default-export
+import * as env from './env';
+import CONST from '../constants/constant';
+
+export function getCniRemoveScript(nowEnv) {
+  const { version } = env.isInstalled(CONST.PRODUCT.CNI.NAME, nowEnv);
+  return `cd ~;
+yum install -y git;
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd ~/hypercloud-install-guide/CNI;
+kubectl delete -f calico_${version}.yaml;
+kubectl delete -f calicoctl_3.15.0.yaml;`;
+}
+
+export function getCniInstallScript(
+  type: string,
+  version: string,
+  nowEnv
+): string {
+  let setRegistry = '';
+  const { registry } = env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv);
+  if (registry) {
+    setRegistry = `
+    sed -i 's/calico\\/cni/'${registry}'\\/calico\\/cni/g' calico_${version}.yaml;
+    sed -i 's/calico\\/pod2daemon-flexvol/'${registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${version}.yaml;
+    sed -i 's/calico\\/node/'${registry}'\\/calico\\/node/g' calico_${version}.yaml;
+    sed -i 's/calico\\/kube-controllers/'${registry}'\\/calico\\/kube-controllers/g' calico_${version}.yaml;
+    sed -i 's/calico\\/ctl/'${registry}'\\/calico\\/ctl/g' calico_${version}.yaml;
+    `;
+  }
+  return `cd ~;
+yum install -y git;
+git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+cd ~/hypercloud-install-guide/CNI;
+sed -i 's/v3.13.4/'v${version}'/g' calico_${version}.yaml;
+. ~/hypercloud-install-guide/K8S_Master/installer/k8s.config;
+sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${version}.yaml;
+${setRegistry}
+kubectl apply -f calico_${version}.yaml;
+kubectl apply -f calicoctl_3.15.0.yaml;`;
+}
+
 export function getK8sMasterRemoveScript(): string {
   const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
   return `${deleteHostName}
@@ -173,56 +214,10 @@ fi
 `;
 }
 
-export function getCniInstallScript(): string {
-  const path = '/root/cni/CNI/yaml';
-  return `kubectl apply -f ${path}/calico_3.9.5.yaml;
-          kubectl apply -f ${path}/metallb_subnet.yaml;
-          kubectl apply -f ${path}/metallb.yaml;`;
-}
-
 export function runScriptAsFile(script: string): string {
   return `touch script.sh;
           echo "${script}" > script.sh;
           chmod 755 script.sh;
           ./script.sh;
           rm -rf ./script.sh`;
-}
-
-// const installOne = (target) => {
-//   return new Promise(async (resolve,reject) => {
-//         setTimeout(() => {
-//             if (true) {
-//               // 성공 시
-//               resolve(`install complete at ${target}`)
-//             } else {
-//               // 실패 시
-//               reject(`install err at ${target}`);
-//             }
-//         },3000)
-//   })
-// }
-// const installAll = async () => {
-//     const targets = ['node1','node2','node3'];
-//     const status = await Promise.all(targets.map(async (target) => {
-//       // 한개 씩 프로미스 리턴
-//       await installOne(target)
-//       .then((result)=>{
-//         console.log(result);
-//       })
-//       .catch((err)=>{
-//         console.error(err)
-//       })
-//     }));
-//     console.log("Status =>",status);
-//     console.log('install compelte')
-// }
-// installAll();
-
-function kubeInstallScript() {
-  return `
-
-
-
-
-  `;
 }

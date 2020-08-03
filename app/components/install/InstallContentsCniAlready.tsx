@@ -20,7 +20,7 @@ import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
-import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import productImage from '../../../resources/assets/cni_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
@@ -45,8 +45,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallContentsKubernetesAlready(props: any) {
-  console.log('InstallContentsKubernetesAlready');
+function InstallContentsCniAlready(props: any) {
+  console.log('InstallContentsCniAlready');
 
   const { history, location, match } = props;
   console.debug(props);
@@ -58,20 +58,10 @@ function InstallContentsKubernetesAlready(props: any) {
 
   const nowEnv = env.getEnvByName(match.params.envName);
 
-  const nowProduct = CONST.PRODUCT.KUBERNETES;
+  const nowProduct = CONST.PRODUCT.CNI;
 
   // loading bar
   // const [loading, setLoading] = React.useState(false);
-
-  const getVersion = () => {
-    // nowEnv 있을 경우만 실행
-    for (let i = 0; i < nowEnv.productList.length; i += 1) {
-      const target = nowEnv.productList[i];
-      if (target.name === nowProduct.NAME) {
-        return target.version;
-      }
-    }
-  };
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -102,42 +92,9 @@ function InstallContentsKubernetesAlready(props: any) {
       nowEnv.nodeList
     );
 
-    console.error('worker remove start');
-    // 각각은 동시에, 전체 완료는 대기
-    await Promise.all(
-      workerArr.map((worker, index) => {
-        let command = '';
-        command += Script.getK8sMasterRemoveScript();
-        worker.cmd = command;
-        console.error(worker.cmd);
-        return Common.send(worker, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('worker remove end');
-
-    console.error('master remove start');
-    await Promise.all(
-      masterArr.map((master, index) => {
-        let command = '';
-        command += Script.getK8sMasterRemoveScript();
-        master.cmd = command;
-        console.error(master.cmd);
-        return Common.send(worker, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('master remove end');
-
     console.error('mainMaster remove start');
     let command = '';
-    command += Script.getK8sMasterRemoveScript();
+    command += Script.getCniRemoveScript(nowEnv);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
@@ -168,9 +125,11 @@ function InstallContentsKubernetesAlready(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={['childUpDownCenter', 'childLeftRightCenter', styles.installedCircle].join(
-                ' '
-              )}
+              className={[
+                'childUpDownCenter',
+                'childLeftRightCenter',
+                styles.installedCircle
+              ].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -186,7 +145,7 @@ function InstallContentsKubernetesAlready(props: any) {
                   alt="Logo"
                 />
                 <div>
-                  <img src={KubernetesImage} alt="Logo" />
+                  <img src={productImage} alt="Logo" />
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>
@@ -195,7 +154,7 @@ function InstallContentsKubernetesAlready(props: any) {
                 </div>
                 <div>
                   <span className={['small', 'lightDark'].join(' ')}>
-                    {nowProduct.NAME}
+                    {nowProduct.DESC}
                   </span>
                 </div>
               </div>
@@ -203,11 +162,21 @@ function InstallContentsKubernetesAlready(props: any) {
           </div>
           <div>
             <div>
+              <span className={['medium', 'thick'].join(' ')}>타입</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {env.isInstalled(nowProduct.NAME, nowEnv).type}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
               <span className={['medium', 'thick'].join(' ')}>버전</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {getVersion()}
+                {env.isInstalled(nowProduct.NAME, nowEnv).version}
               </span>
             </div>
           </div>
@@ -228,6 +197,8 @@ function InstallContentsKubernetesAlready(props: any) {
               </a>
             </span>
           </div>
+        </div>
+        <div>
           <div>
             <Dialog
               open={open}
@@ -252,8 +223,7 @@ function InstallContentsKubernetesAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    쿠버네티스를 삭제하시겠습니까? 삭제 시, 호환 제품의 기능도
-                    모두 삭제됩니다.
+                    CNI를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>
@@ -263,7 +233,7 @@ function InstallContentsKubernetesAlready(props: any) {
                   onClick={() => {
                     handleClose();
                     // TODO:delete kubernetes
-                    env.deleteAllProduct(nowEnv.name);
+                    env.deleteProductByName(nowEnv.name, nowProduct.NAME);
                     remove();
                   }}
                 >
@@ -297,4 +267,4 @@ function InstallContentsKubernetesAlready(props: any) {
   );
 }
 
-export default InstallContentsKubernetesAlready;
+export default InstallContentsCniAlready;

@@ -4,6 +4,7 @@
 import CONST from '../constants/constant';
 import Node, { Role } from '../class/Node';
 import Env from '../class/Env';
+import * as product from './product';
 
 /**
  * 파일 작업은 모두 sync로 수행
@@ -138,7 +139,7 @@ export function isInstalled(productName: any, env: any) {
     const target = env.productList[i];
     if (target.name === productName) {
       // 설치 됨
-      return true;
+      return target;
     }
   }
   // 설치 안됨
@@ -150,8 +151,10 @@ export function isInstalled(productName: any, env: any) {
  * @description 해당 환경에 필수 제품이 모두 설치 되어 있는지 여부
  */
 export const isAllRequiredProductInstall = (env: any) => {
-  for (let i = 0; i < CONST.PRODUCT.REQUIRED.length; i += 1) {
-    const target = CONST.PRODUCT.REQUIRED[i].NAME;
+  const requiredProduct = product.getRequiredProduct();
+
+  for (let i = 0; i < requiredProduct.length; i += 1) {
+    const target = requiredProduct.NAME;
     let installed = false;
     for (let j = 0; j < env.productList.length; j += 1) {
       const target2 = env.productList[j].name;
@@ -173,17 +176,29 @@ export const isAllRequiredProductInstall = (env: any) => {
  * @description 해당 환경에서 해당 제품을 삭제한다.
  */
 export const deleteProductByName = (envName: string, productName: string) => {
+  console.error(envName,productName);
   const envList = loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === envName) {
       const targetEnv = envList[i];
-      for (let j = 0; i < targetEnv.productList.length; j += 1) {
+      for (let j = 0; j < targetEnv.productList.length; j += 1) {
         if (targetEnv.productList[j].name === productName) {
           targetEnv.productList.splice(j, 1);
           saveEnvList(envList);
           return;
         }
       }
+    }
+  }
+};
+
+export const deleteAllProduct = (envName: string) => {
+  const envList = loadEnvList();
+  for (let i = 0; i < envList.length; i += 1) {
+    if (envList[i].name === envName) {
+      const targetEnv = envList[i];
+      targetEnv.productList = [];
+      saveEnvList(envList);
     }
   }
 };

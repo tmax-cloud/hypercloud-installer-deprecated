@@ -17,12 +17,15 @@ function InstallContentsHeader(props: any) {
 
   const getComponent = () => {
     let component;
-    if (location.pathname.indexOf('main') !== -1) {
+    if (
+      location.pathname.indexOf('main') !== -1 ||
+      location.pathname.indexOf('installKubePlease') !== -1
+    ) {
       component = <div />;
-    } else if (location.pathname.indexOf('kubernetes') !== -1) {
+    } else {
       component = (
         <div className={[styles.wrap, 'large', 'lightDark'].join(' ')}>
-          <strong>쿠버네티스</strong>
+          <strong>{location.pathname.split('/')[3]}</strong>
         </div>
       );
     }

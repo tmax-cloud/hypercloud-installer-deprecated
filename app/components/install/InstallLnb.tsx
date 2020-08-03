@@ -17,6 +17,7 @@ import CONST from '../../utils/constants/constant';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
+import * as product from '../../utils/common/product';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,33 +43,42 @@ function InstallLnb(props: any) {
 
   const nowEnv = env.getEnvByName(match.params.envName);
 
+  const requiredProduct = product.getRequiredProduct();
+  const optionalProduct = product.getOptionalProduct();
+
   const classes = useStyles();
+
   const [open] = React.useState(true);
   const handleClick = () => {
     // setOpen(!open);
   };
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    // dispatchAppState({
-    //   env: env.getEnvByName(event.target.value as string)
-    // });
     history.push(`${routes.INSTALL.HOME}/${nowEnv.name}`);
   };
 
-  const goProductInstallPage = (productName: string) => {
-    if (productName === CONST.PRODUCT.KUBERNETES.NAME) {
-      if (env.isInstalled(productName, nowEnv)) {
-        history.push(
-          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
-        );
-      } else {
-        history.push(
-          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
-        );
-      }
+  const getItem = (productName: string, disabled: boolean) => {
+    // Kubernetes가 설치 되지 않으면 disabled === true
+    if (disabled) {
+      return (
+        <div className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}>
+          <div>
+            <ListItemText primary={productName} />
+          </div>
+          {/* <Tooltip
+            title="Kubernetes를 설치하셔야 설치할 수 있습니다."
+            placement="right"
+          >
+            <HelpOutlineIcon fontSize="small" />
+          </Tooltip> */}
+          <div />
+        </div>
+      );
     }
+    return <ListItemText primary={productName} />;
   };
 
+  // 설치 여부 이미지 표시 해주는 함수
   const getInstalledImage = (productName: string) => {
     if (env.isInstalled(productName, nowEnv)) {
       return (
@@ -78,23 +88,10 @@ function InstallLnb(props: any) {
     return '';
   };
 
-  const isAllRequiredProductInstall = () => {
-    return env.isAllRequiredProductInstall(nowEnv);
-  };
-
   return (
     <div className={[styles.wrap].join(' ')}>
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
-        <Select
-          native
-          value={nowEnv.name}
-          onChange={handleChange}
-          inputProps={{
-            name: 'age',
-            id: 'age-native-simple'
-          }}
-        >
-          {/* <option aria-label="None" value="" /> */}
+        <Select native value={nowEnv.name} onChange={handleChange}>
           {env.loadEnvList().map((e: { name: {} | null | undefined }) => {
             return (
               <option key={e.name} value={e.name}>
@@ -117,9 +114,7 @@ function InstallLnb(props: any) {
               id="nested-list-subheader"
               disableSticky
               onClick={() => {
-                history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/main`
-                );
+                history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
               }}
             >
               <span style={{ color: 'white' }}>
@@ -137,23 +132,34 @@ function InstallLnb(props: any) {
           </ListItem>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {CONST.PRODUCT.REQUIRED.map(P => (
-                <ListItem
-                  key={P.NAME}
-                  button
-                  className={[classes.nested, styles.listItemBox].join(' ')}
-                  onClick={() => {
-                    goProductInstallPage(P.NAME);
-                  }}
-                >
-                  {/* <ListItemIcon>
+              {requiredProduct.map(P => {
+                // Kubernetes 이외 제품은
+                // Kubernetes 가 설치되어야만 설치 가능
+                let disabled = false;
+                if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
+                  if (!env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv)) {
+                    disabled = true;
+                  }
+                }
+                return (
+                  <ListItem
+                    key={P.NAME}
+                    button
+                    className={[classes.nested, styles.listItemBox].join(' ')}
+                    onClick={() => {
+                      product.goProductInstallPage(P.NAME, nowEnv, history);
+                    }}
+                    disabled={disabled}
+                  >
+                    {/* <ListItemIcon>
                   <StarBorder />
                 </ListItemIcon> */}
-                  {/* <CheckCircleIcon /> */}
-                  {getInstalledImage(P.NAME)}
-                  <ListItemText primary={P.NAME} />
-                </ListItem>
-              ))}
+                    {/* <CheckCircleIcon /> */}
+                    {getInstalledImage(P.NAME)}
+                    {getItem(P.NAME, disabled)}
+                  </ListItem>
+                );
+              })}
             </List>
           </Collapse>
           <ListItem
@@ -163,7 +169,7 @@ function InstallLnb(props: any) {
             {/* <ListItemIcon>
               <InboxIcon />
             </ListItemIcon> */}
-            {isAllRequiredProductInstall() ? (
+            {env.isAllRequiredProductInstall(nowEnv) ? (
               <ListItemText primary="호환 제품" />
             ) : (
               <div
@@ -188,15 +194,15 @@ function InstallLnb(props: any) {
           </ListItem>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {CONST.PRODUCT.OPTIONAL.map(P => (
+              {optionalProduct.map(P => (
                 <ListItem
                   key={P.NAME}
                   button
                   className={[classes.nested, styles.listItemBox].join(' ')}
                   onClick={() => {
-                    goProductInstallPage(P.NAME);
+                    product.goProductInstallPage(P.NAME, nowEnv, history);
                   }}
-                  disabled={!isAllRequiredProductInstall()}
+                  disabled={!env.isAllRequiredProductInstall(nowEnv)}
                 >
                   {/* <ListItemIcon>
                   <StarBorder />

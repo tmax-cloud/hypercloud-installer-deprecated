@@ -9,7 +9,7 @@ import {
   DialogActions
 } from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
-import styles from './InstallContentsKubernetes3.css';
+import styles from './InstallContentsCni3.css';
 import { Role } from '../../utils/class/Node';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
@@ -17,12 +17,13 @@ import * as Common from '../../utils/common/ssh';
 import ProgressBar from '../ProgressBar';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
+import CONST from '../../utils/constants/constant';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsKubernetes3(props: any) {
-  console.log('InstallContentsKubernetes3');
+function InstallContentsCni3(props: any) {
+  console.log('InstallContentsCni3');
 
-  const { history, location, match } = props;
+  const { history, location, match, state, setState } = props;
   console.debug(props);
 
   // const appContext = useContext(AppContext);
@@ -67,66 +68,18 @@ function InstallContentsKubernetes3(props: any) {
       nowEnv.nodeList
     );
 
+    setProgress(30);
     console.error('mainMaster install start');
-    let joinCmd = '';
     let command = '';
-    command += Script.getK8sMainMasterInstallScript(mainMaster);
-    command += Script.getK8sClusterJoinScript();
+    command += Script.getCniInstallScript(state.type, state.version, nowEnv);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
-      close: () => {
-        joinCmd = logRef.current!.value.split('@@@')[1];
-      },
+      close: () => {},
       stdout: (data: string) => appendToProgressScreen(logRef, data),
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     });
-    console.error(joinCmd);
     console.error('mainMaster install end');
-    setProgress(30);
-
-    console.error('masterArr install start');
-    // 각각은 동시에, 전체 완료는 대기
-    await Promise.all(
-      masterArr.map((master, index) => {
-        command = '';
-        command += Script.getK8sMasterInstallScript(mainMaster, master);
-        command += joinCmd;
-        master.cmd = command;
-        console.error(master.cmd);
-        return Common.send(master, {
-          close: () => {},
-          stdout: (data: string) => appendToProgressScreen(logRef, data),
-          stderr: (data: string) => appendToProgressScreen(logRef, data)
-        });
-      })
-    );
-    console.error('masterArr install end');
-    setProgress(70);
-
-    console.error('workerArr install start');
-    // 각각은 동시에, 전체 완료는 대기
-    await Promise.all(
-      workerArr.map((worker, index) => {
-        command = '';
-        command += Script.getK8sWorkerInstallScript(mainMaster, worker);
-        command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
-        worker.cmd = command;
-        console.error(worker.cmd);
-        return Common.send(worker, {
-          close: () => {},
-          stdout: (data: string) => {
-            logRef.current!.value += data;
-            logRef.current!.scrollTop = logRef.current!.scrollHeight;
-          },
-          stderr: (data: string) => {
-            logRef.current!.value += data;
-            logRef.current!.scrollTop = logRef.current!.scrollHeight;
-          }
-        });
-      })
-    );
-    console.error('workerArr install end');
     setProgress(100);
   };
 
@@ -156,7 +109,7 @@ function InstallContentsKubernetes3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step2`
             );
           }}
         >
@@ -169,7 +122,7 @@ function InstallContentsKubernetes3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step4`
               );
             }}
           >
@@ -208,7 +161,7 @@ function InstallContentsKubernetes3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step1`
                 );
               }}
               color="primary"
@@ -225,4 +178,4 @@ function InstallContentsKubernetes3(props: any) {
   );
 }
 
-export default InstallContentsKubernetes3;
+export default InstallContentsCni3;

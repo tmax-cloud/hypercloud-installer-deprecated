@@ -8,6 +8,7 @@ import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
+import * as product from '../../utils/common/product';
 import CloudImage from '../../../resources/assets/ic_logo_hypercloud.svg';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
 
@@ -37,22 +38,25 @@ function InstallContentsMain(props: any) {
 
   const nowEnv = env.getEnvByName(match.params.envName);
 
+  const requiredProduct = product.getRequiredProduct();
+  const optionalProduct = product.getOptionalProduct();
+
   const classes = useStyles();
 
-  const goProductInstallPage = (name: string) => {
-    console.log('goProductInstallPage');
-    if (name === CONST.PRODUCT.KUBERNETES.NAME) {
-      if (env.isInstalled(name, nowEnv)) {
-        history.push(
-          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
-        );
-      } else {
-        history.push(
-          `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
-        );
-      }
-    }
-  };
+  // const goProductInstallPage = (name: string) => {
+  //   console.log('goProductInstallPage');
+  //   if (name === CONST.PRODUCT.KUBERNETES.NAME) {
+  //     if (env.isInstalled(name, nowEnv)) {
+  //       history.push(
+  //         `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
+  //       );
+  //     } else {
+  //       history.push(
+  //       `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
+  //       );
+  //     }
+  //   }
+  // };
 
   const getInstalledImage = (productName: string) => {
     if (env.isInstalled(productName, nowEnv)) {
@@ -112,55 +116,75 @@ function InstallContentsMain(props: any) {
       <div>
         <Grid item xs={12}>
           <Grid container justify="center" spacing={2}>
-            {CONST.PRODUCT.REQUIRED.map((P, index) => (
-              <Grid key={P.NAME} item>
-                {index === 0 ? (
-                  <div style={{ height: '25px' }}>
-                    <span className={['small', 'thick'].join(' ')}>
-                      필수 제품
-                    </span>
-                  </div>
-                ) : (
-                  <div style={{ height: '25px' }} />
-                )}
-                <Paper
-                  className={classes.paper}
-                  onClick={() => {
-                    goProductInstallPage(P.NAME);
-                  }}
-                  variant="outlined"
-                >
-                  <div
-                    className={[
-                      '',
-                      'childLeftRightCenter',
-                      styles.productBox
-                    ].join(' ')}
+            {requiredProduct.map((P, index) => {
+              // Kubernetes 이외 제품은
+              // Kubernetes 가 설치되어야만 설치 가능
+              let disabled = false;
+              if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
+                if (!env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv)) {
+                  disabled = true;
+                }
+              }
+              return (
+                <Grid key={P.NAME} item>
+                  {index === 0 ? (
+                    <div style={{ height: '25px' }}>
+                      <span className={['small', 'thick'].join(' ')}>
+                        필수 제품
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ height: '25px' }} />
+                  )}
+                  <Paper
+                    className={classes.paper}
+                    onClick={() => {
+                      if (!disabled) {
+                        product.goProductInstallPage(P.NAME, nowEnv, history);
+                      }
+                    }}
+                    variant="outlined"
                   >
-                    <div className={[styles.productBoxContents].join(' ')}>
-                      <div
-                        className={[
-                          'childLeftRightRight',
-                          styles.installedImageBox
-                        ].join(' ')}
-                      >
-                        {getInstalledImage(P.NAME)}
-                      </div>
-                      <div>{getInstalledLogo(P.NAME)}</div>
-                      <div>
-                        <strong>{P.NAME}</strong>
-                      </div>
-                      <div>
-                        <span className={['small', 'lightDark'].join(' ')}>
-                          {P.DESC}
-                        </span>
+                    <div
+                      style={
+                        !disabled
+                          ? {}
+                          : {
+                              pointerEvents: 'none',
+                              opacity: '0.4'
+                            }
+                      }
+                      className={[
+                        '',
+                        'childLeftRightCenter',
+                        styles.productBox
+                      ].join(' ')}
+                    >
+                      <div className={[styles.productBoxContents].join(' ')}>
+                        <div
+                          className={[
+                            'childLeftRightRight',
+                            styles.installedImageBox
+                          ].join(' ')}
+                        >
+                          {getInstalledImage(P.NAME)}
+                        </div>
+                        <div>{getInstalledLogo(P.NAME)}</div>
+                        <div>
+                          <strong>{P.NAME}</strong>
+                        </div>
+                        <div>
+                          <span className={['small', 'lightDark'].join(' ')}>
+                            {P.DESC}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Paper>
-              </Grid>
-            ))}
-            {CONST.PRODUCT.OPTIONAL.map((P, index) => (
+                  </Paper>
+                </Grid>
+              );
+            })}
+            {optionalProduct.map((P, index) => (
               <Grid key={P.NAME} item>
                 {index === 0 ? (
                   <div
@@ -185,7 +209,7 @@ function InstallContentsMain(props: any) {
                   onClick={() => {
                     // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
                     if (env.isAllRequiredProductInstall(nowEnv)) {
-                      goProductInstallPage(P.NAME);
+                      product.goProductInstallPage(P.NAME, nowEnv, history);
                     }
                   }}
                   variant="outlined"

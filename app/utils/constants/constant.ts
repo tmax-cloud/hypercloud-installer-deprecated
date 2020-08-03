@@ -14,26 +14,40 @@ const CONST = {
   PRODUCT: {
     KUBERNETES: {
       NAME: 'Kubernetes',
-      CATEGORY: 'CO', // Container Orchestration
-      REQUIRED: 'R', // Required
+      IS_REQUIRED: true, // Required
       DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
     },
-    REQUIRED: [
-      {
-        NAME: 'Kubernetes',
-        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-      }
-    ],
-    OPTIONAL: [
-      {
-        NAME: 'Helm',
-        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-      },
-      {
-        NAME: 'HyperCloud Operator',
-        DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-      }
-    ]
+    CNI: {
+      NAME: 'CNI',
+      IS_REQUIRED: true, // Required
+      DESC: '컨테이너 네트워크 인터페이스'
+    },
+    HELM: {
+      NAME: 'Helm',
+      IS_REQUIRED: false, // Optional
+      DESC: '헬름'
+    },
+    HYPERCLOUD_OPERATOR: {
+      NAME: 'HyperCloud Operator',
+      IS_REQUIRED: false, // Optional
+      DESC: '하이퍼 클라우드 오퍼레이터'
+    }
+    // REQUIRED: [
+    //   {
+    //     NAME: 'Kubernetes',
+    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
+    //   }
+    // ],
+    // OPTIONAL: [
+    //   {
+    //     NAME: 'Helm',
+    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
+    //   },
+    //   {
+    //     NAME: 'HyperCloud Operator',
+    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
+    //   }
+    // ]
   }
 };
 
