@@ -171,6 +171,11 @@ EOF
   sudo sed -i "s|{apiServer}|${apiServer}|g" ${yaml_dir}/kubeadm-config.yaml
   sudo sed -i "s|{podSubnet}|\"${podSubnet}\"|g" ${yaml_dir}/kubeadm-config.yaml
   sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" ${yaml_dir}/kubeadm-config.yaml
+  if [[ -z ${imageRegistry} ]]; then
+    sudo sed -i "s|{imageRegistry}/|${imageRegistry}|g" ${yaml_dir}/kubeadm-config.yaml
+  else
+   	sudo sed -i "s|{imageRegistry}|${imageRegistry}|g" ${yaml_dir}/kubeadm-config.yaml
+  fi
 
   if [ "${type}" == "mainMaster" ];then
     # kube init

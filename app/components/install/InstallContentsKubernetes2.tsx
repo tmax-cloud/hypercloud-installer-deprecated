@@ -41,7 +41,9 @@ function InstallContentsKubernetes2(props: any) {
     setVersion(event.target.value as string);
   };
 
-  const [registry, setRegistry] = React.useState('');
+  const [registry, setRegistry] = React.useState(
+    appState.kubeinstallState.setRegistry
+  );
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {

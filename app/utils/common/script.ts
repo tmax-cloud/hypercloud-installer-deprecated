@@ -2,14 +2,35 @@
 import * as env from './env';
 import CONST from '../constants/constant';
 
+function cloneGitScript(address: string) {
+  return `
+cd ~;
+yum install -y git;
+git clone ${address};
+  `;
+}
+
+function deleteDockerScript() {
+  return `
+sudo yum remove -y docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-engine;
+  `;
+}
+
 export function getCniRemoveScript(nowEnv) {
   const { version } = env.isInstalled(CONST.PRODUCT.CNI.NAME, nowEnv);
-  return `cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+  return `
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/CNI;
 kubectl delete -f calico_${version}.yaml;
-kubectl delete -f calicoctl_3.15.0.yaml;`;
+kubectl delete -f calicoctl_3.15.0.yaml;
+  `;
 }
 
 export function getCniInstallScript(
@@ -28,24 +49,23 @@ export function getCniInstallScript(
     sed -i 's/calico\\/ctl/'${registry}'\\/calico\\/ctl/g' calico_${version}.yaml;
     `;
   }
-  return `cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+  return `
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/CNI;
 sed -i 's/v3.13.4/'v${version}'/g' calico_${version}.yaml;
 . ~/hypercloud-install-guide/K8S_Master/installer/k8s.config;
 sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${version}.yaml;
 ${setRegistry}
 kubectl apply -f calico_${version}.yaml;
-kubectl apply -f calicoctl_3.15.0.yaml;`;
+kubectl apply -f calicoctl_3.15.0.yaml;
+`;
 }
 
 export function getK8sMasterRemoveScript(): string {
   const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
-  return `${deleteHostName}
-cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+  return `
+${deleteHostName}
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/K8S_Master/installer;
 chmod 755 k8s_infra_installer.sh;
 ./k8s_infra_installer.sh delete;
@@ -54,15 +74,42 @@ yum remove -y kubeadm;
 yum remove -y kubelet;
 yum remove -y kubectl;
 yum remove -y cri-o;
+${deleteDockerScript()}
 rm -rf ~/hypercloud-install-guide/;
 yum install -y ipvsadm
 ipvsadm --clear`;
 }
 
-export function getK8sMainMasterInstallScript(mainMaster: any): string {
-  const IMAGE_REGISTRY = ``;
+export function getImageRegistrySettingScript(registry: string): string {
+  return `
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
+cd ~hypercloud-install-guide/Image_Registry/installer
+${deleteDockerScript()}
+sudo yum install -y yum-utils;
+sudo yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo;
+sudo yum install -y docker-ce docker-ce-cli containerd.io;
+sudo systemctl start docker;
+sudo touch /etc/docker/daemon.json;
+echo { "insecure-registries": ["${registry}"] } > /etc/docker/daemon.json;
+sudo systemctl restart docker;
+sudo systemctl status docker;
+sudo ./run-registry.sh ~/hypercloud-install-guide/Image_Registry/installer ${registry};
+`;
+}
+
+export function getK8sMainMasterInstallScript(
+  mainMaster: any,
+  registry: string,
+  version: string
+): string {
+  let IMAGE_REGISTRY = '';
+  if (registry) {
+    IMAGE_REGISTRY = registry;
+  }
   const CRIO_VERSION = `1.17`;
-  const KUBERNETES_VERSION = `1.17.6`;
+  const KUBERNETES_VERSION = version;
   const API_SERVER = mainMaster.ip;
 
   const setHostName = `sudo hostnamectl set-hostname ${mainMaster.hostName};`;
@@ -70,16 +117,13 @@ export function getK8sMainMasterInstallScript(mainMaster: any): string {
 
   return `${setHostName}
 ${registHostName}
-cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/K8S_Master/installer;
 . k8s.config;
 sudo sed -i "s|$imageRegistry|${IMAGE_REGISTRY}|g" ./k8s.config;
 sudo sed -i "s|$crioVersion|${CRIO_VERSION}|g" ./k8s.config;
 sudo sed -i "s|$k8sVersion|${KUBERNETES_VERSION}|g" ./k8s.config;
 sudo sed -i "s|$apiServer|${API_SERVER}|g" ./k8s.config;
-sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
 git clone https://github.com/tmax-cloud/hypercloud-installer.git;
 mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
 chmod 755 k8s_infra_installer.sh;
@@ -90,26 +134,15 @@ export function getK8sMasterInstallScript(
   mainMaster: any,
   master: any
 ): string {
-  const IMAGE_REGISTRY = ``;
-  const CRIO_VERSION = `1.17`;
-  const KUBERNETES_VERSION = `1.17.6`;
-  const API_SERVER = mainMaster.ip;
 
   const setHostName = `sudo hostnamectl set-hostname ${master.hostName};`;
   const registHostName = `echo \`hostname -I\` \`hostname\` >> /etc/hosts`;
 
   return `${setHostName}
 ${registHostName}
-cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/K8S_Master/installer;
 . k8s.config;
-sudo sed -i "s|$imageRegistry|${IMAGE_REGISTRY}|g" ./k8s.config;
-sudo sed -i "s|$crioVersion|${CRIO_VERSION}|g" ./k8s.config;
-sudo sed -i "s|$k8sVersion|${KUBERNETES_VERSION}|g" ./k8s.config;
-sudo sed -i "s|$apiServer|${API_SERVER}|g" ./k8s.config;
-sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
 git clone https://github.com/tmax-cloud/hypercloud-installer.git;
 mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
 chmod 755 k8s_infra_installer.sh;
@@ -120,26 +153,15 @@ export function getK8sWorkerInstallScript(
   mainMaster: any,
   worker: any
 ): string {
-  const IMAGE_REGISTRY = ``;
-  const CRIO_VERSION = `1.17`;
-  const KUBERNETES_VERSION = `1.17.6`;
-  const API_SERVER = mainMaster.ip;
 
   const setHostName = `sudo hostnamectl set-hostname ${worker.hostName};`;
   const registHostName = `echo \`hostname -I\` \`hostname\` >> /etc/hosts`;
 
   return `${setHostName}
 ${registHostName}
-cd ~;
-yum install -y git;
-git clone https://github.com/tmax-cloud/hypercloud-install-guide.git;
+${cloneGitScript('https://github.com/tmax-cloud/hypercloud-install-guide.git')}
 cd ~/hypercloud-install-guide/K8S_Master/installer;
 . k8s.config;
-sudo sed -i "s|$imageRegistry|${IMAGE_REGISTRY}|g" ./k8s.config;
-sudo sed -i "s|$crioVersion|${CRIO_VERSION}|g" ./k8s.config;
-sudo sed -i "s|$k8sVersion|${KUBERNETES_VERSION}|g" ./k8s.config;
-sudo sed -i "s|$apiServer|${API_SERVER}|g" ./k8s.config;
-sudo sed -i "s|imageRepository|#imageRepository|g" ./yaml/kubeadm-config.yaml;
 git clone https://github.com/tmax-cloud/hypercloud-installer.git;
 mv -f hypercloud-installer/app/k8s_infra_installer.sh .;
 chmod 755 k8s_infra_installer.sh;
@@ -147,9 +169,6 @@ chmod 755 k8s_infra_installer.sh;
 }
 
 export function getK8sClusterJoinScript() {
-  // return `export joinToken=\`kubeadm token list -o jsonpath='{.token}'\`;
-  //         export joinHash=\`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'\`
-  //         echo "@@@kubeadm join ${mainMaster.ip}:6443 --token $joinToken --discovery-token-ca-cert-hash sha256:$joinHash"`;
   return `echo "@@@\`kubeadm token create --print-join-command\`"`;
 }
 

@@ -25,8 +25,8 @@ function InstallContentsKubernetes3(props: any) {
   const { history, location, match } = props;
   console.debug(props);
 
-  // const appContext = useContext(AppContext);
-  // const { appState } = appContext;
+  const appContext = useContext(AppContext);
+  const { appState } = appContext;
 
   const nowEnv = env.getEnvByName(match.params.envName);
 
@@ -70,8 +70,18 @@ function InstallContentsKubernetes3(props: any) {
     console.error('mainMaster install start');
     let joinCmd = '';
     let command = '';
-    command += Script.getK8sMainMasterInstallScript(mainMaster);
+    if (appState.kubeinstallState.registry) {
+      command += Script.getImageRegistrySettingScript(
+        appState.kubeinstallState.registry
+      );
+    }
+    command += Script.getK8sMainMasterInstallScript(
+      mainMaster,
+      appState.kubeinstallState.registry,
+      appState.kubeinstallState.version
+    );
     command += Script.getK8sClusterJoinScript();
+
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
