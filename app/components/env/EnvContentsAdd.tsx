@@ -719,13 +719,16 @@ function EnvContentsAdd(props: any) {
 
                 // kubernetes 설치 되어 있으면, 실제로 워커노드 추가, 삭제 스크립트 실행
                 // 추가된 워커노드 구함
-                if (
-                  env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, envBeforeEdit)
-                ) {
+                const kubernetesInfo = env.isInstalled(
+                  CONST.PRODUCT.KUBERNETES.NAME,
+                  envBeforeEdit
+                );
+                if (kubernetesInfo) {
                   dispatchAppState({
                     type: 'set_loading',
                     loading: true
                   });
+                  const { registry, version } = kubernetesInfo;
 
                   const addedWorker = [];
                   for (let i = 0; i < modifiedWorkerArr.length; i += 1) {
@@ -780,6 +783,8 @@ function EnvContentsAdd(props: any) {
                   addedWorker.map((worker, index) => {
                     command = Script.getK8sWorkerInstallScript(
                       mainMaster,
+                      registry,
+                      version,
                       worker
                     );
                     command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;

@@ -37,7 +37,7 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 10000);
+    }, 5000);
     return () => {
       clearInterval(timer);
     };
@@ -119,7 +119,12 @@ function InstallContentsKubernetes3(props: any) {
     await Promise.all(
       workerArr.map((worker, index) => {
         command = '';
-        command += Script.getK8sWorkerInstallScript(mainMaster, worker);
+        command += Script.getK8sWorkerInstallScript(
+          mainMaster,
+          appState.kubeinstallState.registry,
+          appState.kubeinstallState.version,
+          worker
+        );
         command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
         worker.cmd = command;
         console.error(worker.cmd);

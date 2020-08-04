@@ -92,9 +92,11 @@ function InstallContentsCniAlready(props: any) {
       nowEnv.nodeList
     );
 
+    const { version } = env.isInstalled(CONST.PRODUCT.CNI.NAME, nowEnv);
+
     console.error('mainMaster remove start');
     let command = '';
-    command += Script.getCniRemoveScript(nowEnv);
+    command += Script.getCniRemoveScript(version);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {

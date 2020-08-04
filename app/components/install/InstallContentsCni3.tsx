@@ -68,10 +68,12 @@ function InstallContentsCni3(props: any) {
       nowEnv.nodeList
     );
 
+    const { registry } = env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv);
+
     setProgress(30);
     console.error('mainMaster install start');
     let command = '';
-    command += Script.getCniInstallScript(state.type, state.version, nowEnv);
+    command += Script.getCniInstallScript(state.type, state.version, registry);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {

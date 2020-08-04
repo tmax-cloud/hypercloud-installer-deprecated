@@ -5,7 +5,7 @@ import styles from './InstallContentsCni1.css';
 import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
-import CniImage from '../../../resources/assets/CNI_logo.png';
+import CniImage from '../../../resources/assets/cni_logo.png';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
