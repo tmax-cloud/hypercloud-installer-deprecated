@@ -15,8 +15,11 @@ function InstallKubePlease(props: any) {
   console.debug('InstallKubePlease');
 
   return (
-    <div>
-      쿠버네티스를 먼저 설치해주세요.
+    <div style={{
+      height: '100%'
+    }} className={['childLeftRightCenter', 'childUpDownCenter' ,'large', 'lightDark'].join(' ')}>
+      <br />
+      <span>{CONST.PRODUCT.KUBERNETES.NAME} 를 먼저 설치해 주세요.</span>
     </div>
   );
 }

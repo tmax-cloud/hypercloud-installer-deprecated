@@ -56,7 +56,7 @@ function InstallContentsCni1(props: any) {
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>CNI를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.CNI.NAME} 를 설치할 수 있습니다.</span>
             <br />
             <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
           </div>

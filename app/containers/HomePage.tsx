@@ -11,6 +11,8 @@ import {
 import InstallPage from './InstallPage';
 import EnvPage from './EnvPage';
 import routes from '../utils/constants/routes.json';
+import Data from '../utils/class/Data';
+import * as env from '../utils/common/env';
 
 // component간 depth가 깊어지면
 // props전달로는 한계가 있으므로
@@ -22,7 +24,8 @@ const initialState = {
     version: '1.17.6',
     registry: ''
   },
-  loading: false
+  loading: false,
+  // data: new Data(env.loadEnvList())
 };
 const reducer = (state: any, action: any) => {
   if (action.type === 'set_nowEnv') {
@@ -58,6 +61,7 @@ function HomePage(props: any) {
   console.debug('HomePage', props);
 
   const [appState, dispatchAppState] = useReducer(reducer, initialState);
+  console.debug(appState);
 
   const classes = useStyles();
   return (

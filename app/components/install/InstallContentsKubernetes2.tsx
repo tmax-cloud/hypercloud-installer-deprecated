@@ -10,7 +10,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton
+  IconButton,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@material-ui/core';
 // import { KubeInstallContext } from './InstallContentsKubernetes';
 import CloseIcon from '@material-ui/icons/Close';
@@ -41,9 +45,10 @@ function InstallContentsKubernetes2(props: any) {
     setVersion(event.target.value as string);
   };
 
-  const [registry, setRegistry] = React.useState(
-    appState.kubeinstallState.setRegistry
-  );
+  const [registry, setRegistry] = React.useState('public');
+  const handleChangeRegistry = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRegistry((event.target as HTMLInputElement).value);
+  };
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -57,7 +62,9 @@ function InstallContentsKubernetes2(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>쿠버네티스 버전</span>
+          <span className={['medium'].join(' ')}>
+            {CONST.PRODUCT.KUBERNETES.NAME} 버전
+          </span>
         </div>
         <div>
           <FormControl variant="outlined" className={styles.select}>
@@ -79,10 +86,10 @@ function InstallContentsKubernetes2(props: any) {
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>도커 레지스트리 주소</span>
+          <span className={['medium'].join(' ')}>Docker Registry 설정</span>
         </div>
         <div>
-          <TextField
+          {/* <TextField
             id="outlined"
             className={['long'].join(' ')}
             label="도커 레지스트리 주소"
@@ -94,10 +101,39 @@ function InstallContentsKubernetes2(props: any) {
               setRegistry(e.target.value);
               // hasIpError(e.target.value);
             }}
-          />
+          /> */}
+          <FormControl component="fieldset">
+            {/* <FormLabel component="legend">Gender</FormLabel> */}
+            <RadioGroup
+              aria-label="gender"
+              name="gender1"
+              value={registry}
+              onChange={handleChangeRegistry}
+            >
+              <div>
+                <FormControlLabel
+                  value="public"
+                  control={<Radio />}
+                  label="Public"
+                />
+                <FormControlLabel
+                  value="private"
+                  control={<Radio />}
+                  label="Private"
+                />
+              </div>
+            </RadioGroup>
+          </FormControl>
           <div>
-            <span className={['small', 'lightDark'].join(' ')}>
+            {/* <span className={['small', 'lightDark'].join(' ')}>
               미입력 시, 파드를 생성할 때 Docker Hub에서 이미지를 가져옵니다.
+            </span> */}
+            <span className={['verySmall', 'lightDark'].join(' ')}>
+              Public 선택 시, Docker Hub를 Image Registry로 사용합니다.
+            </span>
+            <br />
+            <span className={['verySmall', 'lightDark'].join(' ')}>
+              Private 선택 시, Master 노드 한 곳에 Image Registry를 구축하여 사용합니다.
             </span>
           </div>
         </div>
@@ -112,11 +148,19 @@ function InstallContentsKubernetes2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
+            let registryAddr = '';
+            if (registry === 'public') {
+              registryAddr = '';
+            } else if (registry === 'private') {
+              const { mainMaster } = env.getArrSortedByRole(nowEnv.nodeList);
+              registryAddr = `${mainMaster.ip}:5000`;
+            }
+
             dispatchAppState({
               type: 'set_kubeinstallState',
               kubeinstallState: {
                 version,
-                registry
+                registry: registryAddr
               }
             });
             history.push(
@@ -159,8 +203,8 @@ function InstallContentsKubernetes2(props: any) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                쿠버네티스 설정 화면에서 나가시겠습니까? 설정 내용은 저장되지
-                않습니다.
+                {CONST.PRODUCT.KUBERNETES.NAME} 설정 화면에서 나가시겠습니까?
+                설정 내용은 저장되지 않습니다.
               </span>
             </DialogContentText>
           </DialogContent>

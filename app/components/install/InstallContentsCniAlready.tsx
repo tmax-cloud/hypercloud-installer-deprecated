@@ -225,7 +225,7 @@ function InstallContentsCniAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    CNI를 삭제하시겠습니까?
+                    {CONST.PRODUCT.CNI.NAME} 를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>

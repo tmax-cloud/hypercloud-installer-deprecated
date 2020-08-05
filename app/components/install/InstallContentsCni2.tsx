@@ -152,7 +152,7 @@ function InstallContentsCni2(props: any) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                CNI 설정 화면에서 나가시겠습니까? 설정 내용은 저장되지
+                {CONST.PRODUCT.CNI.NAME} 설정 화면에서 나가시겠습니까? 설정 내용은 저장되지
                 않습니다.
               </span>
             </DialogContentText>

@@ -465,8 +465,11 @@ export default function EnvContentsExist(props: any) {
       } else {
         component = (
           <div className={['small'].join(' ')}>
-            {products.map(p => {
-              return <span key={p.name}>{p.name}</span>;
+            {products.map((p, index) => {
+              if (index === products.length - 1) {
+                return <span key={p.name}>{p.name}</span>;
+              }
+              return <span key={p.name}>{p.name}, </span>;
             })}
           </div>
         );

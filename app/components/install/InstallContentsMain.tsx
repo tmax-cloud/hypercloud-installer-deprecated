@@ -97,7 +97,7 @@ function InstallContentsMain(props: any) {
           ].join(' ')}
         >
           <span>
-            HyperCloud Installer는 쿠버네티스 및 다양한 호환 제품 설치를
+            HyperCloud Installer는 {CONST.PRODUCT.KUBERNETES.NAME} 및 다양한 호환 제품 설치를
             제공합니다.
           </span>
         </div>
@@ -105,7 +105,7 @@ function InstallContentsMain(props: any) {
           className={[
             'childLeftRightCenter',
             styles.textBoxRow,
-            'mediun',
+            'medium',
             'lightDark'
           ].join(' ')}
         >
@@ -139,21 +139,24 @@ function InstallContentsMain(props: any) {
                   <Paper
                     className={classes.paper}
                     onClick={() => {
-                      if (!disabled) {
-                        product.goProductInstallPage(P.NAME, nowEnv, history);
-                      }
+                      // kubernetes 미설치시, 설치페이지 이동 불가
+                      // if (!disabled) {
+                      //   product.goProductInstallPage(P.NAME, nowEnv, history);
+                      // }
+                      product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
                     variant="outlined"
                   >
                     <div
-                      style={
-                        !disabled
-                          ? {}
-                          : {
-                              pointerEvents: 'none',
-                              opacity: '0.4'
-                            }
-                      }
+                      // kubernetes 미설치시, disabled
+                      // style={
+                      //   !disabled
+                      //     ? {}
+                      //     : {
+                      //         pointerEvents: 'none',
+                      //         opacity: '0.4'
+                      //       }
+                      // }
                       className={[
                         '',
                         'childLeftRightCenter',

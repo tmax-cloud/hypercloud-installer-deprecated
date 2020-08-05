@@ -151,9 +151,9 @@ function EnvContentsAdd(props: any) {
     }
 
     // edit page에서는 기존 이름과 다른 경우에만 validation check 진행
+    const envList = env.loadEnvList();
     if (envBeforeEdit) {
       if (target !== envBeforeEdit.name) {
-        const envList = env.loadEnvList();
         for (let i = 0; i < envList.length; i += 1) {
           if (target === envList[i].name) {
             console.debug(target, envList[i].name);
@@ -163,7 +163,6 @@ function EnvContentsAdd(props: any) {
         }
       }
     } else {
-      const envList = env.loadEnvList();
       for (let i = 0; i < envList.length; i += 1) {
         if (target === envList[i].name) {
           console.debug(target, envList[i].name);

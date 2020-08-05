@@ -20,7 +20,7 @@ const CONST = {
     CNI: {
       NAME: 'CNI',
       IS_REQUIRED: true, // Required
-      DESC: '컨테이너 네트워크 인터페이스'
+      DESC: '컨테이너 간의 네트워킹을 제어할 수 있는 플러그인'
     },
     HELM: {
       NAME: 'Helm',

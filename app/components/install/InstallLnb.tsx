@@ -149,7 +149,7 @@ function InstallLnb(props: any) {
                     onClick={() => {
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
-                    disabled={disabled}
+                    // disabled={disabled}
                   >
                     {/* <ListItemIcon>
                   <StarBorder />
@@ -169,6 +169,7 @@ function InstallLnb(props: any) {
             {/* <ListItemIcon>
               <InboxIcon />
             </ListItemIcon> */}
+            {console.log(env.isAllRequiredProductInstall(nowEnv))}
             {env.isAllRequiredProductInstall(nowEnv) ? (
               <ListItemText primary="호환 제품" />
             ) : (

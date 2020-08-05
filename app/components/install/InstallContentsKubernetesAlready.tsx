@@ -195,7 +195,7 @@ function InstallContentsKubernetesAlready(props: any) {
                 </div>
                 <div>
                   <span className={['small', 'lightDark'].join(' ')}>
-                    {nowProduct.NAME}
+                    {nowProduct.DESC}
                   </span>
                 </div>
               </div>
@@ -252,8 +252,11 @@ function InstallContentsKubernetesAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    쿠버네티스를 삭제하시겠습니까? 삭제 시, 호환 제품의 기능도
-                    모두 삭제됩니다.
+                    {CONST.PRODUCT.KUBERNETES.NAME} 를 삭제하시겠습니까?
+                  </span>
+                  <br />
+                  <span className={['lightDark', 'small'].join(' ')}>
+                    삭제 시, 다른 필수 제품 기능 및 호환 제품 기능도 모두 삭제됩니다.
                   </span>
                 </DialogContentText>
               </DialogContent>

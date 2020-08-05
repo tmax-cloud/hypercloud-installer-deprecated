@@ -25,27 +25,18 @@ function InstallContentsCni4(props: any) {
 
   // json 파일 저장
   env.deleteProductByName(nowEnv.name, CONST.PRODUCT.CNI.NAME);
-  const envList = env.loadEnvList();
-  for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === nowEnv.name) {
-      envList[i].productList.push({
-        name: CONST.PRODUCT.CNI.NAME,
-        version: state.version,
-        type: state.type
-      });
-      break;
-    }
-  }
-  env.saveEnvList(envList);
+  env.addProductAtEnv(nowEnv.name, {
+    name: CONST.PRODUCT.CNI.NAME,
+    version: state.version,
+    type: state.type
+  });
 
   const getRegistryJsx = () => {
     if (state.type) {
       return (
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>
-              Type
-            </span>
+            <span className={['medium', 'thick'].join(' ')}>Type</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>

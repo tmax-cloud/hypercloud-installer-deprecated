@@ -94,14 +94,18 @@ function InstallContentsCni3(props: any) {
   return (
     <div className={[styles.wrap].join(' ')}>
       <div>
-        <span>설치 중 입니다....</span>
+        {progress === 100 ? (
+          <span>설치가 완료 되었습니다.</span>
+        ) : (
+          <span>설치 중 입니다....</span>
+        )}
       </div>
       <ProgressBar progress={progress} />
       <div>
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        <Button
+        {/* <Button
           variant="contained"
           style={{ marginRight: '10px' }}
           className={['blue'].join(' ')}
@@ -116,7 +120,7 @@ function InstallContentsCni3(props: any) {
           }}
         >
           &lt; 이전
-        </Button>
+        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"

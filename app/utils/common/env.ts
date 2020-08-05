@@ -30,6 +30,7 @@ function makeNodeObject(object: any) {
 function makeEnvObject(object: any) {
   return new Env(
     object._name,
+    // 객체 형태로 생성하여 넘겨줌(객체의 메소드 접근 하기 위함)
     object._nodeList.map((node: any) => {
       return makeNodeObject(node);
     }),
@@ -44,7 +45,10 @@ export function loadEnvList() {
   try {
     if (fs.existsSync('env.json')) {
       // file exists
+      console.debug('env.json exist.');
     } else {
+      console.debug('env.json not exist.');
+      console.debug('create empty env.json.');
       fs.writeFileSync('env.json', '[]', (err: any) => {
         if (err) {
           console.debug(err);
@@ -57,6 +61,7 @@ export function loadEnvList() {
 
   const envList = fs.readFileSync('env.json');
   const envObjList = JSON.parse(envList).map((env: any) => {
+    // 객체 형태로 생성하여 넘겨줌(객체의 메소드 접근 하기 위함)
     return makeEnvObject(env);
   });
 
@@ -107,12 +112,64 @@ export function deleteEnvByName(envName: string) {
 }
 
 /**
+ * @param envName 환경 이름
+ * @param productName 제품 이름
+ * @description 해당 환경에서 해당 제품을 삭제한다.
+ */
+export const deleteProductByName = (envName: string, productName: string) => {
+  console.error(envName, productName);
+  const envList = loadEnvList();
+  for (let i = 0; i < envList.length; i += 1) {
+    if (envList[i].name === envName) {
+      const targetEnv = envList[i];
+      for (let j = 0; j < targetEnv.productList.length; j += 1) {
+        if (targetEnv.productList[j].name === productName) {
+          targetEnv.productList.splice(j, 1);
+          saveEnvList(envList);
+          return;
+        }
+      }
+    }
+  }
+};
+
+/**
+ * @param envName 환경 이름
+ * @description 해당 환경에서 모든 제품 삭제
+ */
+export const deleteAllProduct = (envName: string) => {
+  const envList = loadEnvList();
+  for (let i = 0; i < envList.length; i += 1) {
+    if (envList[i].name === envName) {
+      const targetEnv = envList[i];
+      targetEnv.productList = [];
+      saveEnvList(envList);
+    }
+  }
+};
+
+/**
  * @param newEnv 새 환경
  * @description 새로운 환경 정보를 넣어준다.
  */
 export function addEnv(env: Env) {
   const envList = loadEnvList();
   envList.push(env);
+  saveEnvList(envList);
+}
+
+/**
+ * @param newEnv 새 환경
+ * @description 새로운 환경 정보를 넣어준다.
+ */
+export function addProductAtEnv(envName: string, productObj: any, ) {
+  const envList = loadEnvList();
+  for (let i = 0; i < envList.length; i += 1) {
+    if (envList[i].name === envName) {
+      envList[i].productList.push(productObj);
+      break;
+    }
+  }
   saveEnvList(envList);
 }
 
@@ -154,7 +211,7 @@ export const isAllRequiredProductInstall = (env: any) => {
   const requiredProduct = product.getRequiredProduct();
 
   for (let i = 0; i < requiredProduct.length; i += 1) {
-    const target = requiredProduct.NAME;
+    const target = requiredProduct[i].NAME;
     let installed = false;
     for (let j = 0; j < env.productList.length; j += 1) {
       const target2 = env.productList[j].name;
@@ -171,55 +228,22 @@ export const isAllRequiredProductInstall = (env: any) => {
 };
 
 /**
- * @param envName 환경 이름
- * @param productName 제품 이름
- * @description 해당 환경에서 해당 제품을 삭제한다.
- */
-export const deleteProductByName = (envName: string, productName: string) => {
-  console.error(envName,productName);
-  const envList = loadEnvList();
-  for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === envName) {
-      const targetEnv = envList[i];
-      for (let j = 0; j < targetEnv.productList.length; j += 1) {
-        if (targetEnv.productList[j].name === productName) {
-          targetEnv.productList.splice(j, 1);
-          saveEnvList(envList);
-          return;
-        }
-      }
-    }
-  }
-};
-
-export const deleteAllProduct = (envName: string) => {
-  const envList = loadEnvList();
-  for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === envName) {
-      const targetEnv = envList[i];
-      targetEnv.productList = [];
-      saveEnvList(envList);
-    }
-  }
-};
-
-/**
  * @param nodeInfo 한 환경의 노드 리스트
  * @description 노드 리스트를, mainMaster, master, worker로 분리하여 리턴
  */
-export const getArrSortedByRole = (nodeInfo: any) => {
+export const getArrSortedByRole = (nodeList: any) => {
   // mainMaster, master, worker로 분리
   let mainMaster: any = null;
   const masterArr: any[] = [];
   const workerArr: any[] = [];
 
-  for (let i = 0; i < nodeInfo.length; i += 1) {
-    if (nodeInfo[i].role === Role.MAIN_MASTER) {
-      mainMaster = nodeInfo[i];
-    } else if (nodeInfo[i].role === Role.MASTER) {
-      masterArr.push(nodeInfo[i]);
-    } else if (nodeInfo[i].role === Role.WORKER) {
-      workerArr.push(nodeInfo[i]);
+  for (let i = 0; i < nodeList.length; i += 1) {
+    if (nodeList[i].role === Role.MAIN_MASTER) {
+      mainMaster = nodeList[i];
+    } else if (nodeList[i].role === Role.MASTER) {
+      masterArr.push(nodeList[i]);
+    } else if (nodeList[i].role === Role.WORKER) {
+      workerArr.push(nodeList[i]);
     }
   }
 

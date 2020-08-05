@@ -34,7 +34,11 @@ function InstallContentsKubernetes1(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={["childUpDownCenter", "childLeftRightCenter",styles.circle].join(' ')}
+              className={[
+                'childUpDownCenter',
+                'childLeftRightCenter',
+                styles.circle
+              ].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -56,9 +60,13 @@ function InstallContentsKubernetes1(props: any) {
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>쿠버네티스를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {CONST.PRODUCT.KUBERNETES.NAME} 를 설치할 수 있습니다.
+            </span>
             <br />
-            <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              계속하시려면, 아래의 버튼을 클릭해 주세요.
+            </span>
           </div>
           <div>
             <Button

@@ -10,6 +10,12 @@ function cloneGitScript(address: string) {
     `;
 }
 
+function deleteCniConfigScript() {
+  return `
+    rm -rf /etc/cni/*
+  `;
+}
+
 function deleteDockerScript() {
   return `
     sudo yum remove -y docker \
@@ -118,6 +124,7 @@ export function getCniRemoveScript(version: string) {
     cd ~/hypercloud-install-guide/CNI;
     kubectl delete -f calico_${version}.yaml;
     kubectl delete -f calicoctl_3.15.0.yaml;
+    ${deleteCniConfigScript()}
     `;
 }
 
@@ -174,6 +181,7 @@ export function getK8sMasterRemoveScript(): string {
     yum install -y ipvsadm;
     ipvsadm --clear;
     rm -rf /var/lib/etcd/;
+    ${deleteCniConfigScript()}
     `;
 }
 

@@ -25,18 +25,11 @@ function InstallContentsKubernetes4(props: any) {
 
   // json 파일 저장
   env.deleteProductByName(nowEnv.name, CONST.PRODUCT.KUBERNETES.NAME);
-  const envList = env.loadEnvList();
-  for (let i = 0; i < envList.length; i += 1) {
-    if (envList[i].name === nowEnv.name) {
-      envList[i].productList.push({
-        name: CONST.PRODUCT.KUBERNETES.NAME,
-        version: appState.kubeinstallState.version,
-        registry: appState.kubeinstallState.registry
-      });
-      break;
-    }
-  }
-  env.saveEnvList(envList);
+  env.addProductAtEnv(nowEnv.name, {
+    name: CONST.PRODUCT.KUBERNETES.NAME,
+    version: appState.kubeinstallState.version,
+    registry: appState.kubeinstallState.registry
+  });
 
   const getRegistryJsx = () => {
     if (appState.kubeinstallState.registry) {
@@ -79,9 +72,7 @@ function InstallContentsKubernetes4(props: any) {
             className={['white'].join(' ')}
             size="large"
             onClick={() => {
-              history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/main`
-              );
+              history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
             }}
           >
             완료

@@ -17,6 +17,7 @@ import * as Common from '../../utils/common/ssh';
 import ProgressBar from '../ProgressBar';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
+import CONST from '../../utils/constants/constant';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3(props: any) {
@@ -154,14 +155,18 @@ function InstallContentsKubernetes3(props: any) {
   return (
     <div className={[styles.wrap].join(' ')}>
       <div>
-        <span>설치 중 입니다....</span>
+        {progress === 100 ? (
+          <span>설치가 완료 되었습니다.</span>
+        ) : (
+          <span>설치 중 입니다....</span>
+        )}
       </div>
       <ProgressBar progress={progress} />
       <div>
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        <Button
+        {/* <Button
           variant="contained"
           style={{ marginRight: '10px' }}
           className={['blue'].join(' ')}
@@ -171,12 +176,12 @@ function InstallContentsKubernetes3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step2`
             );
           }}
         >
           &lt; 이전
-        </Button>
+        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"
@@ -184,7 +189,7 @@ function InstallContentsKubernetes3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step4`
               );
             }}
           >
@@ -223,7 +228,7 @@ function InstallContentsKubernetes3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step1`
                 );
               }}
               color="primary"
