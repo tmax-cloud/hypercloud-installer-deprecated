@@ -16,13 +16,13 @@ export function send(node: Node, cb: SendCb) {
   return new Promise((resolve, reject) => {
     conn
       .on('ready', () => {
-        console.log('Client :: ready');
+        console.debug('Client :: ready');
         conn.exec(node.cmd, (err, stream) => {
           if (err) throw err;
           stream
             .on('close', (code, signal) => {
               cb.close();
-              console.log(
+              console.debug(
                 `Stream :: close :: code: ${code}, signal: ${signal}`
               );
               conn.end();
@@ -30,7 +30,7 @@ export function send(node: Node, cb: SendCb) {
             })
             .on('data', data => {
               cb.stdout(data);
-              console.log(`STDOUT: ${data}`);
+              console.debug(`STDOUT: ${data}`);
             })
             .stderr.on('data', data => {
               cb.stderr(data);
@@ -60,13 +60,13 @@ export function connectionTest(node: Node) {
     });
     connection.on('ready', () => {
       // Work with the connection
-      console.log('ready');
+      console.debug('ready');
       connection.end();
       resolve();
     });
     connection.on('error', (err: any) => {
       // Handle the connection error
-      console.log('error', err);
+      console.debug('error', err);
       connection.end();
       reject(err);
     });

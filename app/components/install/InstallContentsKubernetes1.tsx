@@ -10,10 +10,8 @@ import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
 function InstallContentsKubernetes1(props: any) {
-  console.log('InstallContentsKubernetes1');
-
+  console.debug(InstallContentsKubernetes1.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;

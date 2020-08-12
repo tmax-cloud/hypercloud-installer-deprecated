@@ -10,10 +10,8 @@ import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
 
 function InstallContentsKubernetes4(props: any) {
-  console.log('InstallContentsKubernetes4');
-
+  console.debug(InstallContentsKubernetes4.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

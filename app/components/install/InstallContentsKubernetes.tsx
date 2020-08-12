@@ -21,10 +21,8 @@ import routes from '../../utils/constants/routes.json';
 // };
 
 function InstallContentsKubernetes(props: any) {
-  console.log('InstallContentsKubernetes');
-
+  console.debug(InstallContentsKubernetes.name, props);
   const { history, location, match } = props;
-  console.log(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

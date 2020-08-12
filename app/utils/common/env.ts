@@ -5,10 +5,41 @@ import CONST from '../constants/constant';
 import Node, { Role } from '../class/Node';
 import Env from '../class/Env';
 import * as product from './product';
+import { rootPath } from 'electron-root-path';
+import path from 'path';
 
 /**
  * 파일 작업은 모두 sync로 수행
  */
+
+/**
+ * @description path 파일 삭제 (동기)
+ */
+export function deleteFileSync(path: string) {
+  const fs = require('fs');
+
+  try {
+    fs.unlinkSync(path);
+    // file removed
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/**
+ * @description path 파일 삭제 (비동기)
+ */
+export function deleteFileAsync(path: string) {
+  const fs = require('fs');
+
+  fs.unlink(path, err => {
+    if (err) {
+      console.error(err);
+    }
+
+    // file removed
+  });
+}
 
 /**
  * @description Node객체 생성하여 리턴
@@ -30,6 +61,7 @@ function makeNodeObject(object: any) {
 function makeEnvObject(object: any) {
   return new Env(
     object._name,
+    object._type,
     // 객체 형태로 생성하여 넘겨줌(객체의 메소드 접근 하기 위함)
     object._nodeList.map((node: any) => {
       return makeNodeObject(node);
@@ -41,15 +73,18 @@ function makeEnvObject(object: any) {
 
 export function loadEnvList() {
   const fs = require('fs');
+  // const envPath = path.join(rootPath, 'env.json');
+  const envPath = 'env.json';
 
   try {
-    if (fs.existsSync('env.json')) {
+    if (fs.existsSync(envPath)) {
       // file exists
-      console.debug('env.json exist.');
+      // console.debug('env.json exist.');
     } else {
-      console.debug('env.json not exist.');
-      console.debug('create empty env.json.');
-      fs.writeFileSync('env.json', '[]', (err: any) => {
+      // console.debug('env.json not exist.');
+      // console.debug('create empty env.json.');
+      // console.debug('envPath', envPath);
+      fs.writeFileSync(envPath, '[]', (err: any) => {
         if (err) {
           console.debug(err);
         }
@@ -59,7 +94,7 @@ export function loadEnvList() {
     throw Error(err);
   }
 
-  const envList = fs.readFileSync('env.json');
+  const envList = fs.readFileSync(envPath);
   const envObjList = JSON.parse(envList).map((env: any) => {
     // 객체 형태로 생성하여 넘겨줌(객체의 메소드 접근 하기 위함)
     return makeEnvObject(env);
@@ -74,10 +109,13 @@ export function loadEnvList() {
  */
 export function saveEnvList(envList: Env[]) {
   const jsonData = JSON.stringify(envList);
+  // const envPath = path.join(rootPath, 'env.json');
+  const envPath = 'env.json';
+
   const fs = require('fs');
-  fs.writeFileSync('env.json', jsonData, (err: any) => {
+  fs.writeFileSync(envPath, jsonData, (err: any) => {
     if (err) {
-      console.log(err);
+      console.debug(err);
     }
   });
 }
@@ -162,7 +200,7 @@ export function addEnv(env: Env) {
  * @param newEnv 새 환경
  * @description 새로운 환경 정보를 넣어준다.
  */
-export function addProductAtEnv(envName: string, productObj: any, ) {
+export function addProductAtEnv(envName: string, productObj: any) {
   const envList = loadEnvList();
   for (let i = 0; i < envList.length; i += 1) {
     if (envList[i].name === envName) {

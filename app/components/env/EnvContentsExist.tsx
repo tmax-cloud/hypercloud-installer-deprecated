@@ -318,10 +318,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 // };
 
 export default function EnvContentsExist(props: any) {
-  console.debug('EnvContentsExist');
-
+  console.debug(EnvContentsExist.name, props);
   const { history } = props;
-  console.debug(props);
 
   const [rows, setRows] = useState(env.loadEnvList());
 
@@ -432,6 +430,7 @@ export default function EnvContentsExist(props: any) {
 
   // table row
   function Row({ row, index }) {
+    console.debug(row.nodeList);
     const isItemSelected = isSelected(row.name);
     const labelId = `enhanced-table-checkbox-${index}`;
     const [open, setOpen] = React.useState(false);
@@ -474,7 +473,7 @@ export default function EnvContentsExist(props: any) {
           </div>
         );
       }
-      // console.log(component);
+      // console.debug(component);
       return component;
     };
 
@@ -717,7 +716,7 @@ export default function EnvContentsExist(props: any) {
               }}
               size="small"
               onChange={e => {
-                console.log(rows);
+                console.debug(rows);
                 const searchResultEnv = [];
                 env.loadEnvList().map(environment => {
                   if (environment.name.indexOf(e.target.value) !== -1) {

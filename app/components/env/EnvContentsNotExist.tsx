@@ -7,8 +7,8 @@ import EmptyImage from '../../../resources/assets/img_empty.svg';
 import styles from './EnvContentsNotExist.css';
 import routes from '../../utils/constants/routes.json';
 
-function EnvContentsNotExist() {
-  console.debug('EnvContentsNotExist');
+function EnvContentsNotExist(props: any) {
+  console.debug(EnvContentsNotExist.name, props);
 
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>

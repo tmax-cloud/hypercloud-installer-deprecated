@@ -33,10 +33,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallLnb(props: any) {
-  console.debug('InstallLnb');
+  console.debug(InstallLnb.name, props);
 
   const { history, location, match } = props;
-  console.debug(props);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -169,7 +168,6 @@ function InstallLnb(props: any) {
             {/* <ListItemIcon>
               <InboxIcon />
             </ListItemIcon> */}
-            {console.log(env.isAllRequiredProductInstall(nowEnv))}
             {env.isAllRequiredProductInstall(nowEnv) ? (
               <ListItemText primary="호환 제품" />
             ) : (

@@ -12,7 +12,7 @@ import CloudImage from '../../../resources/assets/ic_logo_hypercloud.svg';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
 
 function InstallKubePlease(props: any) {
-  console.debug('InstallKubePlease');
+  console.debug(InstallKubePlease.name, props);
 
   return (
     <div style={{

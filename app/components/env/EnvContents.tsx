@@ -11,7 +11,7 @@ import styles from './EnvContents.css';
 import routes from '../../utils/constants/routes.json';
 
 function EnvContents(props: any) {
-  console.debug('EnvContents');
+  console.debug(EnvContents.name, props);
 
   const { history } = props;
 

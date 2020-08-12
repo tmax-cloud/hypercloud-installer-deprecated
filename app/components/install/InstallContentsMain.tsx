@@ -10,6 +10,10 @@ import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import * as product from '../../utils/common/product';
 import CloudImage from '../../../resources/assets/ic_logo_hypercloud.svg';
+import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import CniImage from '../../../resources/assets/Cni_logo.png';
+import HelmImage from '../../../resources/assets/Helm_logo.png';
+import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,10 +32,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallContentsMain(props: any) {
-  console.debug('InstallContentsMain');
-
+  console.debug(InstallContentsMain.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -44,7 +46,7 @@ function InstallContentsMain(props: any) {
   const classes = useStyles();
 
   // const goProductInstallPage = (name: string) => {
-  //   console.log('goProductInstallPage');
+  //   console.debug('goProductInstallPage');
   //   if (name === CONST.PRODUCT.KUBERNETES.NAME) {
   //     if (env.isInstalled(name, nowEnv)) {
   //       history.push(
@@ -72,9 +74,19 @@ function InstallContentsMain(props: any) {
 
   const getInstalledLogo = (productName: string) => {
     const path = `../resources/assets/${productName}_logo.png`;
+    let image = null;
+    if (productName === CONST.PRODUCT.KUBERNETES.NAME) {
+      image = KubernetesImage;
+    } else if (productName === CONST.PRODUCT.CNI.NAME) {
+      image = CniImage;
+    } else if (productName === CONST.PRODUCT.HELM.NAME) {
+      image = HelmImage;
+    } else if (productName === CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME) {
+      image = HyperCloudOperatorImage;
+    }
     return (
       <span>
-        <img src={path} alt="Logo" style={{ marginRight: '5px' }} />
+        <img src={image} alt="Logo" style={{ marginRight: '5px' }} />
       </span>
     );
   };

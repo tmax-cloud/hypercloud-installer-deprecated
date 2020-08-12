@@ -6,10 +6,8 @@ import EnvHeader from '../components/env/EnvHeader';
 import EnvContents from '../components/env/EnvContents';
 
 function EnvPage(props: any) {
-  console.debug('EnvPage');
-
+  console.debug(EnvPage.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   return (
     <>

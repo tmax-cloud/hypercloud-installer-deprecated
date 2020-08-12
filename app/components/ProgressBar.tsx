@@ -32,7 +32,7 @@ const BorderLinearProgress = withStyles((theme: Theme) =>
   })
 )(LinearProgressWithLabel);
 
-function ProgressBar(props) {
+function ProgressBar(props: any) {
   const { progress } = props;
   // const [progress, setProgress] = React.useState(0);
 

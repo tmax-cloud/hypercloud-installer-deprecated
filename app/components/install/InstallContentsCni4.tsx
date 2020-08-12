@@ -10,10 +10,8 @@ import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
 
 function InstallContentsCni4(props: any) {
-  console.log('InstallContentsCni4');
-
+  console.debug(InstallContentsCni4.name, props);
   const { history, location, match, state, setState } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

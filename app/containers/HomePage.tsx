@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
 import React, { useReducer } from 'react';
 import { Switch, Route } from 'react-router-dom';
@@ -8,6 +9,7 @@ import {
   Theme,
   createStyles
 } from '@material-ui/core';
+import { rootPath } from 'electron-root-path';
 import InstallPage from './InstallPage';
 import EnvPage from './EnvPage';
 import routes from '../utils/constants/routes.json';
@@ -24,7 +26,7 @@ const initialState = {
     version: '1.17.6',
     registry: ''
   },
-  loading: false,
+  loading: false
   // data: new Data(env.loadEnvList())
 };
 const reducer = (state: any, action: any) => {
@@ -58,10 +60,12 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function HomePage(props: any) {
-  console.debug('HomePage', props);
+  console.debug('rootPath', rootPath);
+  console.debug('__dirname', __dirname);
+  console.debug(HomePage.name, props);
 
   const [appState, dispatchAppState] = useReducer(reducer, initialState);
-  console.debug(appState);
+  console.debug('appState', appState);
 
   const classes = useStyles();
   return (

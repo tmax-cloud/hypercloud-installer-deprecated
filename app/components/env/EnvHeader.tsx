@@ -7,9 +7,10 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import styles from './EnvHeader.css';
 import routes from '../../utils/constants/routes.json';
+import * as docker from '../../utils/common/docker';
 
 function EnvHeader(props: any) {
-  console.debug('EnvHeader');
+  console.debug(EnvHeader.name, props);
 
   const { history, location } = props;
 
@@ -46,6 +47,7 @@ function EnvHeader(props: any) {
     }
     return null;
   };
+
   return (
     <div className={[styles.wrap, 'childUpDownCenter'].join(' ')}>
       <span className={[styles.title, 'large'].join(' ')}>{title}</span>

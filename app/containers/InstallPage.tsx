@@ -6,15 +6,12 @@ import { AppContext } from './HomePage';
 import * as env from '../utils/common/env';
 
 function InstallPage(props: any) {
-  console.debug('InstallPage');
-
+  console.debug(InstallPage.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  console.log(env.getEnvByName(match.params.envName));
   // dispatchAppState({
   //   type: 'set_nowEnv',
   //   nowEnv: env.getEnvByName(match.params.envName)

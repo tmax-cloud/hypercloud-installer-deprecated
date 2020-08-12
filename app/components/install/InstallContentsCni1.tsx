@@ -5,15 +5,13 @@ import styles from './InstallContentsCni1.css';
 import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
-import CniImage from '../../../resources/assets/cni_logo.png';
+import CniImage from '../../../resources/assets/Cni_logo.png';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
 function InstallContentsCni1(props: any) {
-  console.log('InstallContentsCni1');
-
+  console.debug(InstallContentsCni1.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;

@@ -20,7 +20,7 @@ import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
-import productImage from '../../../resources/assets/cni_logo.png';
+import productImage from '../../../resources/assets/Cni_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
@@ -46,10 +46,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallContentsCniAlready(props: any) {
-  console.log('InstallContentsCniAlready');
-
+  console.debug(InstallContentsCniAlready.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const classes = useStyles();
 
@@ -85,7 +83,7 @@ function InstallContentsCniAlready(props: any) {
       loading: true
     });
     // setLoading(true);
-    console.log(nowEnv.nodeList);
+    console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
     const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(

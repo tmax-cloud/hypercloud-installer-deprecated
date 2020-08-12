@@ -21,10 +21,8 @@ import CONST from '../../utils/constants/constant';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsCni3(props: any) {
-  console.log('InstallContentsCni3');
-
+  console.debug(InstallContentsCni3.name, props);
   const { history, location, match, state, setState } = props;
-  console.debug(props);
 
   // const appContext = useContext(AppContext);
   // const { appState } = appContext;
@@ -61,7 +59,7 @@ function InstallContentsCni3(props: any) {
   };
 
   const install = async () => {
-    console.log(nowEnv.nodeList);
+    console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
     const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(

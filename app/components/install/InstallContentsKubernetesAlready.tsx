@@ -46,10 +46,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallContentsKubernetesAlready(props: any) {
-  console.log('InstallContentsKubernetesAlready');
-
+  console.debug(InstallContentsKubernetesAlready.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const classes = useStyles();
 
@@ -95,7 +93,7 @@ function InstallContentsKubernetesAlready(props: any) {
       loading: true
     });
     // setLoading(true);
-    console.log(nowEnv.nodeList);
+    console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
     const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(

@@ -41,7 +41,8 @@ const configureStore = (initialState?: counterStateType) => {
 
   // Skip redux logs in console during the tests
   if (process.env.NODE_ENV !== 'test') {
-    middleware.push(logger);
+    // redux-logger 끄기
+    // middleware.push(logger);
   }
 
   // Router Middleware

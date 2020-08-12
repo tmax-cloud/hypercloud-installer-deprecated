@@ -21,10 +21,8 @@ import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 
 function InstallContentsCni2(props: any) {
-  console.log('InstallContentsCni2');
-
+  console.debug(InstallContentsCni2.name, props);
   const { history, location, match, state, setState } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

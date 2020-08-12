@@ -6,11 +6,10 @@ import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
 
 function InstallContentsHeader(props: any) {
-  console.debug('InstallContentsHeader');
+  console.debug(InstallContentsHeader.name, props);
   // const installPageContext = useContext(InstallPageContext);
   // const { installPageState } = installPageContext;
   const { history, location, match } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

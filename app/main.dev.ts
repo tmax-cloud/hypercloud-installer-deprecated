@@ -104,7 +104,8 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // 자동 업데이트 막음
+  // new AppUpdater();
 };
 
 /**

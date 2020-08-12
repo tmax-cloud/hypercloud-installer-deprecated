@@ -35,7 +35,7 @@ import * as env from '../../utils/common/env';
 import * as ssh from '../../utils/common/ssh';
 import routes from '../../utils/constants/routes.json';
 import Node, { Role } from '../../utils/class/Node';
-import Env from '../../utils/class/Env';
+import Env, { Type } from '../../utils/class/Env';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
 
@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function EnvContentsAdd(props: any) {
-  console.debug('EnvContentsAdd');
+  console.debug(EnvContentsAdd.name, props);
 
   const { history, match } = props;
 
@@ -711,6 +711,7 @@ function EnvContentsAdd(props: any) {
                 // };
                 const newEnv = new Env(
                   name,
+                  envBeforeEdit.type,
                   masterArr.concat(modifiedWorkerArr),
                   envBeforeEdit.productList,
                   new Date()
@@ -844,7 +845,7 @@ function EnvContentsAdd(props: any) {
                 //   productList: [],
                 //   updatedTime: new Date()
                 // };
-                const newEnv = new Env(name, [], [], new Date());
+                const newEnv = new Env(name, Type.EXTERNAL, [], [], new Date());
                 let isSetMainMaster = false;
                 for (let i = 0; i < state.data.length; i += 1) {
                   const node = state.data[i];

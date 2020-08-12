@@ -23,12 +23,11 @@ import routes from '../../utils/constants/routes.json';
 import styles from './InstallContentsKubernetes2.css';
 import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
+import { Type } from '../../utils/class/Env';
 
 function InstallContentsKubernetes2(props: any) {
-  console.log('InstallContentsKubernetes2');
-
+  console.debug(InstallContentsKubernetes2.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
@@ -45,7 +44,14 @@ function InstallContentsKubernetes2(props: any) {
     setVersion(event.target.value as string);
   };
 
-  const [registry, setRegistry] = React.useState('public');
+  const [registry, setRegistry] = React.useState(()=>{
+    if (nowEnv.type === Type.INTERNAL) {
+      return 'private';
+    }
+    if (nowEnv.type === Type.EXTERNAL) {
+      return 'public';
+    }
+  });
   const handleChangeRegistry = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRegistry((event.target as HTMLInputElement).value);
   };
@@ -86,7 +92,7 @@ function InstallContentsKubernetes2(props: any) {
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Docker Registry 설정</span>
+          <span className={['medium'].join(' ')}>Image Registry 설정</span>
         </div>
         <div>
           {/* <TextField
@@ -102,7 +108,10 @@ function InstallContentsKubernetes2(props: any) {
               // hasIpError(e.target.value);
             }}
           /> */}
-          <FormControl component="fieldset">
+          <FormControl
+            component="fieldset"
+            disabled={nowEnv.type === Type.INTERNAL}
+          >
             {/* <FormLabel component="legend">Gender</FormLabel> */}
             <RadioGroup
               aria-label="gender"
@@ -133,7 +142,7 @@ function InstallContentsKubernetes2(props: any) {
             </span>
             <br />
             <span className={['verySmall', 'lightDark'].join(' ')}>
-              Private 선택 시, Master 노드 한 곳에 Image Registry를 구축하여 사용합니다.
+              Private 선택 시, Master 노드 한 곳에 Docker Image Registry를 구축하여 사용합니다.
             </span>
           </div>
         </div>

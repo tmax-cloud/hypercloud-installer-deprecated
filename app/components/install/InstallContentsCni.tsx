@@ -21,10 +21,8 @@ import routes from '../../utils/constants/routes.json';
 // };
 
 function InstallContentsCni(props: any) {
-  console.log('InstallContentsCni');
-
+  console.debug(InstallContentsCni.name, props);
   const { history, location, match } = props;
-  console.log(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

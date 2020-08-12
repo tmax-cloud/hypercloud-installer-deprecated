@@ -2,8 +2,15 @@
 /* eslint-disable no-underscore-dangle */
 import Node from './Node';
 
+export enum Type {
+  INTERNAL = 'internal',
+  EXTERNAL = 'external'
+}
+
 export default class Env {
   private _name: string;
+
+  private _type: string;
 
   private _nodeList: Node[];
 
@@ -13,11 +20,13 @@ export default class Env {
 
   constructor(
     name: string,
+    type: string,
     nodeList: Node[],
     productList: any,
     updatedTime: Date
   ) {
     this._name = name;
+    this._type = type;
     this._nodeList = nodeList;
     this._productList = productList;
     this._updatedTime = updatedTime;
@@ -29,6 +38,14 @@ export default class Env {
    */
   public get name(): string {
     return this._name;
+  }
+
+  /**
+   * Getter type
+   * @return {string}
+   */
+  public get type(): string {
+    return this._type;
   }
 
   /**
@@ -61,6 +78,14 @@ export default class Env {
    */
   public set name(value: string) {
     this._name = value;
+  }
+
+  /**
+   * Setter type
+   * @param {string} value
+   */
+  public set type(value: string) {
+    this._type = value;
   }
 
   /**

@@ -12,10 +12,8 @@ import routes from '../../utils/constants/routes.json';
 import CONST from '../../utils/constants/constant';
 
 function InstallContents(props: any) {
-  console.debug('InstallContents');
-
+  console.debug(InstallContents.name, props);
   const { history, location, match } = props;
-  console.debug(props);
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
