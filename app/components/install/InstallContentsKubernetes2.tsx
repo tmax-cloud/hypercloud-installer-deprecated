@@ -23,37 +23,46 @@ import routes from '../../utils/constants/routes.json';
 import styles from './InstallContentsKubernetes2.css';
 import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
-import { Type } from '../../utils/class/Env';
+import { NETWORK_TYPE } from '../../utils/class/Env';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
-  const { history, location, match } = props;
+  const {
+    history,
+    location,
+    match,
+    version,
+    setVersion,
+    registry,
+    setRegistry
+  } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  const [version, setVersion] = React.useState(
-    appState.kubeinstallState.version
-  );
+  // const [version, setVersion] = React.useState(
+  //   // appState.kubeinstallState.version
+  //   CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0]
+  // );
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setVersion(event.target.value as string);
   };
 
-  const [registry, setRegistry] = React.useState(()=>{
-    if (nowEnv.type === Type.INTERNAL) {
+  const [registryType, setRegistryType] = React.useState(() => {
+    if (nowEnv.networkType === NETWORK_TYPE.INTERNAL) {
       return 'private';
     }
-    if (nowEnv.type === Type.EXTERNAL) {
+    if (nowEnv.networkType === NETWORK_TYPE.EXTERNAL) {
       return 'public';
     }
   });
-  const handleChangeRegistry = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRegistry((event.target as HTMLInputElement).value);
+  const handleChangeRegistryType = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRegistryType((event.target as HTMLInputElement).value);
   };
 
   const [open, setOpen] = React.useState(false);
@@ -84,8 +93,15 @@ function InstallContentsKubernetes2(props: any) {
                 id: 'age-native-simple'
               }}
             >
+              {CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION.map(v => {
+                return (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                );
+              })}
               {/* <option aria-label="None" value="" /> */}
-              <option value="1.17.6">1.17.6</option>
+              {/* <option value="1.17.6">1.17.6</option> */}
             </Select>
           </FormControl>
         </div>
@@ -110,14 +126,14 @@ function InstallContentsKubernetes2(props: any) {
           /> */}
           <FormControl
             component="fieldset"
-            disabled={nowEnv.type === Type.INTERNAL}
+            disabled={nowEnv.networkType === NETWORK_TYPE.INTERNAL}
           >
             {/* <FormLabel component="legend">Gender</FormLabel> */}
             <RadioGroup
               aria-label="gender"
               name="gender1"
-              value={registry}
-              onChange={handleChangeRegistry}
+              value={registryType}
+              onChange={handleChangeRegistryType}
             >
               <div>
                 <FormControlLabel
@@ -142,7 +158,8 @@ function InstallContentsKubernetes2(props: any) {
             </span>
             <br />
             <span className={['verySmall', 'lightDark'].join(' ')}>
-              Private 선택 시, Master 노드 한 곳에 Docker Image Registry를 구축하여 사용합니다.
+              Private 선택 시, Master 노드 한 곳에 Docker Image Registry를
+              구축하여 사용합니다.
             </span>
           </div>
         </div>
@@ -157,21 +174,10 @@ function InstallContentsKubernetes2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
-            let registryAddr = '';
-            if (registry === 'public') {
-              registryAddr = '';
-            } else if (registry === 'private') {
-              const { mainMaster } = env.getArrSortedByRole(nowEnv.nodeList);
-              registryAddr = `${mainMaster.ip}:5000`;
+            if (registryType === 'private') {
+              const { mainMaster } = nowEnv.getNodesSortedByRole();
+              setRegistry(`${mainMaster.ip}:5000`);
             }
-
-            dispatchAppState({
-              type: 'set_kubeinstallState',
-              kubeinstallState: {
-                version,
-                registry: registryAddr
-              }
-            });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step3`
             );

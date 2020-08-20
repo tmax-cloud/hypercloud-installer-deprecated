@@ -24,7 +24,7 @@ import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
-import { Role } from '../../utils/class/Node';
+import { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,7 +54,7 @@ function InstallContentsKubernetesAlready(props: any) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.KUBERNETES;
 
@@ -96,16 +96,14 @@ function InstallContentsKubernetesAlready(props: any) {
     console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(
-      nowEnv.nodeList
-    );
+    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
 
     console.error('worker remove start');
     // 각각은 동시에, 전체 완료는 대기
     await Promise.all(
       workerArr.map((worker, index) => {
         let command = '';
-        command += Script.getK8sMasterRemoveScript();
+        command += worker.os.getK8sMasterRemoveScript();
         worker.cmd = command;
         console.error(worker.cmd);
         return Common.send(worker, {
@@ -121,10 +119,10 @@ function InstallContentsKubernetesAlready(props: any) {
     await Promise.all(
       masterArr.map((master, index) => {
         let command = '';
-        command += Script.getK8sMasterRemoveScript();
+        command += master.os.getK8sMasterRemoveScript();
         master.cmd = command;
         console.error(master.cmd);
-        return Common.send(worker, {
+        return Common.send(master, {
           close: () => {},
           stdout: (data: string) => {},
           stderr: (data: string) => {}
@@ -135,7 +133,7 @@ function InstallContentsKubernetesAlready(props: any) {
 
     console.error('mainMaster remove start');
     let command = '';
-    command += Script.getK8sMasterRemoveScript();
+    command += mainMaster.os.getK8sMasterRemoveScript();
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
@@ -264,8 +262,10 @@ function InstallContentsKubernetesAlready(props: any) {
                   onClick={() => {
                     handleClose();
                     // TODO:delete kubernetes
-                    env.deleteAllProduct(nowEnv.name);
+                    nowEnv.deleteAllProduct();
                     remove();
+                    // json 파일 저장
+                    env.updateEnv(nowEnv.name, nowEnv);
                   }}
                 >
                   삭제

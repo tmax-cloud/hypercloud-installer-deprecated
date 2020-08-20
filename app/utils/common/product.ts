@@ -27,13 +27,13 @@ export function getOptionalProduct() {
 }
 
 export function goProductInstallPage(productName: string, nowEnv, history) {
-  if (env.isInstalled(productName, nowEnv)) {
+  if (nowEnv.isInstalled(productName)) {
     history.push(
       `${routes.INSTALL.HOME}/${nowEnv.name}/${productName}/already`
     );
   } else if (
     productName !== CONST.PRODUCT.KUBERNETES.NAME &&
-    !env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv)
+    !nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)
   ) {
     // Kubernetes를 설치 하세요
     history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/installKubePlease`);

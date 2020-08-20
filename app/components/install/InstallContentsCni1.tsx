@@ -16,7 +16,7 @@ function InstallContentsCni1(props: any) {
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   const defaultProps = {
     bgcolor: 'background.paper',

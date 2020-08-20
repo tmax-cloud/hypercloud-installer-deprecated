@@ -6,23 +6,23 @@ import Env from './Env';
 export default class Data {
   private _envList: Env[];
 
-  constructor(nodeList: Env[]) {
-    this._envList = nodeList;
+  constructor(envList: Env[]) {
+    this._envList = envList;
   }
 
   /**
-   * Getter nodeList
+   * Getter envList
    * @return {Env[]}
    */
-  public get nodeList(): Env[] {
+  public get envList(): Env[] {
     return this._envList;
   }
 
   /**
-   * Setter nodeList
+   * Setter envList
    * @param {Env[]} value
    */
-  public set nodeList(value: Env[]) {
+  public set envList(value: Env[]) {
     this._envList = value;
   }
 }

@@ -24,7 +24,7 @@ import productImage from '../../../resources/assets/Cni_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
-import { Role } from '../../utils/class/Node';
+import { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,7 +54,7 @@ function InstallContentsCniAlready(props: any) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.CNI;
 
@@ -86,15 +86,46 @@ function InstallContentsCniAlready(props: any) {
     console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(
-      nowEnv.nodeList
-    );
+    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
 
-    const { version } = env.isInstalled(CONST.PRODUCT.CNI.NAME, nowEnv);
+    const { version } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
+
+    console.error('worker remove start');
+    // 각각은 동시에, 전체 완료는 대기
+    await Promise.all(
+      workerArr.map((worker, index) => {
+        let command = '';
+        command += worker.os.getCniRemoveScript(version);
+        worker.cmd = command;
+        console.error(worker.cmd);
+        return Common.send(worker, {
+          close: () => {},
+          stdout: (data: string) => {},
+          stderr: (data: string) => {}
+        });
+      })
+    );
+    console.error('worker remove end');
+
+    console.error('master remove start');
+    await Promise.all(
+      masterArr.map((master, index) => {
+        let command = '';
+        command += master.os.getCniRemoveScript(version);
+        master.cmd = command;
+        console.error(master.cmd);
+        return Common.send(master, {
+          close: () => {},
+          stdout: (data: string) => {},
+          stderr: (data: string) => {}
+        });
+      })
+    );
+    console.error('master remove end');
 
     console.error('mainMaster remove start');
     let command = '';
-    command += Script.getCniRemoveScript(version);
+    command += mainMaster.os.getCniRemoveScript(version);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {
@@ -166,7 +197,7 @@ function InstallContentsCniAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {env.isInstalled(nowProduct.NAME, nowEnv).type}
+                {nowEnv.isInstalled(nowProduct.NAME).type}
               </span>
             </div>
           </div>
@@ -176,7 +207,7 @@ function InstallContentsCniAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {env.isInstalled(nowProduct.NAME, nowEnv).version}
+                {nowEnv.isInstalled(nowProduct.NAME).version}
               </span>
             </div>
           </div>
@@ -233,8 +264,10 @@ function InstallContentsCniAlready(props: any) {
                   onClick={() => {
                     handleClose();
                     // TODO:delete kubernetes
-                    env.deleteProductByName(nowEnv.name, nowProduct.NAME);
+                    nowEnv.deleteProductByName(nowProduct.NAME);
                     remove();
+                    // json 파일 저장
+                    env.updateEnv(nowEnv.name, nowEnv);
                   }}
                 >
                   삭제

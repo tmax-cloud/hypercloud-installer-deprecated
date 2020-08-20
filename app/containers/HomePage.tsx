@@ -22,19 +22,22 @@ import * as env from '../utils/common/env';
 export const AppContext = React.createContext('');
 
 const initialState = {
-  kubeinstallState: {
-    version: '1.17.6',
-    registry: ''
-  },
+  // kubeinstallState: {
+  //   version: '1.17.6',
+  //   registry: ''
+  // },
   loading: false
   // data: new Data(env.loadEnvList())
 };
 const reducer = (state: any, action: any) => {
-  if (action.type === 'set_nowEnv') {
-    state.nowEnv = action.nowEnv;
-  } else if (action.type === 'set_kubeinstallState') {
-    state.kubeinstallState = action.kubeinstallState;
-  } else if (action.type === 'set_loading') {
+  // if (action.type === 'set_nowEnv') {
+  //   state.nowEnv = action.nowEnv;
+  // } else if (action.type === 'set_kubeinstallState') {
+  //   state.kubeinstallState = action.kubeinstallState;
+  // } else if (action.type === 'set_loading') {
+  //   return { ...state, ...action };
+  // }
+  if (action.type === 'set_loading') {
     return { ...state, ...action };
   }
   return state;

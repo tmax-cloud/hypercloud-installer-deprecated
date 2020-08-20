@@ -81,10 +81,10 @@ svg{
 }
 
 .visible{
-  visibility : visible;
+  visibility : visible !important;
 }
 .hidden{
-  visibility : none;
+  visibility : none !important;
 }
 
 /*

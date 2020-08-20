@@ -14,7 +14,7 @@ function InstallPage(props: any) {
 
   // dispatchAppState({
   //   type: 'set_nowEnv',
-  //   nowEnv: env.getEnvByName(match.params.envName)
+  //   nowEnv: env.loadEnvByName(match.params.envName)
   // });
 
   return (

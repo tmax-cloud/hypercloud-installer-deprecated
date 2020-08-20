@@ -40,7 +40,7 @@ function InstallLnb(props: any) {
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   const requiredProduct = product.getRequiredProduct();
   const optionalProduct = product.getOptionalProduct();
@@ -79,7 +79,7 @@ function InstallLnb(props: any) {
 
   // 설치 여부 이미지 표시 해주는 함수
   const getInstalledImage = (productName: string) => {
-    if (env.isInstalled(productName, nowEnv)) {
+    if (nowEnv.isInstalled(productName)) {
       return (
         <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
       );
@@ -136,7 +136,7 @@ function InstallLnb(props: any) {
                 // Kubernetes 가 설치되어야만 설치 가능
                 let disabled = false;
                 if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
-                  if (!env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv)) {
+                  if (!nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)) {
                     disabled = true;
                   }
                 }
@@ -168,7 +168,7 @@ function InstallLnb(props: any) {
             {/* <ListItemIcon>
               <InboxIcon />
             </ListItemIcon> */}
-            {env.isAllRequiredProductInstall(nowEnv) ? (
+            {nowEnv.isAllRequiredProductInstall() ? (
               <ListItemText primary="호환 제품" />
             ) : (
               <div
@@ -201,7 +201,7 @@ function InstallLnb(props: any) {
                   onClick={() => {
                     product.goProductInstallPage(P.NAME, nowEnv, history);
                   }}
-                  disabled={!env.isAllRequiredProductInstall(nowEnv)}
+                  disabled={!nowEnv.isAllRequiredProductInstall()}
                 >
                   {/* <ListItemIcon>
                   <StarBorder />

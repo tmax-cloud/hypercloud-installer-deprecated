@@ -8,29 +8,30 @@ import * as env from '../../utils/common/env';
 import { AppContext } from '../../containers/HomePage';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
+import { NoEmitOnErrorsPlugin } from 'webpack';
 
 function InstallContentsKubernetes4(props: any) {
   console.debug(InstallContentsKubernetes4.name, props);
-  const { history, location, match } = props;
+  const { history, location, match, version, registry } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
-
+  const nowEnv = env.loadEnvByName(match.params.envName);
+  nowEnv.registry = registry;
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  // json 파일 저장
-  env.deleteProductByName(nowEnv.name, CONST.PRODUCT.KUBERNETES.NAME);
-  env.addProductAtEnv(nowEnv.name, {
+  nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
+  nowEnv.addProduct({
     name: CONST.PRODUCT.KUBERNETES.NAME,
-    version: appState.kubeinstallState.version,
-    registry: appState.kubeinstallState.registry
+    version
   });
+  // json 파일 저장
+  env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
-    if (appState.kubeinstallState.registry) {
+    if (registry) {
       return (
         <div style={{ marginBottom: '30px' }}>
           <div>
@@ -40,7 +41,7 @@ function InstallContentsKubernetes4(props: any) {
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {appState.kubeinstallState.registry}
+              {registry}
             </span>
           </div>
         </div>
@@ -58,9 +59,7 @@ function InstallContentsKubernetes4(props: any) {
             <span className={['medium', 'thick'].join(' ')}>버전</span>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
-              {appState.kubeinstallState.version}
-            </span>
+            <span className={['medium', 'lightDark'].join(' ')}>{version}</span>
           </div>
         </div>
         {getRegistryJsx()}

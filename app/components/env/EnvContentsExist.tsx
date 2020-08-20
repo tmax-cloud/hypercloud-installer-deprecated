@@ -37,7 +37,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import styles from './EnvContentsExist.css';
 import * as env from '../../utils/common/env';
 import MasterImage from '../../../resources/assets/ic_crown.svg.svg';
-import Node, { Role } from '../../utils/class/Node';
+import Node, { ROLE } from '../../utils/class/Node';
 import routes from '../../utils/constants/routes.json';
 
 // interface Data {
@@ -437,7 +437,7 @@ export default function EnvContentsExist(props: any) {
 
     const getMasterWorkerImage = role => {
       let component = null;
-      if (role === Role.MASTER || role === Role.MAIN_MASTER) {
+      if (role === ROLE.MASTER || role === ROLE.MAIN_MASTER) {
         component = (
           <Tooltip title="Master" placement="top" arrow>
             <div className={['left'].join(' ')}>
@@ -449,7 +449,7 @@ export default function EnvContentsExist(props: any) {
             </div>
           </Tooltip>
         );
-      } else if (role === Role.WORKER) {
+      } else if (role === ROLE.WORKER) {
         component = <span style={{ margin: '0 17px 0 0' }} />;
       }
       return component;

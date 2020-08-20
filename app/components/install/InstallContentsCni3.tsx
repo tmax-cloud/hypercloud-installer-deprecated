@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import styles from './InstallContentsCni3.css';
-import { Role } from '../../utils/class/Node';
+import { ROLE } from '../../utils/class/Node';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
@@ -27,7 +27,7 @@ function InstallContentsCni3(props: any) {
   // const appContext = useContext(AppContext);
   // const { appState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   // progress bar
   const [progress, setProgress] = React.useState(0);
@@ -62,16 +62,14 @@ function InstallContentsCni3(props: any) {
     console.debug(nowEnv.nodeList);
 
     // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = env.getArrSortedByRole(
-      nowEnv.nodeList
-    );
+    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
 
-    const { registry } = env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv);
+    const { registry } = nowEnv;
 
     setProgress(30);
     console.error('mainMaster install start');
     let command = '';
-    command += Script.getCniInstallScript(state.type, state.version, registry);
+    command += mainMaster.os.getCniInstallScript(state.version, registry);
     mainMaster.cmd = command;
     console.error(mainMaster.cmd);
     await Common.send(mainMaster, {

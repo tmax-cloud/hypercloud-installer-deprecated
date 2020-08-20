@@ -27,7 +27,7 @@ function InstallContentsCni2(props: any) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;

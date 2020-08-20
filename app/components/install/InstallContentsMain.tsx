@@ -38,7 +38,7 @@ function InstallContentsMain(props: any) {
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   const requiredProduct = product.getRequiredProduct();
   const optionalProduct = product.getOptionalProduct();
@@ -61,7 +61,7 @@ function InstallContentsMain(props: any) {
   // };
 
   const getInstalledImage = (productName: string) => {
-    if (env.isInstalled(productName, nowEnv)) {
+    if (nowEnv.isInstalled(productName)) {
       return (
         <span>
           <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
@@ -133,7 +133,7 @@ function InstallContentsMain(props: any) {
               // Kubernetes 가 설치되어야만 설치 가능
               let disabled = false;
               if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
-                if (!env.isInstalled(CONST.PRODUCT.KUBERNETES.NAME, nowEnv)) {
+                if (!nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)) {
                   disabled = true;
                 }
               }
@@ -223,7 +223,7 @@ function InstallContentsMain(props: any) {
                   className={classes.paper}
                   onClick={() => {
                     // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
-                    if (env.isAllRequiredProductInstall(nowEnv)) {
+                    if (nowEnv.isAllRequiredProductInstall()) {
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }
                   }}
@@ -231,7 +231,7 @@ function InstallContentsMain(props: any) {
                 >
                   <div
                     style={
-                      env.isAllRequiredProductInstall(nowEnv)
+                      nowEnv.isAllRequiredProductInstall()
                         ? {}
                         : {
                             pointerEvents: 'none',

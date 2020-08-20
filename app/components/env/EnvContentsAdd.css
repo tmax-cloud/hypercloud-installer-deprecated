@@ -10,10 +10,10 @@
 }
 
 .rowBox{
-  padding: 20px;
+
 }
 .rowBox > div{
-  height: 65px;
+  height: 55px;
 }
 .rowBox>div:not(:last-child){
   margin-right: 20px;
@@ -38,7 +38,7 @@
 }
 
 .titleBox{
-  /* margin: 10px 0 0 0; */
+  margin: 5px 0 0 0;
 }
 
 .input {

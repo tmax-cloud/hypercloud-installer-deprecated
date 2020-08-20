@@ -15,7 +15,8 @@ const CONST = {
     KUBERNETES: {
       NAME: 'Kubernetes',
       IS_REQUIRED: true, // Required
-      DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
+      DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스',
+      SUPPORTED_VERSION: ['1.17.6']
     },
     CNI: {
       NAME: 'CNI',

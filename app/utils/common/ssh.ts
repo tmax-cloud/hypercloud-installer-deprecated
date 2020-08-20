@@ -9,7 +9,7 @@ interface SendCb {
   stderr: Function;
 }
 
-export function send(node: Node, cb: SendCb) {
+export function send(node: any, cb: SendCb) {
   const { Client } = require('ssh2');
   const conn = new Client();
 
@@ -56,7 +56,8 @@ export function connectionTest(node: Node) {
       host: node.ip,
       port: node.port,
       username: node.user,
-      password: node.password
+      password: node.password,
+      readyTimeout: 5000
     });
     connection.on('ready', () => {
       // Work with the connection

@@ -16,18 +16,19 @@ function InstallContentsCni4(props: any) {
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.getEnvByName(match.params.envName);
+  const nowEnv = env.loadEnvByName(match.params.envName);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  // json 파일 저장
-  env.deleteProductByName(nowEnv.name, CONST.PRODUCT.CNI.NAME);
-  env.addProductAtEnv(nowEnv.name, {
+  nowEnv.deleteProductByName(CONST.PRODUCT.CNI.NAME);
+  nowEnv.addProduct({
     name: CONST.PRODUCT.CNI.NAME,
     version: state.version,
     type: state.type
   });
+  // json 파일 저장
+  env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {

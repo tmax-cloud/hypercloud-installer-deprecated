@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
+
+import { OS, OS_TYPE } from '../interface/os';
+import * as ssh from '../common/ssh';
+import CentOS from './os/CentOS';
+import Ubuntu from './os/Ubuntu';
+
 /* eslint-disable no-underscore-dangle */
-export enum Role {
+export enum ROLE {
   MAIN_MASTER = 100,
   MASTER = 0,
   WORKER = 1
@@ -15,7 +21,9 @@ export default class Node {
 
   private _password: string;
 
-  private _role: Role;
+  private _os: OS;
+
+  private _role: ROLE;
 
   private _hostName: string;
 
@@ -26,15 +34,25 @@ export default class Node {
     port: number,
     user: string,
     password: string,
-    role: Role,
+    os: any,
+    role: ROLE,
     hostName: string
   ) {
     this._ip = ip;
     this._port = port;
     this._user = user;
     this._password = password;
+    if (os.type === OS_TYPE.CENTOS) {
+      this._os = new CentOS();
+    } else {
+      this._os = new Ubuntu();
+    }
     this._role = role;
     this._hostName = hostName;
+  }
+
+  public exeCmd(callback?: any): any {
+    return ssh.send(this, callback);
   }
 
   /**
@@ -79,10 +97,18 @@ export default class Node {
 
   /**
    * Getter role
-   * @return {Role}
+   * @return {ROLE}
    */
-  public get role(): Role {
+  public get role(): ROLE {
     return this._role;
+  }
+
+  /**
+   * Getter os
+   * @return {OS}
+   */
+  public get os(): OS {
+    return this._os;
   }
 
   /**
@@ -135,14 +161,22 @@ export default class Node {
 
   /**
    * Setter role
-   * @param {Role} value
+   * @param {ROLE} value
    */
-  public set role(value: Role) {
+  public set role(value: ROLE) {
     this._role = value;
   }
 
   /**
-   * Setter role
+   * Setter os
+   * @param {OS} value
+   */
+  public set os(value: OS) {
+    this._os = value;
+  }
+
+  /**
+   * Setter hostName
    * @param {string} value
    */
   public set hostName(value: string) {

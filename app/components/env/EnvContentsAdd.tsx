@@ -1,3 +1,5 @@
+/* eslint-disable promise/catch-or-return */
+/* eslint-disable promise/always-return */
 /* eslint-disable no-console */
 import React, { useState, useContext } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -20,7 +22,11 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
-  IconButton
+  IconButton,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Checkbox
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
@@ -34,10 +40,14 @@ import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
 import * as ssh from '../../utils/common/ssh';
 import routes from '../../utils/constants/routes.json';
-import Node, { Role } from '../../utils/class/Node';
-import Env, { Type } from '../../utils/class/Env';
+import Node, { ROLE } from '../../utils/class/Node';
+import Env, { NETWORK_TYPE } from '../../utils/class/Env';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
+import { OS_TYPE } from '../../utils/interface/os';
+import CentOS from '../../utils/class/os/CentOS';
+import Ubuntu from '../../utils/class/os/Ubuntu';
+import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -94,8 +104,8 @@ function EnvContentsAdd(props: any) {
   };
 
   // 수정화면에서 envBeforeEdit에 수정 전 데이터를 저장해 놓음
-  const envBeforeEdit = env.getEnvByName(match.params.envName);
-  // const envBeforeEdit = env.getEnvByName(match.params.envName);
+  const envBeforeEdit = env.loadEnvByName(match.params.envName);
+  // const envBeforeEdit = env.loadEnvByName(match.params.envName);
   console.debug('envBeforeEdit', envBeforeEdit);
 
   // state.data에 테이블에 표현될 노드들 데이터를 담음
@@ -120,8 +130,8 @@ function EnvContentsAdd(props: any) {
       const result = [];
       for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
         if (
-          envBeforeEdit.nodeList[i].role === Role.MASTER ||
-          envBeforeEdit.nodeList[i].role === Role.MAIN_MASTER
+          envBeforeEdit.nodeList[i].role === ROLE.MASTER ||
+          envBeforeEdit.nodeList[i].role === ROLE.MAIN_MASTER
         ) {
           result.push(envBeforeEdit.nodeList[i].ip);
         }
@@ -135,6 +145,38 @@ function EnvContentsAdd(props: any) {
   // 선택되어 있는 지 여부 리턴해주는 함수
   const isSelected = (clickedIp: string) => {
     return selected.indexOf(clickedIp) !== -1;
+  };
+  // table row click
+  const handleClick = (event: React.MouseEvent<unknown>, clickedIp: string) => {
+    if (envBeforeEdit) {
+      // edit page에서 수정 불가능
+      return;
+    }
+    // TODO: 추후 다중 마스터 선택 가능 시, checkbox로 변경해야 함
+    const selectedIndex = selected.indexOf(clickedIp);
+    let newSelected: string[] = [];
+    console.debug(selectedIndex);
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, clickedIp);
+    } else if (selectedIndex === 0) {
+      if (selected.length === 1) {
+        newSelected = selected;
+      } else {
+        newSelected = newSelected.concat(selected.slice(1));
+      }
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    console.debug('newSelected', newSelected);
+    setSelected(newSelected);
+    // if (!envBeforeEdit) {
+    //   setSelected([clickedIp]);
+    // }
   };
 
   const [name, setName] = useState(() => {
@@ -281,29 +323,6 @@ function EnvContentsAdd(props: any) {
     setOpen(false);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, clickedIp: string) => {
-    // TODO: 추후 다중 마스터 선택 가능 시, checkbox로 변경해야 함
-    // const selectedIndex = selected.indexOf(clickedIp);
-    // let newSelected: string[] = [];
-
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, clickedIp);
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1));
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1));
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1)
-    //   );
-    // }
-    // setSelected(newSelected);
-    if (!envBeforeEdit) {
-      setSelected([clickedIp]);
-    }
-  };
-
   // password visible off, on
   const [isShowPassword, setisShowPassword] = useState(true);
   const getPasswordVisibility = () => {
@@ -367,6 +386,16 @@ function EnvContentsAdd(props: any) {
     );
   };
 
+  const [type, setType] = React.useState(() => {
+    if (envBeforeEdit) {
+      return envBeforeEdit.networkType;
+    }
+    return NETWORK_TYPE.INTERNAL;
+  });
+  const handleChangeType = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setType((event.target as HTMLInputElement).value);
+  };
+
   return (
     <div className={[styles.wrap].join(' ')}>
       <div className={styles.box}>
@@ -405,249 +434,313 @@ function EnvContentsAdd(props: any) {
         </div>
         <div className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}>
           <div className={styles.titleBox}>
-            <span className={['dark', 'medium'].join(' ')}>노드</span>
+            <span className={['dark', 'medium'].join(' ')}>노드 네트워크</span>
             <span style={{ color: 'red' }}>*</span>
           </div>
           <div>
-            <div>
-              <TextField
-                required
-                className={['medium'].join(' ')}
-                id="outlined-required"
-                label="IP"
-                placeholder="예: 192.168.32.128"
-                variant="outlined"
-                size="small"
-                value={ip}
-                onChange={e => {
-                  setIp(e.target.value);
-                  // hasIpError(e.target.value);
-                }}
-                onBlur={e => {
-                  hasIpError(e.target.value);
-                }}
-                error={ipError.length !== 0}
-                helperText={ipError}
-              />
-            </div>
-          </div>
-          <div className="left">
-            <div>
-              <TextField
-                required
-                className={['medium'].join(' ')}
-                id="outlined-required"
-                label="Port"
-                placeholder="0~65535"
-                variant="outlined"
-                size="small"
-                value={port}
-                onChange={e => {
-                  setPort(e.target.value);
-                  // hasPortError(e.target.value);
-                }}
-                onBlur={e => {
-                  hasPortError(e.target.value);
-                }}
-                error={portError.length !== 0}
-                helperText={portError}
-              />
-            </div>
-          </div>
-          <div className="left">
-            <div className="left">
-              <Tooltip
-                title="root 계정 비밀번호를 입력해 주세요."
-                placement="top"
-                arrow
+            <FormControl component="fieldset" disabled={envBeforeEdit !== null}>
+              {/* <FormLabel component="legend">Gender</FormLabel> */}
+              <RadioGroup
+                aria-label="gender"
+                name="gender1"
+                value={type}
+                onChange={handleChangeType}
               >
+                <div>
+                  <FormControlLabel
+                    value={NETWORK_TYPE.INTERNAL}
+                    control={<Radio />}
+                    label="Can Not access Internet (Internal)"
+                  />
+                  <FormControlLabel
+                    value={NETWORK_TYPE.EXTERNAL}
+                    control={<Radio />}
+                    label="Can access Internet (External)"
+                  />
+                </div>
+              </RadioGroup>
+            </FormControl>
+          </div>
+        </div>
+        <div style={{ border: '' }}>
+          <div
+            style={{ marginTop: '50px' }}
+            className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}
+          >
+            <div className={styles.titleBox}>
+              <span className={['dark', 'medium'].join(' ')}>노드</span>
+              <span style={{ color: 'red' }}>*</span>
+            </div>
+            <div>
+              <div>
                 <TextField
                   required
                   className={['medium'].join(' ')}
-                  type={isShowPassword ? 'password' : 'text'}
                   id="outlined-required"
-                  label="사용자 비밀번호"
-                  placeholder="Text"
+                  label="IP"
+                  placeholder="예: 192.168.32.128"
                   variant="outlined"
                   size="small"
-                  value={password}
+                  value={ip}
                   onChange={e => {
-                    setPassword(e.target.value);
-                    // hasPasswordError(e.target.value);
+                    setIp(e.target.value);
+                    // hasIpError(e.target.value);
                   }}
                   onBlur={e => {
-                    hasPasswordError(e.target.value);
+                    hasIpError(e.target.value);
                   }}
-                  error={passwordError.length !== 0}
-                  helperText={passwordError}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="start">
-                        {getPasswordVisibility()}
-                      </InputAdornment>
-                    )
-                  }}
+                  error={ipError.length !== 0}
+                  helperText={ipError}
                 />
-              </Tooltip>
+              </div>
             </div>
-          </div>
-          <div>
-            {/* {loading && (
+            <div className="left">
+              <div>
+                <TextField
+                  required
+                  className={['medium'].join(' ')}
+                  id="outlined-required"
+                  label="Port"
+                  placeholder="0~65535"
+                  variant="outlined"
+                  size="small"
+                  value={port}
+                  onChange={e => {
+                    setPort(e.target.value);
+                    // hasPortError(e.target.value);
+                  }}
+                  onBlur={e => {
+                    hasPortError(e.target.value);
+                  }}
+                  error={portError.length !== 0}
+                  helperText={portError}
+                />
+              </div>
+            </div>
+            <div className="left">
+              <div className="left">
+                <Tooltip
+                  title="root 계정 비밀번호를 입력해 주세요."
+                  placement="top"
+                  arrow
+                >
+                  <TextField
+                    required
+                    className={['medium'].join(' ')}
+                    type={isShowPassword ? 'password' : 'text'}
+                    id="outlined-required"
+                    label="사용자 비밀번호"
+                    placeholder="Text"
+                    variant="outlined"
+                    size="small"
+                    value={password}
+                    onChange={e => {
+                      setPassword(e.target.value);
+                      // hasPasswordError(e.target.value);
+                    }}
+                    onBlur={e => {
+                      hasPasswordError(e.target.value);
+                    }}
+                    error={passwordError.length !== 0}
+                    helperText={passwordError}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="start">
+                          {getPasswordVisibility()}
+                        </InputAdornment>
+                      )
+                    }}
+                  />
+                </Tooltip>
+              </div>
+            </div>
+            <div>
+              {/* {loading && (
               <CircularProgress
                 color="secondary"
                 size={40}
                 className={classes.buttonProgress}
               />
             )} */}
-            <Button
-              className={['white', 'indicator'].join(' ')}
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                let hasError = false;
-                if (hasIpError()) hasError = true;
-                if (hasPortError()) hasError = true;
-                if (hasPasswordError()) hasError = true;
-                if (hasError) return;
+              <Button
+                className={['white', 'indicator'].join(' ')}
+                variant="contained"
+                color="primary"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  let hasError = false;
+                  if (hasIpError()) hasError = true;
+                  if (hasPortError()) hasError = true;
+                  if (hasPasswordError()) hasError = true;
+                  if (hasError) return;
 
-                handleButtonClick();
-                setTotalError('');
+                  handleButtonClick();
+                  setTotalError('');
 
-                ssh
-                  .connectionTest({
-                    ip,
-                    port,
-                    password,
-                    user: 'root'
-                  })
-                  .then(() => {
-                    console.debug('ready');
-                    // node.state = State.SUCCESS;
-                    // setSshInfo([].concat(sshInfo));
-                    // 첫번째 추가 시, 마스터 노드로 설정
-                    if (state.data.length === 0) {
-                      setSelected([ip]);
-                    }
+                  ssh
+                    .connectionTest({
+                      ip,
+                      port,
+                      password,
+                      user: 'root'
+                    })
+                    .then(async () => {
+                      console.debug('ready');
 
-                    setState(prevState => {
-                      const data = [...prevState.data];
+                      let os;
+                      await ssh.send(
+                        {
+                          ip,
+                          port,
+                          password,
+                          user: 'root',
+                          cmd: `awk -F= '/^NAME/{print $2}' /etc/os-release`
+                        },
+                        {
+                          close: () => {},
+                          stdout: (data: string) => {
+                            const osType = data
+                              .toString()
+                              .replace(/"/gi, '')
+                              .replace('\n', '');
 
-                      // 0번째 index에 삽입
-                      data.splice(0, 0, {
-                        ip,
-                        port,
-                        password
+                            if (osType === OS_TYPE.CENTOS) {
+                              os = new CentOS();
+                            } else {
+                              os = new Ubuntu();
+                            }
+                          },
+                          stderr: () => {}
+                        }
+                      );
+                      // node.state = State.SUCCESS;
+                      // setSshInfo([].concat(sshInfo));
+                      // 첫번째 추가 시, 마스터 노드로 설정
+                      if (state.data.length === 0) {
+                        setSelected([ip]);
+                      }
+
+                      setState(prevState => {
+                        const data = [...prevState.data];
+
+                        // 0번째 index에 삽입
+                        data.splice(0, 0, {
+                          ip,
+                          port,
+                          password,
+                          os
+                        });
+                        return { ...prevState, data };
                       });
-                      return { ...prevState, data };
-                    });
 
-                    // 초기화
-                    initValue();
+                      // 초기화
+                      initValue();
 
-                    setTotalError('');
-                  })
-                  .catch(err => {
-                    console.debug('error', err);
-                    setTotalError(
-                      '입력 정보를 확인해주세요. (ssh connection error)'
-                    );
-                  })
-                  .finally(() => {
-                    dispatchAppState({
-                      type: 'set_loading',
-                      loading: false
+                      setTotalError('');
+                    })
+                    .catch(err => {
+                      console.debug('error', err);
+                      setTotalError(
+                        '입력 정보를 확인해주세요. (ssh connection error)'
+                      );
+                    })
+                    .finally(() => {
+                      dispatchAppState({
+                        type: 'set_loading',
+                        loading: false
+                      });
                     });
-                  });
-              }}
-            >
-              추가
-            </Button>
+                }}
+              >
+                추가
+              </Button>
+            </div>
           </div>
-        </div>
-        <div
-          className={[
-            totalError ? 'visible red' : 'hidden',
-            styles.errorBox
-          ].join(' ')}
-        >
-          <span>{totalError}</span>
-        </div>
-        <div className={[styles.table, 'clear'].join(' ')}>
-          <TableContainer component={Paper} variant="outlined">
-            <Table aria-label="simple table">
-              <TableHead className={['primary'].join(' ')}>
-                <TableRow>
-                  <TableCell
-                    align="center"
-                    style={{ padding: '0px', width: '20%' }}
-                  >
-                    <span>마스터 노드</span>
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{ padding: '0px', width: '40%' }}
-                  >
-                    <span>IP</span>
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{ padding: '0px', width: '20%' }}
-                  >
-                    <span>포트</span>
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{ padding: '0px', width: '20%' }}
-                  >
-                    <span>제거</span>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {state.data.map(row => (
-                  <TableRow
-                    key={row.ip}
-                    onClick={event => handleClick(event, row.ip)}
-                  >
+          <div
+            className={[
+              totalError ? 'visible red' : 'hidden',
+              styles.errorBox
+            ].join(' ')}
+          >
+            <span>{totalError}</span>
+          </div>
+          <div className={[styles.table, 'clear'].join(' ')}>
+            <TableContainer component={Paper} variant="outlined">
+              <Table aria-label="simple table">
+                <TableHead className={['primary'].join(' ')}>
+                  <TableRow>
                     <TableCell
                       align="center"
-                      component="th"
-                      scope="row"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      <Radio
-                        checked={isSelected(row.ip)}
-                        disabled={!!envBeforeEdit}
-                      />
+                      <span>마스터 노드</span>
                     </TableCell>
                     <TableCell
                       align="center"
                       style={{ padding: '0px', width: '40%' }}
                     >
-                      {row.ip}
+                      <span>IP</span>
                     </TableCell>
                     <TableCell
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      {row.port}
+                      <span>포트</span>
                     </TableCell>
                     <TableCell
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
                     >
-                      {getRemoveButton(row)}
+                      <span>제거</span>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {getEmptyTableRow()}
+                </TableHead>
+                <TableBody>
+                  {state.data.map(row => (
+                    <TableRow
+                      key={row.ip}
+                      onClick={event => handleClick(event, row.ip)}
+                    >
+                      <TableCell
+                        align="center"
+                        component="th"
+                        scope="row"
+                        style={{ padding: '0px', width: '20%' }}
+                      >
+                        <Checkbox
+                          checked={isSelected(row.ip)}
+                          disabled={envBeforeEdit !== null}
+                        />
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ padding: '0px', width: '40%' }}
+                      >
+                        {row.ip}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ padding: '0px', width: '20%' }}
+                      >
+                        {row.port}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ padding: '0px', width: '20%' }}
+                      >
+                        {getRemoveButton(row)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {getEmptyTableRow()}
+          </div>
         </div>
         <div
+          style={{ marginTop: '50px' }}
           className={[
             styles.rowBox,
             'childUpDownCenter',
@@ -674,7 +767,7 @@ function EnvContentsAdd(props: any) {
                   mainMaster,
                   masterArr,
                   workerArr
-                } = env.getArrSortedByRole(envBeforeEdit.nodeList);
+                } = envBeforeEdit.getArrSortedByRole();
                 masterArr.push(mainMaster);
 
                 // 수정된 worker들 넣어줌
@@ -688,7 +781,7 @@ function EnvContentsAdd(props: any) {
                     //   port: node.port,
                     //   user: 'root',
                     //   password: node.password,
-                    //   role: Role.WORKER,
+                    //   role: ROLE.WORKER,
                     //   hostName: Common.getRandomString()
                     // });
                     modifiedWorkerArr.push(
@@ -697,7 +790,8 @@ function EnvContentsAdd(props: any) {
                         node.port,
                         'root',
                         node.password,
-                        Role.WORKER,
+                        node.os,
+                        ROLE.WORKER,
                         Common.getRandomString()
                       )
                     );
@@ -711,7 +805,8 @@ function EnvContentsAdd(props: any) {
                 // };
                 const newEnv = new Env(
                   name,
-                  envBeforeEdit.type,
+                  envBeforeEdit.networkType,
+                  envBeforeEdit.registry,
                   masterArr.concat(modifiedWorkerArr),
                   envBeforeEdit.productList,
                   new Date()
@@ -719,16 +814,14 @@ function EnvContentsAdd(props: any) {
 
                 // kubernetes 설치 되어 있으면, 실제로 워커노드 추가, 삭제 스크립트 실행
                 // 추가된 워커노드 구함
-                const kubernetesInfo = env.isInstalled(
-                  CONST.PRODUCT.KUBERNETES.NAME,
-                  envBeforeEdit
+                const kubernetesInfo = envBeforeEdit.isInstalled(
+                  CONST.PRODUCT.KUBERNETES.NAME
                 );
                 if (kubernetesInfo) {
                   dispatchAppState({
                     type: 'set_loading',
                     loading: true
                   });
-                  const { registry, version } = kubernetesInfo;
 
                   const addedWorker = [];
                   for (let i = 0; i < modifiedWorkerArr.length; i += 1) {
@@ -761,76 +854,39 @@ function EnvContentsAdd(props: any) {
                   }
                   console.debug('Deleted worker nodeList', deletedWorker);
 
-                  // mainMaster에게서 join command 받아옴
-                  let joinCmd = '';
-                  let command = '';
-                  command += Script.getK8sClusterJoinScript();
-                  mainMaster.cmd = command;
-                  console.error(mainMaster.cmd);
-                  await ssh.send(mainMaster, {
-                    close: () => {},
-                    stdout: (data: string) => {
-                      if (!joinCmd) {
-                        joinCmd = data.toString().split('@@@')[1];
-                      }
-                    },
-                    stderr: (data: string) => {}
-                  });
-                  console.debug('Join Command', joinCmd);
-
                   // 새로 추가된 노드에 install script 돌려야 함
-                  console.debug('addedWorker install start');
-                  addedWorker.map((worker, index) => {
-                    command = Script.getK8sWorkerInstallScript(
-                      mainMaster,
-                      registry,
-                      version,
-                      worker
-                    );
-                    command += `${joinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
-                    worker.cmd = command;
-                    console.error(worker.cmd);
-                    ssh.send(worker, {
-                      close: () => {},
-                      stdout: (data: string) => {},
-                      stderr: (data: string) => {}
-                    });
-                  });
-                  console.debug('addedWorker install end');
+                  const tempAddEnv = new Env(
+                    name,
+                    envBeforeEdit.networkType,
+                    envBeforeEdit.registry,
+                    masterArr.concat(addedWorker),
+                    envBeforeEdit.productList,
+                    new Date()
+                  );
+                  await new KubernetesInstaller(tempAddEnv).installWorker(
+                    tempAddEnv.registry,
+                    kubernetesInfo.version
+                  );
+                  // await tempAddEnv?.installWorker(
+                  //   tempAddEnv.registry,
+                  //   kubernetesInfo.version
+                  // );
 
                   // 삭제 된 노드에 마스터 노드에서 kubectl delete 명령어 날림
-                  command = '';
-                  deletedWorker.map(worker => {
-                    command += Script.getDeleteWorkerNodeScript(worker);
-                  });
-                  mainMaster.cmd = command;
-                  console.error(
-                    'Command to delete worker node executed in master',
-                    command
+                  const tempDeleteEnv = new Env(
+                    name,
+                    envBeforeEdit.networkType,
+                    envBeforeEdit.registry,
+                    masterArr.concat(deletedWorker),
+                    envBeforeEdit.productList,
+                    new Date()
                   );
-                  await ssh.send(mainMaster, {
-                    close: () => {},
-                    stdout: (data: string) => {},
-                    stderr: (data: string) => {}
-                  });
-
-                  console.debug('deletedWorker remove start');
-                  deletedWorker.map((worker, index) => {
-                    command = Script.getK8sMasterRemoveScript();
-                    worker.cmd = command;
-                    console.debug(worker.cmd);
-                    ssh.send(worker, {
-                      close: () => {},
-                      stdout: (data: string) => {},
-                      stderr: (data: string) => {}
-                    });
-                  });
-                  console.debug('deletedWorker remove end');
+                  await new KubernetesInstaller(tempDeleteEnv).deleteWorker();
+                  // await tempDeleteEnv?.deleteWorker();
                 }
 
                 // 기존 데이터 삭제 후 수정 된 환경 데이터 추가
-                env.deleteEnvByName(envBeforeEdit.name);
-                env.addEnv(newEnv);
+                env.updateEnv(envBeforeEdit.name, newEnv);
 
                 dispatchAppState({
                   type: 'set_loading',
@@ -845,21 +901,21 @@ function EnvContentsAdd(props: any) {
                 //   productList: [],
                 //   updatedTime: new Date()
                 // };
-                const newEnv = new Env(name, Type.EXTERNAL, [], [], new Date());
+                const newEnv = new Env(name, type, '', [], [], new Date());
                 let isSetMainMaster = false;
                 for (let i = 0; i < state.data.length; i += 1) {
                   const node = state.data[i];
                   // worker
-                  let role = Role.WORKER;
+                  let role = ROLE.WORKER;
                   console.debug(node.ip);
                   console.debug(selected);
                   if (selected.indexOf(node.ip) !== -1) {
                     // master
                     if (!isSetMainMaster) {
-                      role = Role.MAIN_MASTER;
+                      role = ROLE.MAIN_MASTER;
                       isSetMainMaster = true;
                     } else {
-                      role = Role.MASTER;
+                      role = ROLE.MASTER;
                     }
                   }
                   // newEnv.nodeList.push({
@@ -876,12 +932,13 @@ function EnvContentsAdd(props: any) {
                       node.port,
                       'root',
                       node.password,
+                      node.os,
                       role,
                       Common.getRandomString()
                     )
                   );
                 }
-                env.addEnv(newEnv);
+                env.createEnv(newEnv);
                 history.push(routes.ENV.EXIST);
               }
             }}
