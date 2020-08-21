@@ -28,13 +28,7 @@ import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3(props: any) {
   console.debug(InstallContentsKubernetes3.name, props);
-  const {
-    history,
-    location,
-    match,
-    version,
-    registry,
-  } = props;
+  const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState } = appContext;
@@ -72,59 +66,41 @@ function InstallContentsKubernetes3(props: any) {
 
   const install = async () => {
     console.debug(`nowEnv`, nowEnv);
+
     const callback = {
       close: () => {},
       stdout: (data: string) => appendToProgressScreen(logRef, data),
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const kubernetesInstaller = new KubernetesInstaller(nowEnv);
+    const kubernetesInstaller = KubernetesInstaller.getInstance;
+    kubernetesInstaller.env = nowEnv;
     await kubernetesInstaller.preWorkInstallKubernetes(
-      registry,
-      version,
+      state.registry,
+      state.version,
       callback
     )
-    // await nowEnv?.preWorkInstallKubernetes(
-    //   registry,
-    //   version,
-    //   callback
-    // );
     setProgress(40);
 
     await kubernetesInstaller.installMainMaster(
-      registry,
-      version,
+      state.registry,
+      state.version,
       callback
     )
-    // await nowEnv?.installMainMaster(
-    //   registry,
-    //   version,
-    //   callback
-    // );
     setProgress(60);
 
     await kubernetesInstaller.installMaster(
-      registry,
-      version,
+      state.registry,
+      state.version,
       callback
     )
-    // await nowEnv?.installMaster(
-    //   registry,
-    //   version,
-    //   callback
-    // );
     setProgress(80);
 
     await kubernetesInstaller.installWorker(
-      registry,
-      version,
+      state.registry,
+      state.version,
       callback
     )
-    // await nowEnv?.installWorker(
-    //   registry,
-    //   version,
-    //   callback
-    // );
     setProgress(100);
   };
 

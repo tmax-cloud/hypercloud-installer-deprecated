@@ -2,6 +2,7 @@ import { OS, OS_TYPE } from '../../interface/os';
 import * as script from '../../common/script';
 import Node, { ROLE } from '../Node';
 import { NETWORK_TYPE } from '../Env';
+import CONST from '../../constants/constant';
 
 /* eslint-disable class-methods-use-this */
 export default class CentOS implements OS {
@@ -65,53 +66,10 @@ export default class CentOS implements OS {
     `;
   }
 
-  getCniRemoveScript(version: string): string {
-    return `
-    ${this.cloneGitFile(
-      'https://github.com/tmax-cloud/hypercloud-install-guide.git'
-    )}
-    cd ~/hypercloud-install-guide/CNI;
-    kubectl delete -f calico_${version}.yaml;
-    kubectl delete -f calicoctl_3.15.0.yaml;
-    ${script.deleteCniConfigScript()}
-    `;
-  }
-
-  getCniInstallScript(version: string, registry: string): string {
-    let setRegistry = '';
-    let imagePushScript = '';
-    if (registry) {
-      setRegistry = `
-      sed -i 's/calico\\/cni/'${registry}'\\/calico\\/cni/g' calico_${version}.yaml;
-      sed -i 's/calico\\/pod2daemon-flexvol/'${registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${version}.yaml;
-      sed -i 's/calico\\/node/'${registry}'\\/calico\\/node/g' calico_${version}.yaml;
-      sed -i 's/calico\\/kube-controllers/'${registry}'\\/calico\\/kube-controllers/g' calico_${version}.yaml;
-      sed -i 's/calico\\/ctl/'${registry}'\\/calico\\/ctl/g' calico_${version}.yaml;
-      `;
-      imagePushScript = script.getCniImagePushScript(registry);
-    }
-    return `
-      ${imagePushScript}
-      ${this.cloneGitFile(
-        'https://github.com/tmax-cloud/hypercloud-install-guide.git'
-      )}
-      cd ~/hypercloud-install-guide/CNI;
-      sed -i 's/v3.13.4/'v${version}'/g' calico_${version}.yaml;
-      . ~/hypercloud-install-guide/K8S_Master/installer/k8s.config;
-      sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${version}.yaml;
-      ${setRegistry}
-      cd ~/hypercloud-install-guide/CNI;
-      kubectl apply -f calico_${version}.yaml;
-      kubectl apply -f calicoctl_3.15.0.yaml;
-      `;
-  }
-
   getK8sMasterRemoveScript(): string {
     const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
     return `
-      ${this.cloneGitFile(
-        'https://github.com/tmax-cloud/hypercloud-install-guide.git'
-      )}
+    ${this.cloneGitFile(CONST.GIT_REPO)}
       cd ~/hypercloud-install-guide/K8S_Master/installer;
       cp -f ~/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
@@ -207,13 +165,6 @@ export default class CentOS implements OS {
     cd ~;
     yum install -y git;
     git clone ${repoPath};
-    `;
-  }
-
-  setPublicPackageRepository() {
-    return `
-    ${this.setCrioRepo(script.CRIO_VERSION)}
-    ${this.setKubernetesRepo()}
     `;
   }
 

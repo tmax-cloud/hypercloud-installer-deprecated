@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
+import { remote } from 'electron';
 import React, { useReducer } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { Redirect } from 'react-router';
@@ -65,10 +66,11 @@ const useStyles = makeStyles((theme: Theme) =>
 function HomePage(props: any) {
   console.debug('rootPath', rootPath);
   console.debug('__dirname', __dirname);
+  console.debug(`remote.app.getPath('home')`, remote.app.getPath('home'));
   console.debug(HomePage.name, props);
 
   const [appState, dispatchAppState] = useReducer(reducer, initialState);
-  console.debug('appState', appState);
+  // console.debug('appState', appState);
 
   const classes = useStyles();
   return (

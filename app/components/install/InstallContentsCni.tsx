@@ -24,12 +24,12 @@ function InstallContentsCni(props: any) {
   console.debug(InstallContentsCni.name, props);
   const { history, location, match } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    type: 'Calico',
-    version: '3.13.4'
+    version: '3.13.4',
+    type: 'Calico'
   });
 
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(
@@ -77,16 +77,7 @@ function InstallContentsCni(props: any) {
     <div className={['childUpDownCenter', styles.wrap].join(' ')}>
       {/* {getComponent()} */}
       <Switch>
-        <Route
-          path={`${match.path}/step1`}
-          render={() => (
-            <InstallContentsCni1
-              history={history}
-              match={match}
-              location={location}
-            />
-          )}
-        />
+        <Route path={`${match.path}/step1`} component={InstallContentsCni1} />
         <Route
           path={`${match.path}/step2`}
           render={() => (

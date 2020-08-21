@@ -27,15 +27,7 @@ import { NETWORK_TYPE } from '../../utils/class/Env';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
-  const {
-    history,
-    location,
-    match,
-    version,
-    setVersion,
-    registry,
-    setRegistry
-  } = props;
+  const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -49,8 +41,13 @@ function InstallContentsKubernetes2(props: any) {
   //   // appState.kubeinstallState.version
   //   CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0]
   // );
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setVersion(event.target.value as string);
+  const handleChangeVersion = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setState({
+      version: event.target.value as string
+    });
+    // setVersion(event.target.value as string);
   };
 
   const [registryType, setRegistryType] = React.useState(() => {
@@ -61,7 +58,9 @@ function InstallContentsKubernetes2(props: any) {
       return 'public';
     }
   });
-  const handleChangeRegistryType = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRegistryType = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRegistryType((event.target as HTMLInputElement).value);
   };
 
@@ -86,8 +85,8 @@ function InstallContentsKubernetes2(props: any) {
             {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
             <Select
               native
-              value={version}
-              onChange={handleChange}
+              value={state.version}
+              onChange={handleChangeVersion}
               inputProps={{
                 name: 'age',
                 id: 'age-native-simple'
@@ -174,12 +173,17 @@ function InstallContentsKubernetes2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
+            let registry = '';
             if (registryType === 'private') {
               const { mainMaster } = nowEnv.getNodesSortedByRole();
-              setRegistry(`${mainMaster.ip}:5000`);
+              registry = `${mainMaster.ip}:5000`;
             }
+            setState({
+              version: state.version,
+              registry
+            });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step3`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step3`
             );
           }}
         >
@@ -230,7 +234,7 @@ function InstallContentsKubernetes2(props: any) {
               onClick={() => {
                 handleClose();
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step1`
                 );
               }}
             >

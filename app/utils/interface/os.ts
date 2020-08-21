@@ -13,15 +13,12 @@ export interface OS {
     priority: number,
     vip: string
   ): string;
-  getCniRemoveScript(version: string): string;
-  getCniInstallScript(version: string, registry: string): string;
   getK8sMasterRemoveScript(): string;
   deleteDockerScript(): string;
   setDockerRepo(): string;
   getImageRegistrySettingScript(registry: string, type: string): string;
   setPackageRepository(destPath: string): string;
   cloneGitFile(repoPath: string): string;
-  setPublicPackageRepository(): string;
   getInstallMainMasterScript(
     mainMaster: Node,
     registry: string,

@@ -12,26 +12,26 @@ import { NoEmitOnErrorsPlugin } from 'webpack';
 
 function InstallContentsKubernetes4(props: any) {
   console.debug(InstallContentsKubernetes4.name, props);
-  const { history, location, match, version, registry } = props;
+  const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-  nowEnv.registry = registry;
+  nowEnv.registry = state.registry;
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
   nowEnv.addProduct({
     name: CONST.PRODUCT.KUBERNETES.NAME,
-    version
+    version: state.version
   });
   // json 파일 저장
   env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
-    if (registry) {
+    if (state.registry) {
       return (
         <div style={{ marginBottom: '30px' }}>
           <div>
@@ -41,7 +41,7 @@ function InstallContentsKubernetes4(props: any) {
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {registry}
+              {state.registry}
             </span>
           </div>
         </div>

@@ -1,6 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 /* eslint-disable global-require */
+import { remote } from 'electron';
+import { rootPath } from 'electron-root-path';
+import path from 'path';
 import { ROLE } from '../class/Node';
 import Env from '../class/Env';
 import * as product from './product';
@@ -51,11 +54,11 @@ function makeEnvObject(object: any) {
 /**
  * @description path 파일 삭제 (동기)
  */
-export function deleteFileSync(path: string) {
+export function deleteFileSync(filePath: string) {
   const fs = require('fs');
 
   try {
-    fs.unlinkSync(path);
+    fs.unlinkSync(filePath);
     // file removed
   } catch (err) {
     console.error(err);
@@ -65,10 +68,10 @@ export function deleteFileSync(path: string) {
 /**
  * @description path 파일 삭제 (비동기)
  */
-export function deleteFileAsync(path: string) {
+export function deleteFileAsync(filePath: string) {
   const fs = require('fs');
 
-  fs.unlink(path, err => {
+  fs.unlink(filePath, err => {
     if (err) {
       console.error(err);
     }
@@ -82,7 +85,8 @@ export function deleteFileAsync(path: string) {
  */
 export function loadEnvList() {
   const fs = require('fs');
-  const envPath = 'env.json';
+  const envPath = path.join(remote.app.getPath('home'), '/env.json');
+  // const envPath = '/env.json';
 
   try {
     if (fs.existsSync(envPath)) {

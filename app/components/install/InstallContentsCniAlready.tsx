@@ -18,7 +18,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
-import * as Script from '../../utils/common/script';
+import * as script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
 import productImage from '../../../resources/assets/Cni_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
@@ -26,6 +26,7 @@ import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 import { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
+import CniInstaller from '../../utils/class/installer/CniInstaller';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -78,69 +79,14 @@ function InstallContentsCniAlready(props: any) {
   };
 
   const remove = async () => {
-    dispatchAppState({
-      type: 'set_loading',
-      loading: true
-    });
-    // setLoading(true);
-    console.debug(nowEnv.nodeList);
+    console.debug(`nowEnv`, nowEnv);
 
-    // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
+    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
 
-    const { version } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
+    const cniInstaller = CniInstaller.getInstance;
+    cniInstaller.env = nowEnv;
 
-    console.error('worker remove start');
-    // 각각은 동시에, 전체 완료는 대기
-    await Promise.all(
-      workerArr.map((worker, index) => {
-        let command = '';
-        command += worker.os.getCniRemoveScript(version);
-        worker.cmd = command;
-        console.error(worker.cmd);
-        return Common.send(worker, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('worker remove end');
-
-    console.error('master remove start');
-    await Promise.all(
-      masterArr.map((master, index) => {
-        let command = '';
-        command += master.os.getCniRemoveScript(version);
-        master.cmd = command;
-        console.error(master.cmd);
-        return Common.send(master, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('master remove end');
-
-    console.error('mainMaster remove start');
-    let command = '';
-    command += mainMaster.os.getCniRemoveScript(version);
-    mainMaster.cmd = command;
-    console.error(mainMaster.cmd);
-    await Common.send(mainMaster, {
-      close: () => {},
-      stdout: (data: string) => {},
-      stderr: (data: string) => {}
-    });
-    console.error('mainMaster remove end');
-
-    // setLoading(false);
-    dispatchAppState({
-      type: 'set_loading',
-      loading: false
-    });
-    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
+    await cniInstaller.removeMainMaster(version, type);
   };
 
   return (
@@ -261,13 +207,27 @@ function InstallContentsCniAlready(props: any) {
               <DialogActions>
                 <Button
                   className={['blue'].join(' ')}
-                  onClick={() => {
-                    handleClose();
-                    // TODO:delete kubernetes
-                    nowEnv.deleteProductByName(nowProduct.NAME);
-                    remove();
-                    // json 파일 저장
-                    env.updateEnv(nowEnv.name, nowEnv);
+                  onClick={async () => {
+                    try {
+                      dispatchAppState({
+                        type: 'set_loading',
+                        loading: true
+                      });
+                      handleClose();
+                      await remove();
+                      nowEnv.deleteProductByName(nowProduct.NAME);
+                      env.updateEnv(nowEnv.name, nowEnv);
+                      history.push(
+                        `${routes.INSTALL.HOME}/${nowEnv.name}/main`
+                      );
+                    } catch (error) {
+                      console.error(error);
+                    } finally {
+                      dispatchAppState({
+                        type: 'set_loading',
+                        loading: false
+                      });
+                    }
                   }}
                 >
                   삭제

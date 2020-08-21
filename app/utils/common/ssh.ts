@@ -9,7 +9,7 @@ interface SendCb {
   stderr: Function;
 }
 
-export function send(node: any, cb: SendCb) {
+export function send(node: any, cb?: SendCb) {
   const { Client } = require('ssh2');
   const conn = new Client();
 
@@ -17,11 +17,12 @@ export function send(node: any, cb: SendCb) {
     conn
       .on('ready', () => {
         console.debug('Client :: ready');
+        console.debug('command', node.cmd);
         conn.exec(node.cmd, (err, stream) => {
           if (err) throw err;
           stream
             .on('close', (code, signal) => {
-              cb.close();
+              cb?.close();
               console.debug(
                 `Stream :: close :: code: ${code}, signal: ${signal}`
               );
@@ -29,21 +30,27 @@ export function send(node: any, cb: SendCb) {
               resolve();
             })
             .on('data', data => {
-              cb.stdout(data);
+              cb?.stdout(data);
               console.debug(`STDOUT: ${data}`);
             })
             .stderr.on('data', data => {
-              cb.stderr(data);
+              cb?.stderr(data);
               console.error(`STDERR: ${data}`);
             });
         });
+      })
+      .on('error', (err: Error) => {
+        cb?.stderr(err);
+        reject(err);
       })
       .connect({
         host: node.ip,
         port: node.port,
         username: node.user,
-        password: node.password
+        password: node.password,
+        readyTimeout: 5000
       });
+
   });
 }
 

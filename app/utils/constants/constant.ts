@@ -1,4 +1,5 @@
 const CONST = {
+  GIT_REPO: 'https://github.com/tmax-cloud/hypercloud-install-guide.git',
   HOME: {
     INSTALL: 'install',
     ENV: 'env'
@@ -21,7 +22,9 @@ const CONST = {
     CNI: {
       NAME: 'CNI',
       IS_REQUIRED: true, // Required
-      DESC: '컨테이너 간의 네트워킹을 제어할 수 있는 플러그인'
+      DESC: '컨테이너 간의 네트워킹을 제어할 수 있는 플러그인',
+      SUPPORTED_VERSION: ['3.13.4'],
+      SUPPORTED_TYPE: ['Calico']
     },
     HELM: {
       NAME: 'Helm',

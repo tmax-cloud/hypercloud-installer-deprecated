@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable global-require */
-import { rootPath } from 'electron-root-path';
 import Node from '../class/Node';
 
 export function sendFile(node: Node, srcPath: string, destPath: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const client = require('scp2');
     client.scp(
       srcPath,

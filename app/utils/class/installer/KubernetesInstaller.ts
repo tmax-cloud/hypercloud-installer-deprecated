@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable prettier/prettier */
@@ -9,13 +10,60 @@ import { rootPath } from 'electron-root-path';
 import Installer from '../../interface/installer';
 import Env, { NETWORK_TYPE } from '../Env';
 import * as scp from '../../common/scp';
-import Node, { ROLE } from '../Node';
+import Node from '../Node';
 import * as script from '../../common/script';
 import * as ssh from '../../common/ssh';
-import * as product from '../../common/product';
 import * as git from '../../common/git';
+import CONST from '../../constants/constant';
 
 export default class KubernetesInstaller extends Installer {
+  // singleton
+  private static instance: KubernetesInstaller;
+
+  private constructor() {
+    super();
+    KubernetesInstaller.instance = this;
+  }
+
+  static get getInstance() {
+    if (!KubernetesInstaller.instance) {
+      KubernetesInstaller.instance = new KubernetesInstaller();
+    }
+    return this.instance;
+  }
+
+  public async removeWorker() {
+    console.error('###### Start remove Worker... ######');
+    const { workerArr } = this.env.getNodesSortedByRole();
+    await Promise.all(
+      workerArr.map((worker: Node) => {
+        worker.cmd = worker.os.getK8sMasterRemoveScript();
+        return worker.exeCmd();
+      })
+    );
+    console.error('###### Finish remove Worker... ######');
+  }
+
+  public async removeMaster() {
+    console.error('###### Start remove Master... ######');
+    const { masterArr } = this.env.getNodesSortedByRole();
+    await Promise.all(
+      masterArr.map((master: Node) => {
+        master.cmd = master.os.getK8sMasterRemoveScript();
+        return master.exeCmd();
+      })
+    );
+    console.error('###### Finish remove Master... ######');
+  }
+
+  public async removeMainMaster() {
+    console.error('###### Start remove main Master... ######');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = mainMaster.os.getK8sMasterRemoveScript();
+    await mainMaster.exeCmd();
+    console.error('###### Finish remove main Master... ######');
+  }
+
   public async preWorkInstallKubernetes(
     registry: string,
     version: string,
@@ -52,7 +100,6 @@ export default class KubernetesInstaller extends Installer {
       version,
       masterArr.length > 0
     );
-    console.debug(mainMaster.cmd);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing main Master... ######');
   }
@@ -71,7 +118,6 @@ export default class KubernetesInstaller extends Installer {
           99-index
         );
         master.cmd += `${masterJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
-        console.debug(master.cmd);
         return master.exeCmd(callback);
       })
     );
@@ -91,7 +137,6 @@ export default class KubernetesInstaller extends Installer {
           worker
         );
         worker.cmd += `${workerJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
-        console.debug(worker.cmd);
         return worker.exeCmd(callback);
       })
     );
@@ -106,13 +151,11 @@ export default class KubernetesInstaller extends Installer {
       command += script.getDeleteWorkerNodeScript(worker);
     });
     mainMaster.cmd = command;
-    console.debug(mainMaster.cmd);
     await mainMaster.exeCmd();
 
     workerArr.map((worker) => {
       command = worker.os.getK8sMasterRemoveScript();
       worker.cmd = command;
-      console.debug(worker.cmd);
       worker.exeCmd();
     });
     console.error('###### Finish deleting Worker... ######');
@@ -144,7 +187,6 @@ export default class KubernetesInstaller extends Installer {
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         node.cmd = node.os.setPackageRepository(destPath);
-        console.debug(node.cmd);
         return node.exeCmd(callback);
       })
     );
@@ -153,11 +195,10 @@ export default class KubernetesInstaller extends Installer {
 
   private async _downloadGitFile() {
     console.error('###### Start downloading the GIT file to client local... ######');
-    const repoPath = `https://github.com/tmax-cloud/hypercloud-install-guide.git`;
     const localPath = `${rootPath}/hypercloud-install-guide/`;
-    console.debug(`repoPath`, repoPath);
+    console.debug(`repoPath`, CONST.GIT_REPO);
     console.debug(`localPath`, localPath);
-    await git.clone(repoPath, localPath);
+    await git.clone(CONST.GIT_REPO, localPath);
     console.error('###### Finish downloading the GIT file to client local... ######');
   }
 
@@ -190,8 +231,8 @@ export default class KubernetesInstaller extends Installer {
     console.error('###### Start setting the public package repository at each node... ######');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        node.cmd = node.os.setPublicPackageRepository();
-        console.debug(node.cmd);
+        node.cmd = node.os.setCrioRepo(script.CRIO_VERSION)
+        node.cmd += node.os.setKubernetesRepo()
         return node.exeCmd(callback);
       })
     );
@@ -200,11 +241,9 @@ export default class KubernetesInstaller extends Installer {
 
   private async _cloneGitFile(callback: any) {
     console.error('###### Start clone the GIT file at each node... ######');
-    const repoPath = `https://github.com/tmax-cloud/hypercloud-install-guide.git`;
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        node.cmd = node.os.cloneGitFile(repoPath);
-        console.debug(node.cmd);
+        node.cmd = node.os.cloneGitFile(CONST.GIT_REPO);
         return node.exeCmd(callback);
       })
     );
@@ -218,7 +257,6 @@ export default class KubernetesInstaller extends Installer {
       registry,
       this.env.networkType
     );
-    console.debug(mainMaster.cmd);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing the image registry at main master node... ######');
   }
@@ -230,7 +268,6 @@ export default class KubernetesInstaller extends Installer {
       registry,
       this.env.networkType
     );
-    console.debug(mainMaster.cmd);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish pushing the Kubernetes image at main master node... ######');
   }

@@ -24,22 +24,30 @@ function InstallContentsCni2(props: any) {
   console.debug(InstallContentsCni2.name, props);
   const { history, location, match, state, setState } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  const [version, setVersion] = React.useState(state.version);
-  const handleChangeVersion = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setVersion(event.target.value as string);
+  // const [version, setVersion] = React.useState(state.version);
+  const handleChangeVersion = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setState((prevState: any) => {
+      return { ...prevState, version: event.target.value as string };
+    });
+    // setVersion(event.target.value as string);
   };
 
-  const [type, setType] = React.useState(state.type);
+  // const [type, setType] = React.useState(state.type);
   const handleChangeType = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setType(event.target.value as string);
+    setState((prevState: any) => {
+      return { ...prevState, type: event.target.value as string };
+    });
+    // setType(event.target.value as string);
   };
 
   const [open, setOpen] = React.useState(false);
@@ -61,15 +69,20 @@ function InstallContentsCni2(props: any) {
             {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
             <Select
               native
+              value={state.type}
               onChange={handleChangeType}
-              value={type}
               inputProps={{
                 name: 'age',
                 id: 'age-native-simple'
               }}
             >
-              {/* <option aria-label="None" value="" /> */}
-              <option value="Calico">Calico</option>
+              {CONST.PRODUCT.CNI.SUPPORTED_TYPE.map(v => {
+                return (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                );
+              })}
             </Select>
           </FormControl>
         </div>
@@ -83,15 +96,20 @@ function InstallContentsCni2(props: any) {
             {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
             <Select
               native
+              value={state.version}
               onChange={handleChangeVersion}
-              value={version}
               inputProps={{
                 name: 'age',
                 id: 'age-native-simple'
               }}
             >
-              {/* <option aria-label="None" value="" /> */}
-              <option value="3.13.4">3.13.4</option>
+              {CONST.PRODUCT.CNI.SUPPORTED_VERSION.map(v => {
+                return (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                );
+              })}
             </Select>
           </FormControl>
         </div>
@@ -107,8 +125,8 @@ function InstallContentsCni2(props: any) {
           size="large"
           onClick={() => {
             setState({
-              version,
-              type
+              version: state.version,
+              type: state.type
             });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step3`
@@ -150,8 +168,8 @@ function InstallContentsCni2(props: any) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                {CONST.PRODUCT.CNI.NAME} 설정 화면에서 나가시겠습니까? 설정 내용은 저장되지
-                않습니다.
+                {CONST.PRODUCT.CNI.NAME} 설정 화면에서 나가시겠습니까? 설정
+                내용은 저장되지 않습니다.
               </span>
             </DialogContentText>
           </DialogContent>

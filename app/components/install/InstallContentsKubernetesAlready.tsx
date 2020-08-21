@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
@@ -18,14 +19,15 @@ import CloseIcon from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
 import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
-import * as Script from '../../utils/common/script';
+import * as script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
-import { ROLE } from '../../utils/class/Node';
+import Node, { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
+import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -88,67 +90,14 @@ function InstallContentsKubernetesAlready(props: any) {
   };
 
   const remove = async () => {
-    dispatchAppState({
-      type: 'set_loading',
-      loading: true
-    });
-    // setLoading(true);
-    console.debug(nowEnv.nodeList);
+    console.debug(`nowEnv`, nowEnv);
 
-    // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
+    const kubernetesInstaller = KubernetesInstaller.getInstance;
+    kubernetesInstaller.env = nowEnv;
 
-    console.error('worker remove start');
-    // 각각은 동시에, 전체 완료는 대기
-    await Promise.all(
-      workerArr.map((worker, index) => {
-        let command = '';
-        command += worker.os.getK8sMasterRemoveScript();
-        worker.cmd = command;
-        console.error(worker.cmd);
-        return Common.send(worker, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('worker remove end');
-
-    console.error('master remove start');
-    await Promise.all(
-      masterArr.map((master, index) => {
-        let command = '';
-        command += master.os.getK8sMasterRemoveScript();
-        master.cmd = command;
-        console.error(master.cmd);
-        return Common.send(master, {
-          close: () => {},
-          stdout: (data: string) => {},
-          stderr: (data: string) => {}
-        });
-      })
-    );
-    console.error('master remove end');
-
-    console.error('mainMaster remove start');
-    let command = '';
-    command += mainMaster.os.getK8sMasterRemoveScript();
-    mainMaster.cmd = command;
-    console.error(mainMaster.cmd);
-    await Common.send(mainMaster, {
-      close: () => {},
-      stdout: (data: string) => {},
-      stderr: (data: string) => {}
-    });
-    console.error('mainMaster remove end');
-
-    // setLoading(false);
-    dispatchAppState({
-      type: 'set_loading',
-      loading: false
-    });
-    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
+    await kubernetesInstaller.removeWorker();
+    await kubernetesInstaller.removeMaster();
+    await kubernetesInstaller.removeMainMaster();
   };
 
   return (
@@ -164,9 +113,11 @@ function InstallContentsKubernetesAlready(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={['childUpDownCenter', 'childLeftRightCenter', styles.installedCircle].join(
-                ' '
-              )}
+              className={[
+                'childUpDownCenter',
+                'childLeftRightCenter',
+                styles.installedCircle
+              ].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -252,20 +203,35 @@ function InstallContentsKubernetesAlready(props: any) {
                   </span>
                   <br />
                   <span className={['lightDark', 'small'].join(' ')}>
-                    삭제 시, 다른 필수 제품 기능 및 호환 제품 기능도 모두 삭제됩니다.
+                    삭제 시, 다른 필수 제품 기능 및 호환 제품 기능도 모두
+                    삭제됩니다.
                   </span>
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button
                   className={['blue'].join(' ')}
-                  onClick={() => {
-                    handleClose();
-                    // TODO:delete kubernetes
-                    nowEnv.deleteAllProduct();
-                    remove();
-                    // json 파일 저장
-                    env.updateEnv(nowEnv.name, nowEnv);
+                  onClick={async () => {
+                    try {
+                      dispatchAppState({
+                        type: 'set_loading',
+                        loading: true
+                      });
+                      handleClose();
+                      await remove();
+                      nowEnv.deleteAllProduct();
+                      env.updateEnv(nowEnv.name, nowEnv);
+                      history.push(
+                        `${routes.INSTALL.HOME}/${nowEnv.name}/main`
+                      );
+                    } catch (error) {
+                      console.error(error);
+                    } finally {
+                      dispatchAppState({
+                        type: 'set_loading',
+                        loading: false
+                      });
+                    }
                   }}
                 >
                   삭제

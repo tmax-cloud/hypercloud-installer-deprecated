@@ -4,10 +4,6 @@ import Env from '../class/Env';
 export default class Installer {
   private _env: Env;
 
-  constructor(env: Env) {
-    this._env = env;
-  }
-
   /**
    * Getter env
    * @return {Env}

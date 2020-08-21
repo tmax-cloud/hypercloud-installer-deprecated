@@ -1,4 +1,4 @@
-import React, { useReducer, useContext, useEffect } from 'react';
+import React, { useReducer, useContext, useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router';
 import styles from './InstallContentsKubernetes.css';
 import InstallContentsKubernetes1 from './InstallContentsKubernetes1';
@@ -26,10 +26,10 @@ function InstallContentsKubernetes(props: any) {
   console.debug(InstallContentsKubernetes.name, props);
   const { history, location, match } = props;
 
-  const [version, setVersion] = React.useState(
-    CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0]
-  );
-  const [registry, setRegistry] = React.useState('');
+  const [state, setState] = useState({
+    version: CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0],
+    registry: ''
+  });
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -87,12 +87,11 @@ function InstallContentsKubernetes(props: any) {
           path={`${match.path}/step2`}
           render={() => (
             <InstallContentsKubernetes2
-              version={version}
-              setVersion={setVersion}
-              setRegistry={setRegistry}
               history={history}
               location={location}
               match={match}
+              state={state}
+              setState={setState}
             />
           )}
         />
@@ -100,11 +99,11 @@ function InstallContentsKubernetes(props: any) {
           path={`${match.path}/step3`}
           render={() => (
             <InstallContentsKubernetes3
-              version={version}
-              registry={registry}
               history={history}
               location={location}
               match={match}
+              state={state}
+              setState={setState}
             />
           )}
         />
@@ -112,11 +111,11 @@ function InstallContentsKubernetes(props: any) {
           path={`${match.path}/step4`}
           render={() => (
             <InstallContentsKubernetes4
-              version={version}
-              registry={registry}
               history={history}
               location={location}
               match={match}
+              state={state}
+              setState={setState}
             />
           )}
         />

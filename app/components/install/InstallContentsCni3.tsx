@@ -18,6 +18,7 @@ import ProgressBar from '../ProgressBar';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
+import CniInstaller from '../../utils/class/installer/CniInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsCni3(props: any) {
@@ -36,7 +37,7 @@ function InstallContentsCni3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 10000);
+    }, 5000);
     return () => {
       clearInterval(timer);
     };
@@ -59,25 +60,18 @@ function InstallContentsCni3(props: any) {
   };
 
   const install = async () => {
-    console.debug(nowEnv.nodeList);
+    console.debug(`nowEnv`, nowEnv);
 
-    // mainMaster, master, worker로 분리
-    const { mainMaster, masterArr, workerArr } = nowEnv.getNodesSortedByRole();
-
-    const { registry } = nowEnv;
-
-    setProgress(30);
-    console.error('mainMaster install start');
-    let command = '';
-    command += mainMaster.os.getCniInstallScript(state.version, registry);
-    mainMaster.cmd = command;
-    console.error(mainMaster.cmd);
-    await Common.send(mainMaster, {
+    const callback = {
       close: () => {},
       stdout: (data: string) => appendToProgressScreen(logRef, data),
       stderr: (data: string) => appendToProgressScreen(logRef, data)
-    });
-    console.error('mainMaster install end');
+    };
+
+    setProgress(50);
+    const cniInstaller = CniInstaller.getInstance;
+    cniInstaller.env = nowEnv;
+    await cniInstaller.installMainMaster(state.type, state.version, callback);
     setProgress(100);
   };
 

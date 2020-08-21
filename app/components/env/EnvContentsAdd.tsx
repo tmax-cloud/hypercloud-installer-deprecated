@@ -863,7 +863,9 @@ function EnvContentsAdd(props: any) {
                     envBeforeEdit.productList,
                     new Date()
                   );
-                  await new KubernetesInstaller(tempAddEnv).installWorker(
+                  const kubernetesInstaller = KubernetesInstaller.getInstance;
+                  kubernetesInstaller.env = tempAddEnv;
+                  await kubernetesInstaller.installWorker(
                     tempAddEnv.registry,
                     kubernetesInfo.version
                   );
@@ -881,7 +883,8 @@ function EnvContentsAdd(props: any) {
                     envBeforeEdit.productList,
                     new Date()
                   );
-                  await new KubernetesInstaller(tempDeleteEnv).deleteWorker();
+                  kubernetesInstaller.env = tempDeleteEnv;
+                  await kubernetesInstaller.deleteWorker();
                   // await tempDeleteEnv?.deleteWorker();
                 }
 

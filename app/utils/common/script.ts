@@ -53,30 +53,6 @@ function registHostName() {
 // `;
 // }
 
-export function deleteCniConfigScript() {
-  return `
-    rm -rf /etc/cni/*
-  `;
-}
-
-// function deleteDockerScript() {
-//   return `
-//     sudo yum remove -y docker \
-//     docker-client \
-//     docker-client-latest \
-//     docker-common \
-//     docker-latest \
-//     docker-latest-logrotate \
-//     docker-logrotate \
-//     docker-engine; \
-
-//     sudo yum remove -y docker-ce docker-ce-cli containerd.io;
-//     sudo rm -rf /var/lib/docker;
-
-//     rm -rf /etc/docker/daemon.json;
-//     `;
-// }
-
 export function getCniImagePushScript(registry: string) {
   return `
     mkdir -p ~/cni-install
@@ -107,6 +83,65 @@ export function getCniImagePushScript(registry: string) {
     sudo docker push ${registry}/calico/ctl:\${CTL_VERSION}
     `;
 }
+
+export function deleteCniConfigScript() {
+  return `
+    rm -rf /etc/cni/*
+  `;
+}
+
+export function getCniRemoveScript(version: string): string {
+  return `
+  cd ~/hypercloud-install-guide/CNI;
+  kubectl delete -f calico_${version}.yaml;
+  kubectl delete -f calicoctl_3.15.0.yaml;
+  ${deleteCniConfigScript()}
+  `;
+}
+
+export function getCniInstallScript(version: string, registry: string): string {
+  let setRegistry = '';
+  let imagePushScript = '';
+  if (registry) {
+    setRegistry = `
+    sed -i 's/calico\\/cni/'${registry}'\\/calico\\/cni/g' calico_${version}.yaml;
+    sed -i 's/calico\\/pod2daemon-flexvol/'${registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${version}.yaml;
+    sed -i 's/calico\\/node/'${registry}'\\/calico\\/node/g' calico_${version}.yaml;
+    sed -i 's/calico\\/kube-controllers/'${registry}'\\/calico\\/kube-controllers/g' calico_${version}.yaml;
+    sed -i 's/calico\\/ctl/'${registry}'\\/calico\\/ctl/g' calico_${version}.yaml;
+    `;
+    imagePushScript = getCniImagePushScript(registry);
+  }
+  return `
+    ${imagePushScript}
+    cd ~/hypercloud-install-guide/CNI;
+    sed -i 's/v3.13.4/'v${version}'/g' calico_${version}.yaml;
+    . ~/hypercloud-install-guide/K8S_Master/installer/k8s.config;
+    sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${version}.yaml;
+    ${setRegistry}
+    cd ~/hypercloud-install-guide/CNI;
+    kubectl apply -f calico_${version}.yaml;
+    kubectl apply -f calicoctl_3.15.0.yaml;
+    `;
+}
+
+// function deleteDockerScript() {
+//   return `
+//     sudo yum remove -y docker \
+//     docker-client \
+//     docker-client-latest \
+//     docker-common \
+//     docker-latest \
+//     docker-latest-logrotate \
+//     docker-logrotate \
+//     docker-engine; \
+
+//     sudo yum remove -y docker-ce docker-ce-cli containerd.io;
+//     sudo rm -rf /var/lib/docker;
+
+//     rm -rf /etc/docker/daemon.json;
+//     `;
+// }
 
 export function getKubernetesImagePushScript(registry: string, type: string) {
   const path = `~/k8s-install`;
