@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
-import styles from './InstallContentsCni4.css';
+import styles from './InstallContentsRookCeph4.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
 import { KubeInstallContext } from './InstallContentsKubernetes';
@@ -9,8 +9,8 @@ import { AppContext } from '../../containers/HomePage';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
 
-function InstallContentsCni4(props: any) {
-  console.debug(InstallContentsCni4.name, props);
+function InstallContentsRookCeph4(props: any) {
+  console.debug(InstallContentsRookCeph4.name, props);
   const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
@@ -21,11 +21,9 @@ function InstallContentsCni4(props: any) {
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.CNI.NAME);
+  nowEnv.deleteProductByName(CONST.PRODUCT.ROOK_CEPH.NAME);
   nowEnv.addProduct({
-    name: CONST.PRODUCT.CNI.NAME,
-    version: state.version,
-    type: state.type
+    name: CONST.PRODUCT.ROOK_CEPH.NAME
   });
   // json 파일 저장
   env.updateEnv(nowEnv.name, nowEnv);
@@ -80,4 +78,4 @@ function InstallContentsCni4(props: any) {
   );
 }
 
-export default InstallContentsCni4;
+export default InstallContentsRookCeph4;

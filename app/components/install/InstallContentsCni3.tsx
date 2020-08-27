@@ -68,11 +68,21 @@ function InstallContentsCni3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    setProgress(50);
+    setProgress(20);
     const cniInstaller = CniInstaller.getInstance;
     cniInstaller.env = nowEnv;
-    await cniInstaller.installMainMaster(state.type, state.version, callback);
-    setProgress(100);
+
+    await cniInstaller.install({
+      type: state.type,
+      version: state.version,
+      callback,
+      setProgress
+    });
+    // await cniInstaller.preWorkInstall(state.registry, state.version, callback);
+    // setProgress(60);
+
+    // await cniInstaller.installMainMaster(state.type, state.version, callback);
+    // setProgress(100);
   };
 
   React.useEffect(() => {

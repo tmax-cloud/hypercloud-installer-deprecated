@@ -1,5 +1,3 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
@@ -11,8 +9,8 @@ import {
   DialogActions
 } from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
-import { rootPath } from 'electron-root-path';
-import styles from './InstallContentsKubernetes3.css';
+import styles from './InstallContentsRookCeph3.css';
+import { ROLE } from '../../utils/class/Node';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';
@@ -20,16 +18,16 @@ import ProgressBar from '../ProgressBar';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
-import * as scp from '../../utils/common/scp';
-import Env, { NETWORK_TYPE } from '../../utils/class/Env';
-import * as git from '../../utils/common/git';
-import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
-
+import CniInstaller from '../../utils/class/installer/CniInstaller';
+import RookCephInstaller from '../../utils/class/installer/RookCephInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsKubernetes3(props: any) {
-  console.debug(InstallContentsKubernetes3.name, props);
+function InstallContentsRookCeph3(props: any) {
+  console.debug(InstallContentsRookCeph3.name, props);
   const { history, location, match, state, setState } = props;
+
+  // const appContext = useContext(AppContext);
+  // const { appState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -71,35 +69,14 @@ function InstallContentsKubernetes3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const kubernetesInstaller = KubernetesInstaller.getInstance;
-    kubernetesInstaller.env = nowEnv;
-
-    await kubernetesInstaller.preWorkInstall(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(40);
-
-    await kubernetesInstaller.installMainMaster(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(60);
-
-    await kubernetesInstaller.installMaster(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(80);
-
-    await kubernetesInstaller.installWorker(
-      state.registry,
-      state.version,
-      callback
-    )
+    setProgress(50);
+    const rookCephInstaller = RookCephInstaller.getInstance;
+    rookCephInstaller.env = nowEnv;
+    await rookCephInstaller.install({
+      isCdi: false,
+      callback,
+      setProgress
+    });
     setProgress(100);
   };
 
@@ -115,7 +92,7 @@ function InstallContentsKubernetes3(props: any) {
         {progress === 100 ? (
           <span>설치가 완료 되었습니다.</span>
         ) : (
-          <span>설치 중 입니다.</span>
+          <span>설치 중 입니다....</span>
         )}
       </div>
       <ProgressBar progress={progress} />
@@ -133,7 +110,7 @@ function InstallContentsKubernetes3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step2`
             );
           }}
         >
@@ -146,7 +123,7 @@ function InstallContentsKubernetes3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step4`
               );
             }}
           >
@@ -181,8 +158,11 @@ function InstallContentsKubernetes3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
+                // dispatchKubeInstall({
+                //   page: 1
+                // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step1`
                 );
               }}
               color="primary"
@@ -199,4 +179,4 @@ function InstallContentsKubernetes3(props: any) {
   );
 }
 
-export default InstallContentsKubernetes3;
+export default InstallContentsRookCeph3;

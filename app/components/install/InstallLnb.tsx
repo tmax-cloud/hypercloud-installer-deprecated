@@ -1,17 +1,16 @@
 /* eslint-disable import/no-cycle */
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import { FormControl, Select, Tooltip } from '@material-ui/core';
+import { Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import styles from './InstallLnb.css';
-import { AppContext } from '../../containers/HomePage';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
 import * as env from '../../utils/common/env';
@@ -35,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function InstallLnb(props: any) {
   console.debug(InstallLnb.name, props);
 
-  const { history, location, match } = props;
+  const { history, match } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -52,7 +51,7 @@ function InstallLnb(props: any) {
     // setOpen(!open);
   };
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChange = () => {
     history.push(`${routes.INSTALL.HOME}/${nowEnv.name}`);
   };
 
@@ -91,7 +90,7 @@ function InstallLnb(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
         <Select native value={nowEnv.name} onChange={handleChange}>
-          {env.loadEnvList().map((e: { name: {} | null | undefined }) => {
+          {env.loadEnvList().map((e: any) => {
             return (
               <option key={e.name} value={e.name}>
                 {e.name}

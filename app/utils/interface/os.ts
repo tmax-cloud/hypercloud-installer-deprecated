@@ -6,6 +6,8 @@ export enum OS_TYPE {
 }
 
 export interface OS {
+  installGdisk(): string;
+  installNtp(): string;
   setKubernetesRepo(): string;
   setCrioRepo(crioVersion: string): string;
   getMasterMultiplexingScript(

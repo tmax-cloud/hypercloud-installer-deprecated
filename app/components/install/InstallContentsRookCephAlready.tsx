@@ -20,13 +20,14 @@ import styles from './InstallContentsKubernetes1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
-import productImage from '../../../resources/assets/Cni_logo.png';
+import productImage from '../../../resources/assets/Rook ceph_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 import { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
 import CniInstaller from '../../utils/class/installer/CniInstaller';
+import RookCephInstaller from '../../utils/class/installer/RookCephInstaller';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,8 +47,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallContentsCniAlready(props: any) {
-  console.debug(InstallContentsCniAlready.name, props);
+function InstallContentsRookCephAlready(props: any) {
+  console.debug(InstallContentsRookCephAlready.name, props);
   const { history, location, match } = props;
 
   const classes = useStyles();
@@ -57,7 +58,7 @@ function InstallContentsCniAlready(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const nowProduct = CONST.PRODUCT.CNI;
+  const nowProduct = CONST.PRODUCT.ROOK_CEPH;
 
   // loading bar
   // const [loading, setLoading] = React.useState(false);
@@ -81,15 +82,12 @@ function InstallContentsCniAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
+    const { version, type } = nowEnv.isInstalled(nowProduct.NAME);
 
-    const cniInstaller = CniInstaller.getInstance;
-    cniInstaller.env = nowEnv;
+    const rookCephInstaller = RookCephInstaller.getInstance;
+    rookCephInstaller.env = nowEnv;
 
-    await cniInstaller.remove({
-      type,
-      version
-    });
+    await rookCephInstaller.remove({});
   };
 
   return (
@@ -203,7 +201,7 @@ function InstallContentsCniAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    {CONST.PRODUCT.CNI.NAME} 를 삭제하시겠습니까?
+                    {CONST.PRODUCT.ROOK_CEPH.NAME} 를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>
@@ -263,4 +261,4 @@ function InstallContentsCniAlready(props: any) {
   );
 }
 
-export default InstallContentsCniAlready;
+export default InstallContentsRookCephAlready;

@@ -59,7 +59,7 @@ export default class Env {
     this._updatedTime = updatedTime;
   }
 
-  // public async preWorkInstallKubernetes(registry: string, version: string, callback: any) {
+  // public async preWorkInstall(registry: string, version: string, callback: any) {
   //   if (this.networkType === NETWORK_TYPE.INTERNAL) {
   //     // 폐쇄망 경우 해주어야 할 작업들
   //     await this._downloadPackageFile();

@@ -17,7 +17,7 @@ export function send(node: any, cb?: SendCb) {
     conn
       .on('ready', () => {
         console.debug('Client :: ready');
-        console.debug('command', node.cmd);
+        console.debug('node', node);
         conn.exec(node.cmd, (err, stream) => {
           if (err) throw err;
           stream
@@ -48,9 +48,8 @@ export function send(node: any, cb?: SendCb) {
         port: node.port,
         username: node.user,
         password: node.password,
-        readyTimeout: 5000
+        readyTimeout: 10000
       });
-
   });
 }
 
@@ -64,7 +63,7 @@ export function connectionTest(node: Node) {
       port: node.port,
       username: node.user,
       password: node.password,
-      readyTimeout: 5000
+      readyTimeout: 10000
     });
     connection.on('ready', () => {
       // Work with the connection
@@ -74,7 +73,7 @@ export function connectionTest(node: Node) {
     });
     connection.on('error', (err: any) => {
       // Handle the connection error
-      console.debug('error', err);
+      // console.debug('error', err);
       connection.end();
       reject(err);
     });

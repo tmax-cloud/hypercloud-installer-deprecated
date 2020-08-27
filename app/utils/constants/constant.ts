@@ -1,17 +1,5 @@
 const CONST = {
   GIT_REPO: 'https://github.com/tmax-cloud/hypercloud-install-guide.git',
-  HOME: {
-    INSTALL: 'install',
-    ENV: 'env'
-  },
-  INSTALL: {
-    MAIN: 'main',
-    KUBERNETES: 'Kubernetes'
-  },
-  ENV: {
-    MANAGE: 'manage',
-    ADD: 'add'
-  },
   PRODUCT: {
     KUBERNETES: {
       NAME: 'Kubernetes',
@@ -26,6 +14,11 @@ const CONST = {
       SUPPORTED_VERSION: ['3.13.4'],
       SUPPORTED_TYPE: ['Calico']
     },
+    ROOK_CEPH: {
+      NAME: 'Rook Ceph',
+      IS_REQUIRED: true, // Optional
+      DESC: '스토리지'
+    },
     HELM: {
       NAME: 'Helm',
       IS_REQUIRED: false, // Optional
@@ -36,22 +29,6 @@ const CONST = {
       IS_REQUIRED: false, // Optional
       DESC: '하이퍼 클라우드 오퍼레이터'
     }
-    // REQUIRED: [
-    //   {
-    //     NAME: 'Kubernetes',
-    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-    //   }
-    // ],
-    // OPTIONAL: [
-    //   {
-    //     NAME: 'Helm',
-    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-    //   },
-    //   {
-    //     NAME: 'HyperCloud Operator',
-    //     DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스'
-    //   }
-    // ]
   }
 };
 

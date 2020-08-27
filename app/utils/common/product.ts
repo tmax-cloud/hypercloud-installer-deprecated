@@ -15,7 +15,7 @@ export function getRequiredProduct() {
 }
 
 export function getOptionalProduct() {
-  const result = [];
+  const result: any[] = [];
 
   Object.keys(CONST.PRODUCT).map(key => {
     if (!CONST.PRODUCT[key].IS_REQUIRED) {

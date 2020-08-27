@@ -105,8 +105,6 @@ function EnvContentsAdd(props: any) {
 
   // 수정화면에서 envBeforeEdit에 수정 전 데이터를 저장해 놓음
   const envBeforeEdit = env.loadEnvByName(match.params.envName);
-  // const envBeforeEdit = env.loadEnvByName(match.params.envName);
-  console.debug('envBeforeEdit', envBeforeEdit);
 
   // state.data에 테이블에 표현될 노드들 데이터를 담음
   const [state, setState] = useState(() => {
@@ -767,7 +765,7 @@ function EnvContentsAdd(props: any) {
                   mainMaster,
                   masterArr,
                   workerArr
-                } = envBeforeEdit.getArrSortedByRole();
+                } = envBeforeEdit.getNodesSortedByRole();
                 masterArr.push(mainMaster);
 
                 // 수정된 worker들 넣어줌
@@ -854,6 +852,7 @@ function EnvContentsAdd(props: any) {
                   }
                   console.debug('Deleted worker nodeList', deletedWorker);
 
+                  const kubernetesInstaller = KubernetesInstaller.getInstance;
                   // 새로 추가된 노드에 install script 돌려야 함
                   const tempAddEnv = new Env(
                     name,
@@ -863,9 +862,8 @@ function EnvContentsAdd(props: any) {
                     envBeforeEdit.productList,
                     new Date()
                   );
-                  const kubernetesInstaller = KubernetesInstaller.getInstance;
                   kubernetesInstaller.env = tempAddEnv;
-                  await kubernetesInstaller.installWorker(
+                  await kubernetesInstaller.addWorker(
                     tempAddEnv.registry,
                     kubernetesInfo.version
                   );
@@ -885,7 +883,6 @@ function EnvContentsAdd(props: any) {
                   );
                   kubernetesInstaller.env = tempDeleteEnv;
                   await kubernetesInstaller.deleteWorker();
-                  // await tempDeleteEnv?.deleteWorker();
                 }
 
                 // 기존 데이터 삭제 후 수정 된 환경 데이터 추가

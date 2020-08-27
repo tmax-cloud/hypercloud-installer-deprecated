@@ -10,6 +10,7 @@ import InstallContentsCni from './InstallContentsCni';
 import InstallContentsHeader from './InstallContentsHeader';
 import routes from '../../utils/constants/routes.json';
 import CONST from '../../utils/constants/constant';
+import InstallContentsRookCeph from './InstallContentsRookCeph';
 
 function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
@@ -34,6 +35,10 @@ function InstallContents(props: any) {
         <Route
           path={`${match.path}/${CONST.PRODUCT.CNI.NAME}`}
           component={InstallContentsCni}
+        />
+        <Route
+          path={`${match.path}/${CONST.PRODUCT.ROOK_CEPH.NAME}`}
+          component={InstallContentsRookCeph}
         />
         <Route
           path={`${match.path}/installKubePlease`}

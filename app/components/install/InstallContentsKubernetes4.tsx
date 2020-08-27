@@ -59,7 +59,9 @@ function InstallContentsKubernetes4(props: any) {
             <span className={['medium', 'thick'].join(' ')}>버전</span>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>{version}</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.version}
+            </span>
           </div>
         </div>
         {getRegistryJsx()}

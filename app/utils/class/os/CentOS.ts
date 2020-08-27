@@ -8,18 +8,29 @@ import CONST from '../../constants/constant';
 export default class CentOS implements OS {
   type: OS_TYPE = OS_TYPE.CENTOS;
 
+  installGdisk(): string {
+    return `
+    yum install -y gdisk;
+    `;
+  }
+
+  installNtp(): string {
+    return `
+    yum install -y ntp;
+    `;
+  }
+
   setKubernetesRepo(): string {
     return `
     cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-  [kubernetes]
-  name=Kubernetes
-  baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\\$basearch
-  enabled=1
-  gpgcheck=1
-  repo_gpgcheck=1
-  gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-  EOF
-    `;
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF`;
   }
 
   setCrioRepo(crioVersion: string): string {
@@ -45,7 +56,7 @@ export default class CentOS implements OS {
     return `
     sudo yum install -y keepalived;
     interfaceName=\`ls /sys/class/net | grep ens\`;
-  echo "vrrp_instance VI_1 {
+    echo "vrrp_instance VI_1 {
     state ${state}
     interface \${interfaceName}
     virtual_router_id 50

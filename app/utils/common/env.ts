@@ -119,7 +119,7 @@ export function loadEnvList() {
 export function saveEnvList(envList: Env[]) {
   const jsonData = JSON.stringify(envList);
   // const envPath = path.join(rootPath, 'env.json');
-  const envPath = 'env.json';
+  const envPath = path.join(remote.app.getPath('home'), '/env.json');
 
   const fs = require('fs');
   fs.writeFileSync(envPath, jsonData, (err: any) => {

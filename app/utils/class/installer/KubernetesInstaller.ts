@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
 import { rootPath } from 'electron-root-path';
-import Installer from '../../interface/installer';
+import Installer from '../../interface/installer/installer';
 import Env, { NETWORK_TYPE } from '../Env';
 import * as scp from '../../common/scp';
 import Node from '../Node';
@@ -30,6 +30,14 @@ export default class KubernetesInstaller extends Installer {
       KubernetesInstaller.instance = new KubernetesInstaller();
     }
     return this.instance;
+  }
+
+  public async install() {
+    throw new Error("Method not implemented.");
+  }
+
+  public async remove() {
+    throw new Error("Method not implemented.");
   }
 
   public async removeWorker() {
@@ -64,31 +72,52 @@ export default class KubernetesInstaller extends Installer {
     console.error('###### Finish remove main Master... ######');
   }
 
-  public async preWorkInstallKubernetes(
+  public async preWorkInstall(
     registry: string,
     version: string,
-    callback: any
+    callback?: any
   ) {
+    console.error('###### Start pre-installation... ######');
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
-      // 폐쇄망 경우 해주어야 할 작업들
+      // internal network 경우 해주어야 할 작업들
+      /**
+       * 1. 패키지 파일 다운(client 로컬), 전송(각 노드), 설치 (각 노드)
+       * 2. git guide 다운(client 로컬), 전송(각 노드)
+       * 3. 설치 이미지 파일 다운(client 로컬), 전송(각 노드)
+       */
       await this._downloadPackageFile();
       await this._sendPackageFile();
       await this._installLocalPackageRepository(callback);
+
       await this._downloadGitFile();
       await this._sendGitFile();
-      await this._downloadKubernetesImageFile();
-      await this._sendKubernetesImageFile();
+
+      await this._downloadImageFile();
+      await this._sendImageFile();
+
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
+      // external network 경우 해주어야 할 작업들
+      /**
+       * 1. public 패키지 레포 등록 (각 노드)
+       * 2. git guide clone (각 노드)
+       */
       await this._setPublicPackageRepository(callback);
       await this._cloneGitFile(callback);
     }
 
     if (registry) {
-      // image registry 구축
+      // 내부 image registry 구축 경우 해주어야 할 작업들
+      /**
+       * 1. image registry 설치 (main 마스터 노드)
+       * 2. 설치 이미지 push
+       */
       await this._installImageRegistry(registry, callback);
-      // push kubernetes image
-      await this._kubernetesImagePush(registry, callback);
+      await this._pushImageFileToRegistry({
+        registry: this.env.registry,
+        callback
+      });
     }
+    console.error('###### Finish pre-installation... ######');
   }
 
   public async installMainMaster(registry: string, version: string, callback: any) {
@@ -143,6 +172,27 @@ export default class KubernetesInstaller extends Installer {
     console.error('###### Finish installing Worker... ######');
   }
 
+  public async addWorker(registry: string, version: string, callback?: any) {
+    await this._preWorkAddWorker(registry, version, callback);
+
+    console.error('###### Start adding Worker... ######');
+    const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
+    const workerJoinCmd = await this.getWorkerJoinCmd(mainMaster);
+    await Promise.all(
+      workerArr.map(worker => {
+        worker.cmd = worker.os.getInstallWorkerScript(
+          mainMaster,
+          registry,
+          version,
+          worker
+        );
+        worker.cmd += `${workerJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
+        return worker.exeCmd(callback);
+      })
+    );
+    console.error('###### Finish adding Worker... ######');
+  }
+
   public async deleteWorker() {
     console.error('###### Start deleting Worker... ######');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
@@ -159,6 +209,54 @@ export default class KubernetesInstaller extends Installer {
       worker.exeCmd();
     });
     console.error('###### Finish deleting Worker... ######');
+  }
+
+  private async _preWorkAddWorker(
+    registry: string,
+    version: string,
+    callback?: any
+  ) {
+    console.error('###### Start pre work adding Worker... ######');
+    if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
+      // internal network 경우 해주어야 할 작업들
+      /**
+       * 1. 패키지 파일 다운(client 로컬), 전송(각 노드), 설치 (각 노드)
+       * 2. git guide 다운(client 로컬), 전송(각 노드)
+       * 3. 설치 이미지 파일 다운(client 로컬), 전송(각 노드)
+       */
+      await this._downloadPackageFile();
+      await this._sendPackageFile();
+      await this._installLocalPackageRepository(callback);
+
+      await this._downloadGitFile();
+      await this._sendGitFile();
+
+      await this._downloadImageFile();
+      await this._sendImageFile();
+
+    } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
+      // external network 경우 해주어야 할 작업들
+      /**
+       * 1. public 패키지 레포 등록 (각 노드)
+       * 2. git guide clone (각 노드)
+       */
+      await this._setPublicPackageRepository(callback);
+      await this._cloneGitFile(callback);
+    }
+
+    if (registry) {
+      // 내부 image registry 구축 경우 해주어야 할 작업들
+      /**
+       * 1. image registry 설치 (main 마스터 노드)
+       * 2. 설치 이미지 push
+       */
+      await this._installImageRegistry(registry, callback);
+      await this._pushImageFileToRegistry({
+        registry: this.env.registry,
+        callback
+      });
+    }
+    console.error('###### Finish pre work adding Worker... ######');
   }
 
   private async _downloadPackageFile() {
@@ -213,18 +311,18 @@ export default class KubernetesInstaller extends Installer {
     console.error('###### Finish sending the GIT file to each node (using scp)... ######');
   }
 
-  private async _downloadKubernetesImageFile() {
+  protected async _downloadImageFile() {
     // TODO: download kubernetes image file
-    console.error('###### Start downloading the Kubernetes image file to client local... ######');
-    console.error('###### Finish downloading the Kubernetes image file to client local... ######');
+    console.error('###### Start downloading the image file to client local... ######');
+    console.error('###### Finish downloading the image file to client local... ######');
   }
 
-  private async _sendKubernetesImageFile() {
-    console.error('###### Start sending the Kubernetes image file to main master node... ######');
+  protected async _sendImageFile() {
+    console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/kube_image/`;
+    const srcPath = `${rootPath}/k8s-install/`;
     await scp.sendFile(mainMaster, srcPath, `k8s-install/`);
-    console.error('###### Finish sending the Kubernetes image file to main master node... ######');
+    console.error('###### Finish sending the image file to main master node... ######');
   }
 
   private async _setPublicPackageRepository(callback: any) {
@@ -261,15 +359,16 @@ export default class KubernetesInstaller extends Installer {
     console.error('###### Finish installing the image registry at main master node... ######');
   }
 
-  private async _kubernetesImagePush(registry: string, callback: any) {
-    console.error('###### Start pushing the Kubernetes image at main master node... ######');
+  protected async _pushImageFileToRegistry(param: object) {
+    console.error('###### Start pushing the image at main master node... ######');
+    const { registry, callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = script.getKubernetesImagePushScript(
       registry,
       this.env.networkType
     );
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the Kubernetes image at main master node... ######');
+    console.error('###### Finish pushing the image at main master node... ######');
   }
 
   private async getWorkerJoinCmd(mainMaster: Node) {
