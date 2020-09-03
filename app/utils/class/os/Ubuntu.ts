@@ -1,7 +1,8 @@
-import { OS, OS_TYPE } from '../../interface/os';
-import Node from '../Node';
+import { AbstractOs, OS_TYPE } from './AbstractOs';
 
 /* eslint-disable class-methods-use-this */
-export default class Ubuntu implements OS {
-  type: OS_TYPE = OS_TYPE.UBUNTU;
+export default class Ubuntu extends AbstractOs {
+  constructor() {
+    super(OS_TYPE.UBUNTU);
+  }
 }

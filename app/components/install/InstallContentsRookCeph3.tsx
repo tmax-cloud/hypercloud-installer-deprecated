@@ -38,7 +38,7 @@ function InstallContentsRookCeph3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 5000);
+    }, 3000);
     return () => {
       clearInterval(timer);
     };
@@ -69,7 +69,6 @@ function InstallContentsRookCeph3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    setProgress(50);
     const rookCephInstaller = RookCephInstaller.getInstance;
     rookCephInstaller.env = nowEnv;
     await rookCephInstaller.install({
@@ -77,7 +76,6 @@ function InstallContentsRookCeph3(props: any) {
       callback,
       setProgress
     });
-    setProgress(100);
   };
 
   React.useEffect(() => {

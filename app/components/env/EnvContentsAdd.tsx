@@ -44,7 +44,7 @@ import Node, { ROLE } from '../../utils/class/Node';
 import Env, { NETWORK_TYPE } from '../../utils/class/Env';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
-import { OS_TYPE } from '../../utils/interface/os';
+import { OS_TYPE } from '../../utils/class/os/AbstractOs';
 import CentOS from '../../utils/class/os/CentOS';
 import Ubuntu from '../../utils/class/os/Ubuntu';
 import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 
-import { OS, OS_TYPE } from '../interface/os';
+import { AbstractOs, OS_TYPE } from './os/AbstractOs';
 import * as ssh from '../common/ssh';
 import CentOS from './os/CentOS';
 import Ubuntu from './os/Ubuntu';
@@ -21,7 +21,7 @@ export default class Node {
 
   private _password: string;
 
-  private _os: OS;
+  private _os: AbstractOs;
 
   private _role: ROLE;
 
@@ -51,8 +51,11 @@ export default class Node {
     this._hostName = hostName;
   }
 
-  public exeCmd(callback?: any): any {
-    return ssh.send(this, callback);
+  public async exeCmd(callback?: any): any {
+    const promise = await ssh.send(this, callback);
+    // FIXME:cmd 초기화 하지 않으면 env.json에 저장됨...
+    // this.cmd = '';
+    return promise;
   }
 
   /**
@@ -107,7 +110,7 @@ export default class Node {
    * Getter os
    * @return {OS}
    */
-  public get os(): OS {
+  public get os(): AbstractOs {
     return this._os;
   }
 
@@ -171,7 +174,7 @@ export default class Node {
    * Setter os
    * @param {OS} value
    */
-  public set os(value: OS) {
+  public set os(value: AbstractOs) {
     this._os = value;
   }
 

@@ -1,0 +1,36 @@
+/* eslint-disable no-underscore-dangle */
+import Env from '../Env';
+
+export default abstract class AbstractInstaller {
+  private _env!: Env;
+
+  /**
+   * Getter env
+   * @return {Env}
+   */
+  public get env(): Env {
+    return this._env;
+  }
+
+  /**
+   * Setter env
+   * @param {Env} value
+   */
+  public set env(value: Env) {
+    this._env = value;
+  }
+
+  public abstract async install(param?: any): Promise<any>;
+
+  public abstract async remove(param?: any): Promise<any>;
+
+  protected abstract async _preWorkInstall(param?: any): Promise<any>;
+
+  protected abstract async _downloadImageFile(param?: any): Promise<any>;
+
+  protected abstract async _sendImageFile(param?: any): Promise<any>;
+
+  protected abstract async _pushImageFileToRegistry(param?: any): Promise<any>;
+
+  protected abstract _getImagePushScript(param?: any): any;
+}

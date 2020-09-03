@@ -1,5 +1,6 @@
 const CONST = {
   GIT_REPO: 'https://github.com/tmax-cloud/hypercloud-install-guide.git',
+  GIT_BRANCH: '4.1',
   PRODUCT: {
     KUBERNETES: {
       NAME: 'Kubernetes',

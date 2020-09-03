@@ -95,9 +95,7 @@ function InstallContentsKubernetesAlready(props: any) {
     const kubernetesInstaller = KubernetesInstaller.getInstance;
     kubernetesInstaller.env = nowEnv;
 
-    await kubernetesInstaller.removeWorker();
-    await kubernetesInstaller.removeMaster();
-    await kubernetesInstaller.removeMainMaster();
+    await kubernetesInstaller.remove();
   };
 
   return (

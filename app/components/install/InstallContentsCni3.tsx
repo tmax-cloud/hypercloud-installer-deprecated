@@ -19,6 +19,7 @@ import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 import CniInstaller from '../../utils/class/installer/CniInstaller';
+import MetalLbInstaller from '../../utils/class/installer/MetalLbInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsCni3(props: any) {
@@ -68,13 +69,20 @@ function InstallContentsCni3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    setProgress(20);
-    const cniInstaller = CniInstaller.getInstance;
-    cniInstaller.env = nowEnv;
+    // const cniInstaller = CniInstaller.getInstance;
+    // cniInstaller.env = nowEnv;
 
-    await cniInstaller.install({
-      type: state.type,
-      version: state.version,
+    // await cniInstaller.install({
+    //   type: state.type,
+    //   version: state.version,
+    //   callback,
+    //   setProgress
+    // });
+
+    const metalLbInstaller = MetalLbInstaller.getInstance;
+    metalLbInstaller.env = nowEnv;
+
+    await metalLbInstaller.install({
       callback,
       setProgress
     });

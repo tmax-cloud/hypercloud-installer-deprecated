@@ -51,14 +51,14 @@ function InstallContentsRookCeph4(props: any) {
           <img src={FinishImage} alt="Logo" />
         </div>
         <div style={{ marginBottom: '30px' }}>
-          <div>
+          {/* <div>
             <span className={['medium', 'thick'].join(' ')}>버전</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
               {state.version}
             </span>
-          </div>
+          </div> */}
         </div>
         {getRegistryJsx()}
         <div>

@@ -87,7 +87,7 @@ function InstallContentsRookCephAlready(props: any) {
     const rookCephInstaller = RookCephInstaller.getInstance;
     rookCephInstaller.env = nowEnv;
 
-    await rookCephInstaller.remove({});
+    await rookCephInstaller.remove();
   };
 
   return (
@@ -139,24 +139,24 @@ function InstallContentsRookCephAlready(props: any) {
             </MuiBox>
           </div>
           <div>
-            <div>
+            {/* <div>
               <span className={['medium', 'thick'].join(' ')}>타입</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
                 {nowEnv.isInstalled(nowProduct.NAME).type}
               </span>
-            </div>
+            </div> */}
           </div>
           <div>
-            <div>
+            {/* <div>
               <span className={['medium', 'thick'].join(' ')}>버전</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
                 {nowEnv.isInstalled(nowProduct.NAME).version}
               </span>
-            </div>
+            </div> */}
           </div>
           <div>
             <span

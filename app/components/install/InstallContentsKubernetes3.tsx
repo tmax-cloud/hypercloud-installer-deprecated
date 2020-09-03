@@ -24,6 +24,7 @@ import * as scp from '../../utils/common/scp';
 import Env, { NETWORK_TYPE } from '../../utils/class/Env';
 import * as git from '../../utils/common/git';
 import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
+import MetalLbInstaller from '../../utils/class/installer/MetalLbInstaller';
 
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
@@ -40,7 +41,7 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 5000);
+    }, 7000);
     return () => {
       clearInterval(timer);
     };
@@ -74,33 +75,12 @@ function InstallContentsKubernetes3(props: any) {
     const kubernetesInstaller = KubernetesInstaller.getInstance;
     kubernetesInstaller.env = nowEnv;
 
-    await kubernetesInstaller.preWorkInstall(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(40);
-
-    await kubernetesInstaller.installMainMaster(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(60);
-
-    await kubernetesInstaller.installMaster(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(80);
-
-    await kubernetesInstaller.installWorker(
-      state.registry,
-      state.version,
-      callback
-    )
-    setProgress(100);
+    await kubernetesInstaller.install({
+      registry: state.registry,
+      version: state.version,
+      callback,
+      setProgress
+    });
   };
 
   React.useEffect(() => {
