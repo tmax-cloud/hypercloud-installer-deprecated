@@ -1,14 +1,11 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React, { useState } from 'react';
+import { Switch, Route } from 'react-router';
 import styles from './InstallContents0.css';
-import InstallContentsRookCeph1 from './InstallContentsRookCeph1';
-import InstallContentsRookCeph2 from './InstallContentsRookCeph2';
-import InstallContentsRookCeph3 from './InstallContentsRookCeph3';
-import InstallContentsRookCeph4 from './InstallContentsRookCeph4';
-import InstallContentsRookCephAlready from './InstallContentsRookCephAlready';
-import { AppContext } from '../../containers/HomePage';
-import CONST from '../../utils/constants/constant';
-import routes from '../../utils/constants/routes.json';
+import InstallContentsMetalLb1 from './InstallContentsMetalLb1';
+import InstallContentsMetalLb2 from './InstallContentsMetalLb2';
+import InstallContentsMetalLb3 from './InstallContentsMetalLb3';
+import InstallContentsMetalLb4 from './InstallContentsMetalLb4';
+import InstallContentsMetalLbAlready from './InstallContentsMetalLbAlready';
 import InstallKubePlease from './InstallKubePlease';
 
 // const initialState = {
@@ -21,16 +18,15 @@ import InstallKubePlease from './InstallKubePlease';
 //   return { ...state, ...action };
 // };
 
-function InstallContentsRookCeph(props: any) {
-  console.debug(InstallContentsRookCeph.name, props);
+function InstallContentsMetalLb(props: any) {
+  console.debug(InstallContentsMetalLb.name, props);
   const { history, location, match } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    version: '3.13.4',
-    type: 'Calico'
+    data: []
   });
 
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(
@@ -53,16 +49,16 @@ function InstallContentsRookCeph(props: any) {
 
   //   if (!isInstalled) {
   //     if (kubeInstallState.page === 1) {
-  //       component = <InstallContentsRookCeph1 />;
+  //       component = <InstallContentsMetalLb1 />;
   //     } else if (kubeInstallState.page === 2) {
-  //       component = <InstallContentsRookCeph2 />;
+  //       component = <InstallContentsMetalLb2 />;
   //     } else if (kubeInstallState.page === 3) {
-  //       component = <InstallContentsRookCeph3 />;
+  //       component = <InstallContentsMetalLb3 />;
   //     } else if (kubeInstallState.page === 4) {
-  //       component = <InstallContentsRookCeph4 history={history} />;
+  //       component = <InstallContentsMetalLb4 history={history} />;
   //     }
   //   } else {
-  //     component = <InstallContentsRookCephAlready />;
+  //     component = <InstallContentsMetalLbAlready />;
   //   }
 
   //   return component;
@@ -80,12 +76,12 @@ function InstallContentsRookCeph(props: any) {
       <Switch>
         <Route
           path={`${match.path}/step1`}
-          component={InstallContentsRookCeph1}
+          component={InstallContentsMetalLb1}
         />
         <Route
           path={`${match.path}/step2`}
           render={() => (
-            <InstallContentsRookCeph2
+            <InstallContentsMetalLb2
               history={history}
               match={match}
               location={location}
@@ -97,7 +93,7 @@ function InstallContentsRookCeph(props: any) {
         <Route
           path={`${match.path}/step3`}
           render={() => (
-            <InstallContentsRookCeph3
+            <InstallContentsMetalLb3
               history={history}
               match={match}
               location={location}
@@ -109,7 +105,7 @@ function InstallContentsRookCeph(props: any) {
         <Route
           path={`${match.path}/step4`}
           render={() => (
-            <InstallContentsRookCeph4
+            <InstallContentsMetalLb4
               history={history}
               match={match}
               location={location}
@@ -120,7 +116,7 @@ function InstallContentsRookCeph(props: any) {
         />
         <Route
           path={`${match.path}/already`}
-          component={InstallContentsRookCephAlready}
+          component={InstallContentsMetalLbAlready}
         />
         <Route
           path={`${match.path}/impossible`}
@@ -132,4 +128,4 @@ function InstallContentsRookCeph(props: any) {
   );
 }
 
-export default InstallContentsRookCeph;
+export default InstallContentsMetalLb;

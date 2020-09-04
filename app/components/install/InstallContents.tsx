@@ -11,13 +11,14 @@ import InstallContentsHeader from './InstallContentsHeader';
 import routes from '../../utils/constants/routes.json';
 import CONST from '../../utils/constants/constant';
 import InstallContentsRookCeph from './InstallContentsRookCeph';
+import InstallContentsMetalLb from './InstallContentsMetalLb';
 
 function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
   const { history, location, match } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
   return (
     <div className={[styles.wrap].join(' ')}>
@@ -37,12 +38,12 @@ function InstallContents(props: any) {
           component={InstallContentsCni}
         />
         <Route
-          path={`${match.path}/${CONST.PRODUCT.ROOK_CEPH.NAME}`}
-          component={InstallContentsRookCeph}
+          path={`${match.path}/${CONST.PRODUCT.METAL_LB.NAME}`}
+          component={InstallContentsMetalLb}
         />
         <Route
-          path={`${match.path}/installKubePlease`}
-          component={InstallKubePlease}
+          path={`${match.path}/${CONST.PRODUCT.ROOK_CEPH.NAME}`}
+          component={InstallContentsRookCeph}
         />
         <Redirect path="*" to={`${match.url}/main`} />
       </Switch>

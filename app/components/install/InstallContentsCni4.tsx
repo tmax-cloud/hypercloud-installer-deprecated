@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
-import styles from './InstallContentsCni4.css';
+import styles from './InstallContents4.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
 import { KubeInstallContext } from './InstallContentsKubernetes';

@@ -20,7 +20,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
-import styles from './InstallContentsKubernetes2.css';
+import styles from './InstallContents2.css';
 import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 import { NETWORK_TYPE } from '../../utils/class/Env';
@@ -29,18 +29,8 @@ function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
   const { history, location, match, state, setState } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
-
-  // const [version, setVersion] = React.useState(
-  //   // appState.kubeinstallState.version
-  //   CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0]
-  // );
   const handleChangeVersion = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {

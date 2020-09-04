@@ -16,7 +16,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
-import styles from './InstallContentsCni2.css';
+import styles from './InstallContents2.css';
 import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 

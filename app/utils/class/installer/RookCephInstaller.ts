@@ -53,6 +53,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   public async install(param: { isCdi: boolean; callback: any; setProgress: Function; }) {
     const { isCdi, callback, setProgress } = param;
 
+    setProgress(60);
     await this._preWorkInstall({
       isCdi,
       callback

@@ -1,6 +1,6 @@
 import React, { useReducer, useContext, useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router';
-import styles from './InstallContentsKubernetes.css';
+import styles from './InstallContents0.css';
 import InstallContentsKubernetes1 from './InstallContentsKubernetes1';
 import InstallContentsKubernetes2 from './InstallContentsKubernetes2';
 import InstallContentsKubernetes3 from './InstallContentsKubernetes3';

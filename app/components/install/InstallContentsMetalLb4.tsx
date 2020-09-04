@@ -9,8 +9,8 @@ import { AppContext } from '../../containers/HomePage';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import routes from '../../utils/constants/routes.json';
 
-function InstallContentsRookCeph4(props: any) {
-  console.debug(InstallContentsRookCeph4.name, props);
+function InstallContentsMetalLb4(props: any) {
+  console.debug(InstallContentsMetalLb4.name, props);
   const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
@@ -21,9 +21,9 @@ function InstallContentsRookCeph4(props: any) {
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.ROOK_CEPH.NAME);
+  nowEnv.deleteProductByName(CONST.PRODUCT.METAL_LB.NAME);
   nowEnv.addProduct({
-    name: CONST.PRODUCT.ROOK_CEPH.NAME
+    name: CONST.PRODUCT.METAL_LB.NAME
   });
   // json 파일 저장
   env.updateEnv(nowEnv.name, nowEnv);
@@ -78,4 +78,4 @@ function InstallContentsRookCeph4(props: any) {
   );
 }
 
-export default InstallContentsRookCeph4;
+export default InstallContentsMetalLb4;

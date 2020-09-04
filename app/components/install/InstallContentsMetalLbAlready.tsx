@@ -20,7 +20,7 @@ import styles from './InstallContents1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
-import productImage from '../../../resources/assets/Rook ceph_logo.png';
+import productImage from '../../../resources/assets/MetalLb_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
@@ -28,6 +28,7 @@ import { ROLE } from '../../utils/class/Node';
 import * as Common from '../../utils/common/ssh';
 import CniInstaller from '../../utils/class/installer/CniInstaller';
 import RookCephInstaller from '../../utils/class/installer/RookCephInstaller';
+import MetalLbInstaller from '../../utils/class/installer/MetalLbInstaller';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,8 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallContentsRookCephAlready(props: any) {
-  console.debug(InstallContentsRookCephAlready.name, props);
+function InstallContentsMetalLbAlready(props: any) {
+  console.debug(InstallContentsMetalLbAlready.name, props);
   const { history, location, match } = props;
 
   const classes = useStyles();
@@ -58,7 +59,7 @@ function InstallContentsRookCephAlready(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const nowProduct = CONST.PRODUCT.ROOK_CEPH;
+  const nowProduct = CONST.PRODUCT.METAL_LB;
 
   // loading bar
   // const [loading, setLoading] = React.useState(false);
@@ -84,10 +85,10 @@ function InstallContentsRookCephAlready(props: any) {
 
     const { version, type } = nowEnv.isInstalled(nowProduct.NAME);
 
-    const rookCephInstaller = RookCephInstaller.getInstance;
-    rookCephInstaller.env = nowEnv;
+    const metalLbInstaller = MetalLbInstaller.getInstance;
+    metalLbInstaller.env = nowEnv;
 
-    await rookCephInstaller.remove();
+    await metalLbInstaller.remove();
   };
 
   return (
@@ -196,7 +197,7 @@ function InstallContentsRookCephAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    {CONST.PRODUCT.ROOK_CEPH.NAME} 를 삭제하시겠습니까?
+                    {CONST.PRODUCT.METAL_LB.NAME} 를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>
@@ -256,4 +257,4 @@ function InstallContentsRookCephAlready(props: any) {
   );
 }
 
-export default InstallContentsRookCephAlready;
+export default InstallContentsMetalLbAlready;

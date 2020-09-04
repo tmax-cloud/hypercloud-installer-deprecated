@@ -15,10 +15,15 @@ const CONST = {
       SUPPORTED_VERSION: ['3.13.4'],
       SUPPORTED_TYPE: ['Calico']
     },
+    METAL_LB: {
+      NAME: 'MetalLB',
+      IS_REQUIRED: true, // Optional
+      DESC: '로드 밸런싱 기능을 제공해주는 플러그인'
+    },
     ROOK_CEPH: {
       NAME: 'Rook Ceph',
       IS_REQUIRED: true, // Optional
-      DESC: '스토리지'
+      DESC: '오픈 소스 소프트웨어 스토리지 플랫폼 '
     },
     HELM: {
       NAME: 'Helm',

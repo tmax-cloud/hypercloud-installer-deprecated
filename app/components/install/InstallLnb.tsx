@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
@@ -17,6 +17,7 @@ import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
 import * as product from '../../utils/common/product';
+import { InstallContext } from '../../containers/InstallPage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function InstallLnb(props: any) {
   console.debug(InstallLnb.name, props);
 
-  const { history, match } = props;
+  const { history, match, location } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -143,7 +144,12 @@ function InstallLnb(props: any) {
                   <ListItem
                     key={P.NAME}
                     button
-                    className={[classes.nested, styles.listItemBox].join(' ')}
+                    className={
+                      location.pathname.split('/')[3]?.toLowerCase() ===
+                      P.NAME.toLowerCase()
+                        ? [classes.nested, styles.seletecItemBox].join(' ')
+                        : [classes.nested, styles.listItemBox].join(' ')
+                    }
                     onClick={() => {
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
@@ -196,7 +202,12 @@ function InstallLnb(props: any) {
                 <ListItem
                   key={P.NAME}
                   button
-                  className={[classes.nested, styles.listItemBox].join(' ')}
+                  className={
+                    location.pathname.split('/')[3]?.toLowerCase() ===
+                    P.NAME.toLowerCase()
+                      ? [classes.nested, styles.seletecItemBox].join(' ')
+                      : [classes.nested, styles.listItemBox].join(' ')
+                  }
                   onClick={() => {
                     product.goProductInstallPage(P.NAME, nowEnv, history);
                   }}

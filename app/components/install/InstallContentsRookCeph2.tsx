@@ -16,7 +16,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
-import styles from './InstallContentsRookCeph2.css';
+import styles from './InstallContents2.css';
 import { AppContext } from '../../containers/HomePage';
 import * as env from '../../utils/common/env';
 
@@ -60,14 +60,14 @@ function InstallContentsRookCeph2(props: any) {
 
   return (
     <div className={[styles.wrap].join(' ')}>
-      <div className={['childLeftRightLeft'].join(' ')}>
-        {/* <div className={[styles.titleBox].join(' ')}>
+      {/* <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>ROOK_CEPH</span>
-        </div> */}
+        </div>
         <div>
           <FormControl variant="outlined" className={styles.select}>
-            {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
-            {/* <Select
+            <InputLabel htmlFor="age-native-simple">Age</InputLabel>
+            <Select
               native
               value={state.type}
               onChange={handleChangeType}
@@ -83,18 +83,18 @@ function InstallContentsRookCeph2(props: any) {
                   </option>
                 );
               })}
-            </Select> */}
+            </Select>
           </FormControl>
         </div>
-      </div>
-      <div className={['childLeftRightLeft'].join(' ')}>
-        {/* <div className={[styles.titleBox].join(' ')}>
+      </div> */}
+      {/* <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>Version</span>
-        </div> */}
+        </div>
         <div>
           <FormControl variant="outlined" className={styles.select}>
-            {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
-            {/* <Select
+            <InputLabel htmlFor="age-native-simple">Age</InputLabel>
+            <Select
               native
               value={state.version}
               onChange={handleChangeVersion}
@@ -110,9 +110,12 @@ function InstallContentsRookCeph2(props: any) {
                   </option>
                 );
               })}
-            </Select> */}
+            </Select>
           </FormControl>
         </div>
+      </div> */}
+      <div>
+        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.ROOK_CEPH.NAME} 를 환경에 설치 하시겠습니까?</span>
       </div>
       <div
         style={{ marginTop: '50px' }}

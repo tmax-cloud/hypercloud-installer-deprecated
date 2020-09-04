@@ -1,6 +1,6 @@
 import React, { useReducer, useContext, useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router';
-import styles from './InstallContentsCni.css';
+import styles from './InstallContents0.css';
 import InstallContentsCni1 from './InstallContentsCni1';
 import InstallContentsCni2 from './InstallContentsCni2';
 import InstallContentsCni3 from './InstallContentsCni3';
@@ -9,6 +9,7 @@ import InstallContentsCniAlready from './InstallContentsCniAlready';
 import { AppContext } from '../../containers/HomePage';
 import CONST from '../../utils/constants/constant';
 import routes from '../../utils/constants/routes.json';
+import InstallKubePlease from './InstallKubePlease';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -117,6 +118,10 @@ function InstallContentsCni(props: any) {
         <Route
           path={`${match.path}/already`}
           component={InstallContentsCniAlready}
+        />
+        <Route
+          path={`${match.path}/impossible`}
+          component={InstallKubePlease}
         />
       </Switch>
     </div>

@@ -38,27 +38,27 @@ export default class MetalLbInstaller extends AbstractInstaller {
   }
 
   public async install(param?: any): Promise<any> {
-    const { callback, setProgress } = param;
+    const { data, callback, setProgress } = param;
 
     setProgress(20);
     await this._preWorkInstall({
       callback
     });
     setProgress(60);
-    await this._installMainMaster(callback);
+    await this._installMainMaster(data, callback);
     setProgress(100);
   }
 
   public async remove(param?: any): Promise<any> {
-    throw new Error("Method not implemented.");
+    await this._removeMainMaster();
   }
 
-  private async _installMainMaster(callback: any) {
+  private async _installMainMaster(data: any, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const cniScript = ScriptMatalLbFactory.createScript(mainMaster.os.type)
     mainMaster.cmd = cniScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getInstallScript();
+    mainMaster.cmd += this._getInstallScript(data);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing main Master... ######');
   }
@@ -73,7 +73,26 @@ export default class MetalLbInstaller extends AbstractInstaller {
     console.error('###### Finish remove main Master... ######');
   }
 
-  private _getInstallScript(): string {
+  // private async _EditYamlScript() {
+  //   const { mainMaster } = this.env.getNodesSortedByRole();
+  //   mainMaster.cmd = `cat ~/${MetalLbInstaller.INSTALL_HOME}/metallb_cidr.yaml`;
+  //   let cidrYaml;
+  //   await mainMaster.exeCmd({
+  //     close: () => {},
+  //     stdout: (data: string) => {
+  //       cidrYaml = YAML.parse(data.toString());
+  //     },
+  //     stderr: () => {},
+  //   });
+  //   console.error('cidrYaml', cidrYaml);
+  //   // clusterYaml.spec.storage.useAllNodes = true;
+  //   // clusterYaml.spec.storage.useAllDevices = true;
+
+  //   // mainMaster.cmd = `echo "${YAML.stringify(cidrYaml)}" > ~/${MetalLbInstaller.INSTALL_HOME}/metallb_cidr.yaml`;
+  //   // await mainMaster.exeCmd();
+  // }
+
+  private _getInstallScript(data: any): string {
     let setRegistry = '';
     if (this.env.registry) {
       setRegistry = `
@@ -85,20 +104,26 @@ export default class MetalLbInstaller extends AbstractInstaller {
       cd ~/${MetalLbInstaller.INSTALL_HOME};
       sed -i 's/v0.8.2/'v${MetalLbInstaller.METALLB_VERSION}'/g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
       ${setRegistry}
+      ${this._setMetalLbArea(data)}
       kubectl apply -f metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-      ${this._setMetalLbArea()};
       kubectl apply -f metallb_cidr.yaml;
       `;
   }
 
-  private _setMetalLbArea() {
+  private _setMetalLbArea(data: any) {
+    let ipRangeText = '';
+    for (let i = 0; i < data.length; i += 1) {
+      ipRangeText = ipRangeText.concat(`      - ${data[i]}\\n`);
+    }
+    console.error('ipRangeText', ipRangeText);
     return `
-    interfaceName=\`ls /sys/class/net | grep ens\`;
-    inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
-    network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
-    prefix=\`ipcalc -p \${inet} | cut -d"=" -f2\`;
-    networkArea=\${network}/\${prefix};
-    sed -i 's|172.22.8.160-172.22.8.180|'\${networkArea}'|g' metallb_cidr.yaml;
+    # interfaceName=\`ls /sys/class/net | grep ens\`;
+    # inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
+    # network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
+    # prefix=\`ipcalc -p \${inet} | cut -d"=" -f2\`;
+    # networkArea=\${network}/\${prefix};
+    sed -i 's|      - 172.22.8.160-172.22.8.180|${ipRangeText}|g' metallb_cidr.yaml;
+    sed -i 's|\\r$||g' metallb_cidr.yaml;
     `;
   }
 

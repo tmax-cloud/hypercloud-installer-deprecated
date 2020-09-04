@@ -5,12 +5,12 @@ import styles from './InstallContents1.css';
 import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
-import productImage from '../../../resources/assets/Cni_logo.png';
+import productImage from '../../../resources/assets/MetalLb_logo.png';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
-function InstallContentsCni1(props: any) {
-  console.debug(InstallContentsCni1.name, props);
+function InstallContentsMetalLb1(props: any) {
+  console.debug(InstallContentsMetalLb1.name, props);
   const { history, location, match } = props;
 
   // const appContext = useContext(AppContext);
@@ -32,7 +32,7 @@ function InstallContentsCni1(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={["childUpDownCenter", "childLeftRightCenter",styles.circle].join(' ')}
+              className={["childUpDownCenter", "childLeftRightCenter", styles.circle].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -42,19 +42,19 @@ function InstallContentsCni1(props: any) {
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>
-                    {CONST.PRODUCT.CNI.NAME}
+                    {CONST.PRODUCT.METAL_LB.NAME}
                   </span>
                 </div>
                 <div>
                   <span className={['small', 'lightDark'].join(' ')}>
-                    {CONST.PRODUCT.CNI.DESC}
+                    {CONST.PRODUCT.METAL_LB.DESC}
                   </span>
                 </div>
               </div>
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.CNI.NAME} 를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.METAL_LB.NAME} 를 설치할 수 있습니다.</span>
             <br />
             <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
           </div>
@@ -68,7 +68,7 @@ function InstallContentsCni1(props: any) {
                 //   page: 2
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step2`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step2`
                 );
               }}
             >
@@ -93,4 +93,4 @@ function InstallContentsCni1(props: any) {
   );
 }
 
-export default InstallContentsCni1;
+export default InstallContentsMetalLb1;

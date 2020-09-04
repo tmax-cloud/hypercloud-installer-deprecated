@@ -48,6 +48,7 @@ import { OS_TYPE } from '../../utils/class/os/AbstractOs';
 import CentOS from '../../utils/class/os/CentOS';
 import Ubuntu from '../../utils/class/os/Ubuntu';
 import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
+import * as validation from '../../utils/common/validation';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -239,8 +240,7 @@ function EnvContentsAdd(props: any) {
       }
     }
 
-    const ipRegex = /^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/;
-    if (!ipRegex.test(target)) {
+    if (!validation.checkIpFormat(target)) {
       setFunc('IP 형식을 확인해 주세요.');
       return true;
     }

@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import CONST from '../constants/constant';
 import * as env from './env';
 import routes from '../constants/routes.json';
@@ -35,8 +36,10 @@ export function goProductInstallPage(productName: string, nowEnv, history) {
     productName !== CONST.PRODUCT.KUBERNETES.NAME &&
     !nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)
   ) {
-    // Kubernetes를 설치 하세요
-    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/installKubePlease`);
+    // 설치 불가능한 상황
+    history.push(
+      `${routes.INSTALL.HOME}/${nowEnv.name}/${productName}/impossible`
+    );
   } else {
     // 설치 페이지로
     history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/${productName}/step1`);

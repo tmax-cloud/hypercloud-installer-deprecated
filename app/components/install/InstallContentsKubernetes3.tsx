@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import { rootPath } from 'electron-root-path';
-import styles from './InstallContentsKubernetes3.css';
+import styles from './InstallContents3.css';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
 import * as Common from '../../utils/common/ssh';

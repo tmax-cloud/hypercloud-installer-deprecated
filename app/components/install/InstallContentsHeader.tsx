@@ -11,8 +11,8 @@ function InstallContentsHeader(props: any) {
   // const { installPageState } = installPageContext;
   const { history, location, match } = props;
 
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  // const appContext = useContext(AppContext);
+  // const { appState, dispatchAppState } = appContext;
 
   const getComponent = () => {
     let component;

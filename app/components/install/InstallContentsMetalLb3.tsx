@@ -20,10 +20,11 @@ import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 import CniInstaller from '../../utils/class/installer/CniInstaller';
 import RookCephInstaller from '../../utils/class/installer/RookCephInstaller';
+import MetalLbInstaller from '../../utils/class/installer/MetalLbInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsRookCeph3(props: any) {
-  console.debug(InstallContentsRookCeph3.name, props);
+function InstallContentsMetalLb3(props: any) {
+  console.debug(InstallContentsMetalLb3.name, props);
   const { history, location, match, state, setState } = props;
 
   // const appContext = useContext(AppContext);
@@ -69,10 +70,11 @@ function InstallContentsRookCeph3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const rookCephInstaller = RookCephInstaller.getInstance;
-    rookCephInstaller.env = nowEnv;
-    await rookCephInstaller.install({
-      isCdi: false,
+    const metalLbInstaller = MetalLbInstaller.getInstance;
+    metalLbInstaller.env = nowEnv;
+
+    await metalLbInstaller.install({
+      data: state.data,
       callback,
       setProgress
     });
@@ -108,7 +110,7 @@ function InstallContentsRookCeph3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step2`
             );
           }}
         >
@@ -121,7 +123,7 @@ function InstallContentsRookCeph3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step4`
               );
             }}
           >
@@ -160,7 +162,7 @@ function InstallContentsRookCeph3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step1`
                 );
               }}
               color="primary"
@@ -177,4 +179,4 @@ function InstallContentsRookCeph3(props: any) {
   );
 }
 
-export default InstallContentsRookCeph3;
+export default InstallContentsMetalLb3;

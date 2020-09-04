@@ -1,11 +1,11 @@
 import MuiBox from '@material-ui/core/Box';
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
-import styles from './InstallContentsRookCeph1.css';
+import styles from './InstallContents1.css';
 import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
-import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
+import productImage from '../../../resources/assets/Rook ceph_logo.png';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
@@ -32,13 +32,13 @@ function InstallContentsRookCeph1(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={["childUpDownCenter", "childLeftRightCenter",styles.circle].join(' ')}
+              className={["childUpDownCenter", "childLeftRightCenter", styles.circle].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
               <div className={[styles.insideCircle].join(' ')}>
                 <div>
-                  <img src={RookCephImage} alt="Logo" />
+                  <img src={productImage} alt="Logo" />
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>

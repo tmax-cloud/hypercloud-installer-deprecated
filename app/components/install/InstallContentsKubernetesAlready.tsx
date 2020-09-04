@@ -17,11 +17,11 @@ import {
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
-import styles from './InstallContentsKubernetes1.css';
+import styles from './InstallContents1.css';
 import { AppContext } from '../../containers/HomePage';
 import * as script from '../../utils/common/script';
 import CONST from '../../utils/constants/constant';
-import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import productImage from '../../../resources/assets/Kubernetes_logo.png';
 import FinishImage from '../../../resources/assets/img_finish.svg';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
@@ -119,19 +119,14 @@ function InstallContentsKubernetesAlready(props: any) {
               borderRadius="50%"
               {...defaultProps}
             >
+              <img
+                className={[styles.installedImage].join(' ')}
+                src={FinishImage}
+                alt="Logo"
+              />
               <div className={[styles.insideCircle].join(' ')}>
-                <img
-                  style={{
-                    heigh: '50px',
-                    width: '50px',
-                    position: 'relative',
-                    left: '-125px'
-                  }}
-                  src={FinishImage}
-                  alt="Logo"
-                />
                 <div>
-                  <img src={KubernetesImage} alt="Logo" />
+                  <img src={productImage} alt="Logo" />
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>

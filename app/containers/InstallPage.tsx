@@ -1,16 +1,15 @@
-import React, { useContext } from 'react';
+import React, { useContext, useReducer } from 'react';
 import InstallLnb from '../components/install/InstallLnb';
 import InstallContents from '../components/install/InstallContents';
 import layout from './InstallPage.css';
 import { AppContext } from './HomePage';
 import * as env from '../utils/common/env';
 
+
+
 function InstallPage(props: any) {
   console.debug(InstallPage.name, props);
   const { history, location, match } = props;
-
-  const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
 
   // dispatchAppState({
   //   type: 'set_nowEnv',

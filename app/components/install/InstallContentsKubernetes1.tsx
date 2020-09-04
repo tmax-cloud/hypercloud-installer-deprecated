@@ -1,11 +1,11 @@
 import MuiBox from '@material-ui/core/Box';
 import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
-import styles from './InstallContentsKubernetes1.css';
+import styles from './InstallContents1.css';
 import { AppContext } from '../../containers/HomePage';
 import { KubeInstallContext } from './InstallContentsKubernetes';
 import routes from '../../utils/constants/routes.json';
-import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
+import productImage from '../../../resources/assets/Kubernetes_logo.png';
 import * as env from '../../utils/common/env';
 import CONST from '../../utils/constants/constant';
 
@@ -42,7 +42,7 @@ function InstallContentsKubernetes1(props: any) {
             >
               <div className={[styles.insideCircle].join(' ')}>
                 <div>
-                  <img src={KubernetesImage} alt="Logo" />
+                  <img src={productImage} alt="Logo" />
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>

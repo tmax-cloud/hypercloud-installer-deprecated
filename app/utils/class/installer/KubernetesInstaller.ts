@@ -166,7 +166,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Finish remove main Master... ######');
   }
 
-  public async addWorker(registry: string, version: string, callback: any) {
+  public async addWorker(registry: string, version: string, callback?: any) {
     await this._preWorkAddWorker(registry, version, callback);
 
     console.error('###### Start adding Worker... ######');

@@ -12,6 +12,7 @@ import * as product from '../../utils/common/product';
 import CloudImage from '../../../resources/assets/ic_logo_hypercloud.svg';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import CniImage from '../../../resources/assets/Cni_logo.png';
+import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
 import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
 import HelmImage from '../../../resources/assets/Helm_logo.png';
 import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
@@ -80,6 +81,8 @@ function InstallContentsMain(props: any) {
       image = KubernetesImage;
     } else if (productName === CONST.PRODUCT.CNI.NAME) {
       image = CniImage;
+    } else if (productName === CONST.PRODUCT.METAL_LB.NAME) {
+      image = MetalLbImage;
     } else if (productName === CONST.PRODUCT.HELM.NAME) {
       image = HelmImage;
     } else if (productName === CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME) {

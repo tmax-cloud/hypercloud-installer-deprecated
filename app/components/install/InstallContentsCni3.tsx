@@ -9,7 +9,7 @@ import {
   DialogActions
 } from '@material-ui/core';
 // import { InstallPageContext } from '../../containers/InstallPage';
-import styles from './InstallContentsCni3.css';
+import styles from './InstallContents3.css';
 import { ROLE } from '../../utils/class/Node';
 import { AppContext } from '../../containers/HomePage';
 import * as Script from '../../utils/common/script';
@@ -69,28 +69,15 @@ function InstallContentsCni3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    // const cniInstaller = CniInstaller.getInstance;
-    // cniInstaller.env = nowEnv;
+    const cniInstaller = CniInstaller.getInstance;
+    cniInstaller.env = nowEnv;
 
-    // await cniInstaller.install({
-    //   type: state.type,
-    //   version: state.version,
-    //   callback,
-    //   setProgress
-    // });
-
-    const metalLbInstaller = MetalLbInstaller.getInstance;
-    metalLbInstaller.env = nowEnv;
-
-    await metalLbInstaller.install({
+    await cniInstaller.install({
+      type: state.type,
+      version: state.version,
       callback,
       setProgress
     });
-    // await cniInstaller.preWorkInstall(state.registry, state.version, callback);
-    // setProgress(60);
-
-    // await cniInstaller.installMainMaster(state.type, state.version, callback);
-    // setProgress(100);
   };
 
   React.useEffect(() => {
