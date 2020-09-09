@@ -11,7 +11,6 @@ import AbstractInstaller from './AbstractInstaller';
 import Env, { NETWORK_TYPE } from '../Env';
 import * as scp from '../../common/scp';
 import Node from '../Node';
-import * as script from '../../common/script';
 import * as ssh from '../../common/ssh';
 import * as git from '../../common/git';
 import CONST from '../../constants/constant';
@@ -41,7 +40,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { registry: string; version: string; callback: any; setProgress: Funtion; }) {
+  public async install(param: { registry: string; version: string; callback: any; setProgress: Function; }) {
     const { registry, version, callback, setProgress } = param;
 
     await this._preWorkInstall({
@@ -136,8 +135,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     const { workerArr } = this.env.getNodesSortedByRole();
     await Promise.all(
       workerArr.map((worker: Node) => {
-        const kubeScript = ScriptKubernetesFactory.createScript(worker.os.type);
-        worker.cmd = kubeScript.getK8sMasterRemoveScript();
+        const script = ScriptKubernetesFactory.createScript(worker.os.type);
+        worker.cmd = script.getK8sMasterRemoveScript();
         return worker.exeCmd();
       })
     );
@@ -149,8 +148,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     const { masterArr } = this.env.getNodesSortedByRole();
     await Promise.all(
       masterArr.map((master: Node) => {
-        const kubeScript = ScriptKubernetesFactory.createScript(master.os.type);
-        master.cmd = kubeScript.getK8sMasterRemoveScript();
+        const script = ScriptKubernetesFactory.createScript(master.os.type);
+        master.cmd = script.getK8sMasterRemoveScript();
         return master.exeCmd();
       })
     );
@@ -160,8 +159,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
   private async _removeMainMaster() {
     console.error('###### Start remove main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const kubeScript = ScriptKubernetesFactory.createScript(mainMaster.os.type);
-    mainMaster.cmd = kubeScript.getK8sMasterRemoveScript();
+    const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
+    mainMaster.cmd = script.getK8sMasterRemoveScript();
     await mainMaster.exeCmd();
     console.error('###### Finish remove main Master... ######');
   }
@@ -198,8 +197,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     workerArr.map((worker) => {
-      const kubeScript = ScriptKubernetesFactory.createScript(worker.os.type);
-      command = kubeScript.getK8sMasterRemoveScript();
+      const script = ScriptKubernetesFactory.createScript(worker.os.type);
+      command = script.getK8sMasterRemoveScript();
       worker.cmd = command;
       worker.exeCmd();
     });
@@ -219,14 +218,14 @@ export default class KubernetesInstaller extends AbstractInstaller {
        * 2. git guide 다운(client 로컬), 전송(각 노드) (현재 Kubernetes 설치 시에만 진행)
        * 3. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
        */
-      await this._downloadPackageFile();
+      // await this._downloadPackageFile();
       await this._sendPackageFile();
       await this._installLocalPackageRepository(callback);
 
-      await this._downloadGitFile();
+      // await this._downloadGitFile();
       await this._sendGitFile();
 
-      await this._downloadImageFile();
+      // await this._downloadImageFile();
       await this._sendImageFile();
 
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
@@ -245,11 +244,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
        * 1. image registry 설치 (main 마스터 노드)
        * 2. 설치 이미지 push
        */
-      await this._installImageRegistry(registry, callback);
-      await this._pushImageFileToRegistry({
-        registry: this.env.registry,
-        callback
-      });
+      // await this._installImageRegistry(registry, callback);
+      // await this._pushImageFileToRegistry({
+      //   registry: this.env.registry,
+      //   callback
+      // });
     }
     console.error('###### Finish pre work adding Worker... ######');
   }
@@ -279,8 +278,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     const destPath = `${Env.TARGET_ARC_NAME}/`;
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        const kubeScript = ScriptKubernetesFactory.createScript(node.os.type);
-        node.cmd = kubeScript.setPackageRepository(destPath);
+        const script = ScriptKubernetesFactory.createScript(node.os.type);
+        node.cmd = script.setPackageRepository(destPath);
         return node.exeCmd(callback);
       })
     );
@@ -311,9 +310,9 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Start setting the public package repository at each node... ######');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        const kubeScript = ScriptKubernetesFactory.createScript(node.os.type);
-        node.cmd = kubeScript.setCrioRepo(KubernetesInstaller.CRIO_VERSION)
-        node.cmd += kubeScript.setKubernetesRepo()
+        const script = ScriptKubernetesFactory.createScript(node.os.type);
+        node.cmd = script.setCrioRepo(KubernetesInstaller.CRIO_VERSION)
+        node.cmd += script.setKubernetesRepo()
         return node.exeCmd(callback);
       })
     );
@@ -324,8 +323,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Start clone the GIT file at each node... ######');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        const kubeScript = ScriptKubernetesFactory.createScript(node.os.type);
-        node.cmd = kubeScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+        const script = ScriptKubernetesFactory.createScript(node.os.type);
+        node.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
         return node.exeCmd(callback);
       })
     );
@@ -335,8 +334,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
   private async _installImageRegistry(registry: string, callback: any) {
     console.error('###### Start installing the image registry at main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const kubeScript = ScriptKubernetesFactory.createScript(mainMaster.os.type);
-    mainMaster.cmd = kubeScript.getImageRegistrySettingScript(
+    const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
+    mainMaster.cmd = script.getImageRegistrySettingScript(
       registry,
       this.env.networkType
     );
@@ -344,7 +343,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Finish installing the image registry at main master node... ######');
   }
 
-  private _getK8sClusterMasterJoinScript() {
+  private _getK8sClusterMasterJoinScript(): string {
     return `
     cd ~/${KubernetesInstaller.INSTALL_HOME}/yaml;
     result=\`kubeadm init phase upload-certs --upload-certs --config=./kubeadm-config.yaml\`;
@@ -353,11 +352,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
     `;
   }
 
-  private _getK8sClusterWorkerJoinScript() {
+  private _getK8sClusterWorkerJoinScript(): string {
     return `echo "@@@\`kubeadm token create --print-join-command\`@@@"`;
   }
 
-  private _getDeleteWorkerNodeScript(worker: Node) {
+  private _getDeleteWorkerNodeScript(worker: Node): string {
     return `
   kubectl drain ${worker.hostName};
   kubectl delete node ${worker.hostName};
@@ -370,13 +369,13 @@ export default class KubernetesInstaller extends AbstractInstaller {
     version: string,
     isMultiMaster: boolean
   ): string {
-    const kubeScript = ScriptKubernetesFactory.createScript(mainMaster.os.type);
+    const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
     return `
       ${this._setHostName(mainMaster.hostName)}
       ${this._registHostName()}
       ${
         isMultiMaster
-          ? kubeScript.getMasterMultiplexingScript(
+          ? script.getMasterMultiplexingScript(
               mainMaster,
               100,
               mainMaster.ip
@@ -406,11 +405,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
     master: Node,
     priority: number
   ): string {
-    const kubeScript = ScriptKubernetesFactory.createScript(master.os.type);
+    const script = ScriptKubernetesFactory.createScript(master.os.type);
     return `
       ${this._setHostName(master.hostName)}
       ${this._registHostName()}
-      ${kubeScript.getMasterMultiplexingScript(master, priority, mainMaster.ip)}
+      ${script.getMasterMultiplexingScript(master, priority, mainMaster.ip)}
       cd ~/${KubernetesInstaller.INSTALL_HOME};
       sed -i 's|\\r$||g' k8s.config;
       . k8s.config;
@@ -451,15 +450,15 @@ export default class KubernetesInstaller extends AbstractInstaller {
       `;
   }
 
-  private _makeMasterCanSchedule(hostName: string) {
+  private _makeMasterCanSchedule(hostName: string): string {
     return `kubectl taint node ${hostName} node-role.kubernetes.io/master:NoSchedule-;`;
   }
 
-  private _setHostName(hostName: string) {
+  private _setHostName(hostName: string): string {
     return `sudo hostnamectl set-hostname ${hostName};`;
   }
 
-  private _registHostName() {
+  private _registHostName(): string {
     return `echo \`hostname -I\` \`hostname\` >> /etc/hosts;`;
   }
 
@@ -560,7 +559,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Finish pushing the image at main master node... ######');
   }
 
-  protected _getImagePushScript(registry: string) {
+  protected _getImagePushScript(registry: string): string {
     const path = `~/${KubernetesInstaller.IMAGE_DIR}`;
     let gitPullCommand = `
     mkdir -p ${path};

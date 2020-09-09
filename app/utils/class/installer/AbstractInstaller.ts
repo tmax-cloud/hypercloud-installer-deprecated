@@ -32,5 +32,5 @@ export default abstract class AbstractInstaller {
 
   protected abstract async _pushImageFileToRegistry(param?: any): Promise<any>;
 
-  protected abstract _getImagePushScript(param?: any): any;
+  protected abstract _getImagePushScript(param?: any): string;
 }

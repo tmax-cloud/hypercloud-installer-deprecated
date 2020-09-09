@@ -1,11 +1,11 @@
 import ScriptFactory from './ScriptFactory';
 import { OS_TYPE } from '../os/AbstractOs';
-import CentosMetalLbScript from './CentosMetalLbScript';
+import CentosPrometheusScript from './CentosPrometheusScript';
 
-export default class ScriptMatalLbFactory extends ScriptFactory {
+export default class ScriptPrometheusFactory extends ScriptFactory {
   public static createScript(osType: string) {
     if (osType === OS_TYPE.CENTOS) {
-      return new CentosMetalLbScript();
+      return new CentosPrometheusScript();
     }
 
     throw new Error();

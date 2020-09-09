@@ -1,11 +1,11 @@
 import ScriptFactory from './ScriptFactory';
 import { OS_TYPE } from '../os/AbstractOs';
-import CentosMetalLbScript from './CentosMetalLbScript';
+import CentosHyperCloudOperatorScript from './CentosHyperCloudOperatorScript';
 
-export default class ScriptMatalLbFactory extends ScriptFactory {
+export default class ScriptHyperCloudOperatorFactory extends ScriptFactory {
   public static createScript(osType: string) {
     if (osType === OS_TYPE.CENTOS) {
-      return new CentosMetalLbScript();
+      return new CentosHyperCloudOperatorScript();
     }
 
     throw new Error();

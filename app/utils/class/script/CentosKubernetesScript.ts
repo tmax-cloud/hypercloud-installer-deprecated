@@ -24,10 +24,8 @@ EOF`;
 
   setCrioRepo(crioVersion: string): string {
     return `
-    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo \\
-    https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
-    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo \\
-    https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crioVersion}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo;
+    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
+    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crioVersion}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo;
     `;
   }
 
@@ -84,7 +82,7 @@ EOF`;
       sudo yum remove -y keepalived;
       rm -rf /etc/keepalived/;
       ${this.deleteDockerScript()}
-      #rm -rf ~/hypercloud-install-guide/;
+      rm -rf ~/hypercloud-install-guide/;
       yum install -y ipvsadm;
       ipvsadm --clear;
       rm -rf /var/lib/etcd/;

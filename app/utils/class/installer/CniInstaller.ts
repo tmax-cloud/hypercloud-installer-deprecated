@@ -41,7 +41,7 @@ export default class CniInstaller extends AbstractInstaller {
   public async install(param: { type: string; version: string; callback: any; setProgress: Function; }) {
     const { type, version, callback, setProgress } = param;
 
-    setProgress(20);
+    setProgress(10);
     await this._preWorkInstall({
       version,
       callback
@@ -51,7 +51,7 @@ export default class CniInstaller extends AbstractInstaller {
     setProgress(100);
   }
 
-  public async remove(param: { type?: any; version?: any; }) {
+  public async remove(param: { type: any; version: any; }) {
     const { type, version } = param;
 
     await this._removeMainMaster(type, version);
@@ -60,8 +60,8 @@ export default class CniInstaller extends AbstractInstaller {
   private async _installMainMaster(type: string, version: string, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const cniScript = ScriptCniFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = cniScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+    const script = ScriptCniFactory.createScript(mainMaster.os.type)
+    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
     mainMaster.cmd += this._getInstallScript(version);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing main Master... ######');
@@ -70,8 +70,8 @@ export default class CniInstaller extends AbstractInstaller {
   private async _removeMainMaster(type: string, version: string) {
     console.error('###### Start remove main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const cniScript = ScriptCniFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = cniScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+    const script = ScriptCniFactory.createScript(mainMaster.os.type)
+    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
     mainMaster.cmd += this._getRemoveScript(version);
     await mainMaster.exeCmd();
     console.error('###### Finish remove main Master... ######');
@@ -79,13 +79,20 @@ export default class CniInstaller extends AbstractInstaller {
 
   private _getInstallScript(version: string): string {
     let setRegistry = '';
+    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
     if (this.env.registry) {
       setRegistry = `
-      sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+      # sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      # sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      # sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      # sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      # sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+
+      sed -i 's| calico/cni| '${this.env.registry}'/calico/cni|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      sed -i 's| calico/pod2daemon-flexvol| '${this.env.registry}'/calico/pod2daemon-flexvol|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      sed -i 's| calico/node| '${this.env.registry}'/calico/node|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      sed -i 's| calico/kube-controllers| '${this.env.registry}'/calico/kube-controllers|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+      sed -i 's| calico/ctl| '${this.env.registry}'/calico/ctl|g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
       `;
     }
     return `
@@ -148,7 +155,7 @@ export default class CniInstaller extends AbstractInstaller {
   }
 
   protected async _downloadImageFile() {
-    // TODO: download kubernetes image file
+    // TODO: download image file
     console.error('###### Start downloading the image file to client local... ######');
     console.error('###### Finish downloading the image file to client local... ######');
   }
@@ -170,7 +177,7 @@ export default class CniInstaller extends AbstractInstaller {
     console.error('###### Finish pushing the image at main master node... ######');
   }
 
-  protected _getImagePushScript() {
+  protected _getImagePushScript(): string {
     let gitPullCommand = `
     mkdir -p ~/${CniInstaller.IMAGE_DIR};
     export CNI_HOME=~/${CniInstaller.IMAGE_DIR};

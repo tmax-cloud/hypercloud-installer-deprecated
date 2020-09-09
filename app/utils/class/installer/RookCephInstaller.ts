@@ -53,7 +53,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   public async install(param: { isCdi: boolean; callback: any; setProgress: Function; }) {
     const { isCdi, callback, setProgress } = param;
 
-    setProgress(60);
+    setProgress(10);
     await this._preWorkInstall({
       isCdi,
       callback
@@ -70,8 +70,8 @@ export default class RookCephInstaller extends AbstractInstaller {
   private async _installMainMaster(isCdi: boolean, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const rookCephScript = ScriptRookCephFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = rookCephScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+    const script = ScriptRookCephFactory.createScript(mainMaster.os.type)
+    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
     mainMaster.cmd += this._getInstallScript({
       isCdi
     });
@@ -91,8 +91,8 @@ export default class RookCephInstaller extends AbstractInstaller {
   private async _removeMainMaster() {
     console.error('###### Start remove rook-ceph... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const rookCephScript = ScriptRookCephFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = rookCephScript.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+    const script = ScriptRookCephFactory.createScript(mainMaster.os.type)
+    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
     mainMaster.cmd += this._getRemoveScript();
     await mainMaster.exeCmd();
     await Promise.all(
@@ -145,7 +145,7 @@ export default class RookCephInstaller extends AbstractInstaller {
     return script;
   }
 
-  private _getRemoveScript() {
+  private _getRemoveScript(): string {
     return `
     cd ~/${RookCephInstaller.INSTALL_HOME};
     ./hcsctl uninstall ./install;
@@ -160,15 +160,15 @@ export default class RookCephInstaller extends AbstractInstaller {
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // main master를 ntp 서버로
       // main master를 제외한 노드를 ntp client로 설정하기 위함
-      let rookCephScript = ScriptRookCephFactory.createScript(mainMaster.os.type)
-      mainMaster.cmd = rookCephScript.installNtp();
+      let script = ScriptRookCephFactory.createScript(mainMaster.os.type)
+      mainMaster.cmd = script.installNtp();
       mainMaster.cmd += this._setNtpServer();
       await mainMaster.exeCmd(callback);
       workerArr.concat(masterArr);
       await Promise.all(
         workerArr.map(worker => {
-          rookCephScript = ScriptRookCephFactory.createScript(worker.os.type)
-          worker.cmd = rookCephScript.installNtp();
+          script = ScriptRookCephFactory.createScript(worker.os.type)
+          worker.cmd = script.installNtp();
           worker.cmd += this._setNtpClient(
             mainMaster.ip,
           );
@@ -179,8 +179,8 @@ export default class RookCephInstaller extends AbstractInstaller {
       // 한국 공용 타임서버 목록 설정
       await Promise.all(
         this.env.nodeList.map((node: Node) => {
-          const rookCephScript = ScriptRookCephFactory.createScript(node.os.type)
-          node.cmd = rookCephScript.installNtp();
+          const script = ScriptRookCephFactory.createScript(node.os.type)
+          node.cmd = script.installNtp();
           node.cmd = this._setPublicNtp();
           return node.exeCmd(callback);
         })
@@ -193,15 +193,15 @@ export default class RookCephInstaller extends AbstractInstaller {
     console.error('###### Start installing gdisk... ######');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        const rookCephScript = ScriptRookCephFactory.createScript(node.os.type)
-        node.cmd = rookCephScript.installGdisk();
+        const script = ScriptRookCephFactory.createScript(node.os.type)
+        node.cmd = script.installGdisk();
         return node.exeCmd(callback);
       })
     );
     console.error('###### Finish installing gdisk... ######');
   }
 
-  private _getRookCephRemoveConfigScript() {
+  private _getRookCephRemoveConfigScript(): string{
     return `
     sudo rm -rf /var/lib/rook;
     sudo sgdisk --zap-all /dev/sdb;
@@ -301,7 +301,7 @@ data:
     await mainMaster.exeCmd();
   }
 
-  private _startNtp() {
+  private _startNtp(): string {
     return `
     systemctl start ntpd;
     systemctl enable ntpd;
@@ -309,14 +309,14 @@ data:
     `;
   }
 
-  private _setNtpClient(mainMasterIp: string) {
+  private _setNtpClient(mainMasterIp: string): string {
     return `
     echo -e "server ${mainMasterIp}" > /etc/ntp.conf;
     ${this._startNtp()}
     `;
   }
 
-  private _setNtpServer() {
+  private _setNtpServer(): string {
     return `
     interfaceName=\`ls /sys/class/net | grep ens\`;
     inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
@@ -327,7 +327,7 @@ data:
     `;
   }
 
-  private _setPublicNtp() {
+  private _setPublicNtp(): string {
     return `
     echo -e "server 1.kr.pool.ntp.org\nserver 0.asia.pool.ntp.org\nserver 2.asia.pool.ntp.org" > /etc/ntp.conf;
     ${this._startNtp()}
@@ -342,26 +342,14 @@ data:
     await this._installGdisk(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
-      /**
-       * 1. 패키지 파일 다운(client 로컬), 전송(각 노드), 설치 (각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 2. git guide 다운(client 로컬), 전송(각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 3. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
-       */
       await this._downloadImageFile();
       await this._sendImageFile();
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       // external network 경우 해주어야 할 작업들
-      /**
-       * 1. git guide clone (각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 2. public 패키지 레포 등록 (각 노드) (필요 시)
-       */
     }
 
     if (this.env.registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
-      /**
-       * 1. 설치 이미지 push
-       */
       await this._pushImageFileToRegistry({
         callback
       });
@@ -394,7 +382,7 @@ data:
     console.error('###### Finish pushing the image at main master node... ######');
   }
 
-  protected _getImagePushScript() {
+  protected _getImagePushScript(): string {
     let gitPullCommand = `
     mkdir -p ~/${RookCephInstaller.IMAGE_DIR};
     export ROOK_HOME=~/${RookCephInstaller.IMAGE_DIR};

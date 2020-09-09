@@ -2,7 +2,7 @@
 import AbstractScript from './AbstractScript';
 
 export default class AbstractCentosScript extends AbstractScript {
-  // Centos
+  // Centos 공통
   cloneGitFile(repoPath: string, repoBranch = 'master') {
     return `
     cd ~;

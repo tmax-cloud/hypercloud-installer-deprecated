@@ -14,6 +14,7 @@ import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import CniImage from '../../../resources/assets/Cni_logo.png';
 import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
 import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
+import PrometheusImage from '../../../resources/assets/Prometheus_logo.png';
 import HelmImage from '../../../resources/assets/Helm_logo.png';
 import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
 import InstalledImage from '../../../resources/assets/ic_finish.svg';
@@ -89,6 +90,8 @@ function InstallContentsMain(props: any) {
       image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.ROOK_CEPH.NAME) {
       image = RookCephImage;
+    } else if (productName === CONST.PRODUCT.PROMETHEUS.NAME) {
+      image = PrometheusImage;
     }
     return (
       <span>

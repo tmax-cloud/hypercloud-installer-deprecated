@@ -23,7 +23,12 @@ const CONST = {
     ROOK_CEPH: {
       NAME: 'Rook Ceph',
       IS_REQUIRED: true, // Optional
-      DESC: '오픈 소스 소프트웨어 스토리지 플랫폼 '
+      DESC: '오픈 소스 소프트웨어 스토리지 플랫폼'
+    },
+    PROMETHEUS: {
+      NAME: 'Prometheus',
+      IS_REQUIRED: true, // Optional
+      DESC: '이벤트 모니터링 및 경고에 사용되는 무료 소프트웨어 응용 프로그램'
     },
     HELM: {
       NAME: 'Helm',
