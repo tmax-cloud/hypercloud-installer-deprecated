@@ -84,8 +84,12 @@ function InstallContentsMain(props: any) {
       image = CniImage;
     } else if (productName === CONST.PRODUCT.METAL_LB.NAME) {
       image = MetalLbImage;
-    } else if (productName === CONST.PRODUCT.HELM.NAME) {
-      image = HelmImage;
+    }
+    // else if (productName === CONST.PRODUCT.HELM.NAME) {
+    //   image = HelmImage;
+    // }
+    else if (productName === CONST.PRODUCT.HYPERAUTH.NAME) {
+      image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME) {
       image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.ROOK_CEPH.NAME) {

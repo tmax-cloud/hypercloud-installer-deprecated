@@ -53,6 +53,14 @@ export default class RookCephInstaller extends AbstractInstaller {
   public async install(param: { isCdi: boolean; callback: any; setProgress: Function; }) {
     const { isCdi, callback, setProgress } = param;
 
+    // 각 노드 디스크 초기화
+    await Promise.all(
+      this.env.nodeList.map((node: Node) => {
+        node.cmd = this._getRookCephRemoveConfigScript();
+        return node.exeCmd();
+      })
+    );
+
     setProgress(10);
     await this._preWorkInstall({
       isCdi,
@@ -70,9 +78,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   private async _installMainMaster(isCdi: boolean, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptRookCephFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getInstallScript({
+    mainMaster.cmd = this._getInstallScript({
       isCdi
     });
     await mainMaster.exeCmd(callback);
@@ -91,9 +97,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   private async _removeMainMaster() {
     console.error('###### Start remove rook-ceph... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptRookCephFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getRemoveScript();
+    mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
@@ -107,7 +111,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   private _getInstallScript(param: { isCdi: boolean }): string {
     // TODO:cdi도 설치 할 경우 먼저 설치하는 로직 추가
     const { isCdi } = param;
-    let script = `cd ~/${RookCephInstaller.INSTALL_HOME};`;
+    let script = `cd ~/${RookCephInstaller.INSTALL_HOME};chmod 755 hcsctl;`;
     if (isCdi) {
       script += `./hcsctl create-inventory install --include-cdi;`;
     } else {
@@ -212,7 +216,7 @@ export default class RookCephInstaller extends AbstractInstaller {
 
   private async _EditYamlScript() {
     const { mainMaster } = this.env.getNodesSortedByRole();
-    mainMaster.cmd = `cat ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml`;
+    mainMaster.cmd = `cat ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`;
     let clusterYaml;
     await mainMaster.exeCmd({
       close: () => {},
@@ -350,7 +354,7 @@ data:
 
     if (this.env.registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
-      await this._pushImageFileToRegistry({
+      await this._registryWork({
         callback
       });
     }
@@ -373,7 +377,7 @@ data:
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
-  protected async _pushImageFileToRegistry(param: { callback: any; }) {
+  protected async _registryWork(param: { callback: any; }) {
     console.error('###### Start pushing the image at main master node... ######');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();

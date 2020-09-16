@@ -60,9 +60,10 @@ export default class CniInstaller extends AbstractInstaller {
   private async _installMainMaster(type: string, version: string, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptCniFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getInstallScript(version);
+    // const script = ScriptCniFactory.createScript(mainMaster.os.type)
+    // mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
+    // mainMaster.cmd += this._getInstallScript(version);
+    mainMaster.cmd = this._getInstallScript(version);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing main Master... ######');
   }
@@ -70,37 +71,18 @@ export default class CniInstaller extends AbstractInstaller {
   private async _removeMainMaster(type: string, version: string) {
     console.error('###### Start remove main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptCniFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getRemoveScript(version);
+    mainMaster.cmd = this._getRemoveScript(version);
     await mainMaster.exeCmd();
     console.error('###### Finish remove main Master... ######');
   }
 
   private _getInstallScript(version: string): string {
-    let setRegistry = '';
-    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
-    if (this.env.registry) {
-      setRegistry = `
-      # sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      # sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      # sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      # sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      # sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
-
-      sed -i 's| calico/cni| '${this.env.registry}'/calico/cni|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's| calico/pod2daemon-flexvol| '${this.env.registry}'/calico/pod2daemon-flexvol|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's| calico/node| '${this.env.registry}'/calico/node|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's| calico/kube-controllers| '${this.env.registry}'/calico/kube-controllers|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      sed -i 's| calico/ctl| '${this.env.registry}'/calico/ctl|g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
-      `;
-    }
     return `
       cd ~/${CniInstaller.INSTALL_HOME};
       sed -i 's/v3.13.4/'v${CniInstaller.CNI_VERSION}'/g' calico_${CniInstaller.CNI_VERSION}.yaml;
       . ~/${KubernetesInstaller.INSTALL_HOME}/k8s.config;
       sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-      ${setRegistry}
+
       kubectl apply -f calico_${CniInstaller.CNI_VERSION}.yaml;
       kubectl apply -f calicoctl_${CniInstaller.CTL_VERSION}.yaml;
       `;
@@ -128,26 +110,23 @@ export default class CniInstaller extends AbstractInstaller {
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
-       * 1. 패키지 파일 다운(client 로컬), 전송(각 노드), 설치 (각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 2. git guide 다운(client 로컬), 전송(각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 3. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
+       * 1. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
        */
       await this._downloadImageFile();
       await this._sendImageFile();
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       // external network 경우 해주어야 할 작업들
       /**
-       * 1. git guide clone (각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 2. public 패키지 레포 등록 (각 노드) (필요 시)
+       * 1. public 패키지 레포 등록 (각 노드) (필요 시)
        */
     }
 
     if (this.env.registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
       /**
-       * 1. 설치 이미지 push
+       * 1. 레지스트리 관련 작업
        */
-      await this._pushImageFileToRegistry({
+      await this._registryWork({
         callback
       });
     }
@@ -168,11 +147,12 @@ export default class CniInstaller extends AbstractInstaller {
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
-  protected async _pushImageFileToRegistry(param: { callback: any; }) {
+  protected async _registryWork(param: { callback: any; }) {
     console.error('###### Start pushing the image at main master node... ######');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
+    mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
     console.error('###### Finish pushing the image at main master node... ######');
   }
@@ -220,5 +200,23 @@ export default class CniInstaller extends AbstractInstaller {
       sudo docker push \${REGISTRY}/calico/ctl:\${CTL_VERSION};
       #rm -rf $CNI_HOME;
       `;
+  }
+
+  private _getImagePathEditScript(): string {
+    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
+    return `
+    cd ~/${CniInstaller.INSTALL_HOME};
+    # sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    # sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    # sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    # sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    # sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+
+    sed -i 's| calico/cni| '${this.env.registry}'/calico/cni|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    sed -i 's| calico/pod2daemon-flexvol| '${this.env.registry}'/calico/pod2daemon-flexvol|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    sed -i 's| calico/node| '${this.env.registry}'/calico/node|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    sed -i 's| calico/kube-controllers| '${this.env.registry}'/calico/kube-controllers|g' calico_${CniInstaller.CNI_VERSION}.yaml;
+    sed -i 's| calico/ctl| '${this.env.registry}'/calico/ctl|g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+    `;
   }
 }

@@ -24,7 +24,13 @@ EOF`;
 
   setCrioRepo(crioVersion: string): string {
     return `
-    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
+    sudo yum install -y yum-utils;
+    yum-config-manager --enable 'CentOS-7 - Base';
+    yum-config-manager --enable 'CentOS-7 - Extras';
+    yum-config-manager --enable 'CentOS-7 - Updates';
+    sudo yum clean all && yum repolist;
+
+    curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_7/devel:kubic:libcontainers:stable.repo;
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crioVersion}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo;
     `;
   }
@@ -67,7 +73,6 @@ EOF`;
   getK8sMasterRemoveScript(): string {
     const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
     return `
-    ${this.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH)}
       cd ~/${KubernetesInstaller.INSTALL_HOME};
       cp -f ~/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;

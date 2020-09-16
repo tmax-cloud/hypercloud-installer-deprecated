@@ -55,9 +55,7 @@ export default class MetalLbInstaller extends AbstractInstaller {
   private async _installMainMaster(data: Array<string>, callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptMatalLbFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getInstallScript(data);
+    mainMaster.cmd = this._getInstallScript(data);
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing main Master... ######');
   }
@@ -65,29 +63,15 @@ export default class MetalLbInstaller extends AbstractInstaller {
   private async _removeMainMaster() {
     console.error('###### Start remove main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptMatalLbFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getRemoveScript();
+    mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
     console.error('###### Finish remove main Master... ######');
   }
 
   private _getInstallScript(data: Array<string>): string {
-    let setRegistry = '';
-    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
-    if (this.env.registry) {
-      setRegistry = `
-      # sed -i 's/metallb\\/speaker/'${this.env.registry}'\\/metallb\\/speaker/g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-      # sed -i 's/metallb\\/controller/'${this.env.registry}'\\/metallb\\/controller/g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-
-      sed -i 's| metallb/speaker| '${this.env.registry}'/metallb/speaker|g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-      sed -i 's| metallb/controller| '${this.env.registry}'/metallb/controller|g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-      `;
-    }
     return `
       cd ~/${MetalLbInstaller.INSTALL_HOME};
       sed -i 's/v0.8.2/'v${MetalLbInstaller.METALLB_VERSION}'/g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
-      ${setRegistry}
       ${this._setMetalLbArea(data)}
       kubectl apply -f metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
       kubectl apply -f metallb_cidr.yaml;
@@ -133,7 +117,7 @@ export default class MetalLbInstaller extends AbstractInstaller {
 
     if (this.env.registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
-      await this._pushImageFileToRegistry({
+      await this._registryWork({
         callback
       });
     }
@@ -154,11 +138,12 @@ export default class MetalLbInstaller extends AbstractInstaller {
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
-  protected async _pushImageFileToRegistry(param: { callback: any; }) {
+  protected async _registryWork(param: { callback: any; }) {
     console.error('###### Start pushing the image at main master node... ######');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
+    mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
     console.error('###### Finish pushing the image at main master node... ######');
   }
@@ -193,5 +178,14 @@ export default class MetalLbInstaller extends AbstractInstaller {
       sudo docker push \${REGISTRY}/metallb/speaker:\${METALLB_VERSION}
       #rm -rf $METALLB_HOME;
       `;
+  }
+
+  private _getImagePathEditScript(): string {
+    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
+    return `
+    cd ~/${MetalLbInstaller.INSTALL_HOME};
+    sed -i 's| metallb/speaker| '${this.env.registry}'/metallb/speaker|g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
+    sed -i 's| metallb/controller| '${this.env.registry}'/metallb/controller|g' metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml;
+    `;
   }
 }

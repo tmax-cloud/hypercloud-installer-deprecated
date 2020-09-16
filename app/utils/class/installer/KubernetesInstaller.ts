@@ -43,6 +43,13 @@ export default class KubernetesInstaller extends AbstractInstaller {
   public async install(param: { registry: string; version: string; callback: any; setProgress: Function; }) {
     const { registry, version, callback, setProgress } = param;
 
+    await this._envSetting({
+      registry,
+      version,
+      callback
+    })
+    setProgress(20);
+
     await this._preWorkInstall({
       registry,
       version,
@@ -245,7 +252,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
        * 2. 설치 이미지 push
        */
       // await this._installImageRegistry(registry, callback);
-      // await this._pushImageFileToRegistry({
+      // await this._registryWork({
       //   registry: this.env.registry,
       //   callback
       // });
@@ -291,7 +298,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     const localPath = `${rootPath}/hypercloud-install-guide/`;
     console.debug(`repoPath`, CONST.GIT_REPO);
     console.debug(`localPath`, localPath);
-    await git.clone(CONST.GIT_REPO, localPath);
+    await git.clone(CONST.GIT_REPO, localPath, [`-b${CONST.GIT_BRANCH}`]);
     console.error('###### Finish downloading the GIT file to client local... ######');
   }
 
@@ -304,19 +311,6 @@ export default class KubernetesInstaller extends AbstractInstaller {
       })
     );
     console.error('###### Finish sending the GIT file to each node (using scp)... ######');
-  }
-
-  private async _setPublicPackageRepository(callback: any) {
-    console.error('###### Start setting the public package repository at each node... ######');
-    await Promise.all(
-      this.env.nodeList.map((node: Node) => {
-        const script = ScriptKubernetesFactory.createScript(node.os.type);
-        node.cmd = script.setCrioRepo(KubernetesInstaller.CRIO_VERSION)
-        node.cmd += script.setKubernetesRepo()
-        return node.exeCmd(callback);
-      })
-    );
-    console.error('###### Finish setting the public package repository at each node... ######');
   }
 
   private async _cloneGitFile(callback: any) {
@@ -341,6 +335,19 @@ export default class KubernetesInstaller extends AbstractInstaller {
     );
     await mainMaster.exeCmd(callback);
     console.error('###### Finish installing the image registry at main master node... ######');
+  }
+
+  private async _setPublicPackageRepository(callback: any) {
+    console.error('###### Start setting the public package repository at each node... ######');
+    await Promise.all(
+      this.env.nodeList.map((node: Node) => {
+        const script = ScriptKubernetesFactory.createScript(node.os.type);
+        node.cmd = script.setCrioRepo(KubernetesInstaller.CRIO_VERSION)
+        node.cmd += script.setKubernetesRepo()
+        return node.exeCmd(callback);
+      })
+    );
+    console.error('###### Finish setting the public package repository at each node... ######');
   }
 
   private _getK8sClusterMasterJoinScript(): string {
@@ -490,16 +497,14 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return masterJoinCmd;
   }
 
-  // protected abstract 구현
-  protected async _preWorkInstall(param: { registry: string; version: string; callback: any; }) {
-    console.error('###### Start pre-installation... ######');
+  private async _envSetting(param: { registry: string; version: string; callback: any; }) {
+    console.error('###### Start env setting... ######');
     const { registry, version, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
        * 1. 패키지 파일 다운(client 로컬), 전송(각 노드), 설치 (각 노드) (현재 Kubernetes 설치 시에만 진행)
        * 2. git guide 다운(client 로컬), 전송(각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 3. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
        */
       await this._downloadPackageFile();
       await this._sendPackageFile();
@@ -507,28 +512,50 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
       await this._downloadGitFile();
       await this._sendGitFile();
-
-      await this._downloadImageFile();
-      await this._sendImageFile();
-
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       // external network 경우 해주어야 할 작업들
       /**
        * 1. git guide clone (각 노드) (현재 Kubernetes 설치 시에만 진행)
-       * 2. public 패키지 레포 등록 (각 노드) (필요 시)
        */
       await this._cloneGitFile(callback);
-      await this._setPublicPackageRepository(callback);
     }
 
     if (registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
       /**
        * 1. image registry 설치 (main 마스터 노드)
-       * 2. 설치 이미지 push
        */
       await this._installImageRegistry(registry, callback);
-      await this._pushImageFileToRegistry({
+    }
+    console.error('###### Finish env setting... ######');
+  }
+
+  // protected abstract 구현
+  protected async _preWorkInstall(param: { registry: string; version: string; callback: any; }) {
+    console.error('###### Start pre-installation... ######');
+    const { registry, version, callback } = param;
+    if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
+      // internal network 경우 해주어야 할 작업들
+      /**
+       * 1. 해당 이미지 파일 다운(client 로컬), 전송 (main 마스터 노드)
+       */
+      await this._downloadImageFile();
+      await this._sendImageFile();
+
+    } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
+      // external network 경우 해주어야 할 작업들
+      /**
+       * 1. public 패키지 레포 등록 (각 노드) (필요 시)
+       */
+      await this._setPublicPackageRepository(callback);
+    }
+
+    if (registry) {
+      // 내부 image registry 구축 경우 해주어야 할 작업들
+      /**
+       * 1. 레지스트리 관련 작업
+       */
+      await this._registryWork({
         registry,
         callback
       });
@@ -550,7 +577,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
-  protected async _pushImageFileToRegistry(param: { registry: any; callback: any; }) {
+  protected async _registryWork(param: { registry: any; callback: any; }) {
     console.error('###### Start pushing the image at main master node... ######');
     const { registry, callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();

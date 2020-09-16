@@ -62,7 +62,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
     });
     setProgress(60);
     await this._installMainMaster(callback);
-    // setProgress(100);
+    setProgress(100);
   }
 
   public async remove() {
@@ -72,38 +72,94 @@ export default class PrometheusInstaller extends AbstractInstaller {
   private async _installMainMaster(callback: any) {
     console.error('###### Start installing main Master... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptPrometheusFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getInstallScript();
+    mainMaster.cmd = this._getVersionEditScript();
+    await mainMaster.exeCmd(callback);
+
+    // Step 1. prometheus namespace 및 crd 생성
+    mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
 
     // setup/ yaml 적용 후, 특정 pod가 뜨고 난 후 다음 작업 해야함
     // 10초 대기
     await new Promise(resolve => setTimeout(resolve, 10000));
 
-
     // Step 2. Prometheus 모듈들에 대한 deploy 및 RBAC 생성
-    mainMaster.cmd = `
+    mainMaster.cmd = this._step2();
+    await mainMaster.exeCmd(callback);
+
+    // Step 3. kube-scheduler 와 kube-controller-manager 설정
+    mainMaster.cmd = this._step3();
+    await mainMaster.exeCmd(callback);
+
+    // monitoring namespace의 servicemonitor 객체 중 kube-controller-manager 와 kube-scheduler의 spec.endpoints.metricRelabelings 부분 삭제
+    await this._EditYamlScript();
+
+    // kube-system namespace에 있는 모든 kube-schduler pod의 metadata.labels에k8s-app: kube-scheduler추가
+    // kube-system namespace에 있는 모든 kube-contoroller-manager pod의 metadata.labels에k8s-app: kube-controller-manager 추가
+    await this._EditYamlScript2();
+    console.error('###### Finish installing main Master... ######');
+  }
+
+  private async _removeMainMaster() {
+    console.error('###### Start remove main Master... ######');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = this._getRemoveScript();
+    await mainMaster.exeCmd();
+    console.error('###### Finish remove main Master... ######');
+  }
+
+  private _getVersionEditScript(): string {
+    return `
+      export PROMETHEUS_VERSION=v${PrometheusInstaller.PROMETHEUS_VERSION};
+      export PROMETHEUS_OPERATOR_VERSION=v${PrometheusInstaller.PROMETHEUS_OPERATOR_VERSION};
+      export NODE_EXPORTER_VERSION=v${PrometheusInstaller.NODE_EXPORTER_VERSION};
+      export GRAFANA_VERSION=${PrometheusInstaller.GRAFANA_VERSION};
+      export KUBE_STATE_METRICS_VERSION=v${PrometheusInstaller.KUBE_STATE_METRICS_VERSION};
+      export CONFIGMAP_RELOADER_VERSION=v${PrometheusInstaller.CONFIGMAP_RELOADER_VERSION};
+      export CONFIGMAP_RELOAD_VERSION=v${PrometheusInstaller.CONFIGMAP_RELOAD_VERSION};
+      export KUBE_RBAC_PROXY_VERSION=v${PrometheusInstaller.KUBE_RBAC_PROXY_VERSION};
+      export PROMETHEUS_ADAPTER_VERSION=v${PrometheusInstaller.PROMETHEUS_ADAPTER_VERSION};
+      export ALERTMANAGER_VERSION=v${PrometheusInstaller.ALERTMANAGER_VERSION};
+
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
+      sed -i 's/{ALERTMANAGER_VERSION}/'\${ALERTMANAGER_VERSION}'/g' alertmanager-alertmanager.yaml;
+      sed -i 's/{GRAFANA_VERSION}/'\${GRAFANA_VERSION}'/g' grafana-deployment.yaml;
+      sed -i 's/{KUBE_RBAC_PROXY_VERSION}/'\${KUBE_RBAC_PROXY_VERSION}'/g' kube-state-metrics-deployment.yaml;
+      sed -i 's/{KUBE_STATE_METRICS_VERSION}/'\${KUBE_STATE_METRICS_VERSION}'/g' kube-state-metrics-deployment.yaml;
+      sed -i 's/{NODE_EXPORTER_VERSION}/'\${NODE_EXPORTER_VERSION}'/g' node-exporter-daemonset.yaml;
+      sed -i 's/{KUBE_RBAC_PROXY_VERSION}/'\${KUBE_RBAC_PROXY_VERSION}'/g' node-exporter-daemonset.yaml;
+      sed -i 's/{PROMETHEUS_ADAPTER_VERSION}/'\${PROMETHEUS_ADAPTER_VERSION}'/g' prometheus-adapter-deployment.yaml;
+      sed -i 's/{PROMETHEUS_VERSION}/'\${PROMETHEUS_VERSION}'/g' prometheus-prometheus.yaml;
+
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
+      sed -i 's/{PROMETHEUS_OPERATOR_VERSION}/'\${PROMETHEUS_OPERATOR_VERSION}'/g' prometheus-operator-deployment.yaml;
+      sed -i 's/{CONFIGMAP_RELOADER_VERSION}/'\${CONFIGMAP_RELOADER_VERSION}'/g' prometheus-operator-deployment.yaml;
+      sed -i 's/{CONFIGMAP_RELOAD_VERSION}/'\${CONFIGMAP_RELOAD_VERSION}'/g' prometheus-operator-deployment.yaml;
+      `;
+  }
+
+  private _step1(): string {
+    return `
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+      kubectl create -f setup/;
+      `;
+  }
+
+  private _step2(): string {
+    return `
     cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
     kubectl create -f manifests/;
     kubectl get svc -n monitoring prometheus-k8s -o yaml | sed "s|type: NodePort|type: LoadBalancer|g" | kubectl replace -f -;
     kubectl get svc -n monitoring grafana -o yaml | sed "s|type: ClusterIP|type: LoadBalancer|g" | kubectl replace -f -;
     `;
-    await mainMaster.exeCmd(callback);
+  }
 
-    // Step 3. kube-scheduler 와 kube-controller-manager 설정
-    mainMaster.cmd = `
+  private _step3(): string {
+    return `
     cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
     kubectl create -f kube-controller-manager-prometheus-discovery.yaml;
     kubectl create -f kube-scheduler-prometheus-discovery.yaml;
     `;
-    await mainMaster.exeCmd(callback);
-    // monitoring namespace의 servicemonitor 객체 중 kube-controller-manager 와 kube-scheduler의 spec.endpoints.metricRelabelings 부분 삭제
-    await this._EditYamlScript();
-    // kube-system namespace에 있는 모든 kube-schduler pod의 metadata.labels에k8s-app: kube-scheduler추가
-    // kube-system namespace에 있는 모든 kube-contoroller-manager pod의 metadata.labels에k8s-app: kube-controller-manager 추가
-    await this._EditYamlScript2();
-    console.error('###### Finish installing main Master... ######');
   }
 
   private async _EditYamlScript2() {
@@ -188,72 +244,13 @@ export default class PrometheusInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
   }
 
-  private async _removeMainMaster() {
-    console.error('###### Start remove rook-ceph... ######');
-    const { mainMaster } = this.env.getNodesSortedByRole();
-    const script = ScriptPrometheusFactory.createScript(mainMaster.os.type)
-    mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
-    mainMaster.cmd += this._getRemoveScript();
-    await mainMaster.exeCmd();
-    console.error('###### Finish remove rook-ceph... ######');
-  }
-
-  private _getInstallScript(): string {
-    let setRegistry = '';
-    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
-    if (this.env.registry) {
-      setRegistry = `
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
-      sed -i "s| quay.io/prometheus/alertmanager| ${this.env.registry}/prometheus/alertmanager|g" alertmanager-alertmanager.yaml;
-      sed -i "s| grafana/grafana| ${this.env.registry}/grafana|g" grafana-deployment.yaml;
-      sed -i "s| quay.io/coreos/kube-rbac-proxy| ${this.env.registry}/coreos/kube-rbac-proxy|g" kube-state-metrics-deployment.yaml;
-      sed -i "s| quay.io/coreos/kube-state-metrics| ${this.env.registry}/coreos/kube-state-metrics|g" kube-state-metrics-deployment.yaml;
-      sed -i "s| quay.io/prometheus/node-exporter| ${this.env.registry}/prometheus/node-exporter|g" node-exporter-daemonset.yaml;
-      sed -i "s| quay.io/coreos/kube-rbac-proxy| ${this.env.registry}/coreos/kube-rbac-proxy|g" node-exporter-daemonset.yaml;
-      sed -i "s| quay.io/coreos/k8s-prometheus-adapter-amd64| ${this.env.registry}/coreos/k8s-prometheus-adapter-amd64|g" prometheus-adapter-deployment.yaml;
-      sed -i "s| quay.io/prometheus/prometheus| ${this.env.registry}/prometheus/prometheus|g" prometheus-prometheus.yaml;
-
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
-      sed -i "s| quay.io/coreos/configmap-reload| ${this.env.registry}/coreos/configmap-reload|g" prometheus-operator-deployment.yaml
-      sed -i "s| quay.io/coreos/prometheus-config-reloader| ${this.env.registry}/coreos/prometheus-config-reloader|g" prometheus-operator-deployment.yaml
-      sed -i "s| quay.io/coreos/prometheus-operator| ${this.env.registry}/coreos/prometheus-operator|g" prometheus-operator-deployment.yaml
-      `;
-    }
-    return `
-      export PROMETHEUS_VERSION=v${PrometheusInstaller.PROMETHEUS_VERSION};
-      export PROMETHEUS_OPERATOR_VERSION=v${PrometheusInstaller.PROMETHEUS_OPERATOR_VERSION};
-      export NODE_EXPORTER_VERSION=v${PrometheusInstaller.NODE_EXPORTER_VERSION};
-      export GRAFANA_VERSION=${PrometheusInstaller.GRAFANA_VERSION};
-      export KUBE_STATE_METRICS_VERSION=v${PrometheusInstaller.KUBE_STATE_METRICS_VERSION};
-      export CONFIGMAP_RELOADER_VERSION=v${PrometheusInstaller.CONFIGMAP_RELOADER_VERSION};
-      export CONFIGMAP_RELOAD_VERSION=v${PrometheusInstaller.CONFIGMAP_RELOAD_VERSION};
-      export KUBE_RBAC_PROXY_VERSION=v${PrometheusInstaller.KUBE_RBAC_PROXY_VERSION};
-      export PROMETHEUS_ADAPTER_VERSION=v${PrometheusInstaller.PROMETHEUS_ADAPTER_VERSION};
-      export ALERTMANAGER_VERSION=v${PrometheusInstaller.ALERTMANAGER_VERSION};
-
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
-      sed -i 's/{ALERTMANAGER_VERSION}/'\${ALERTMANAGER_VERSION}'/g' alertmanager-alertmanager.yaml;
-      sed -i 's/{GRAFANA_VERSION}/'\${GRAFANA_VERSION}'/g' grafana-deployment.yaml;
-      sed -i 's/{KUBE_RBAC_PROXY_VERSION}/'\${KUBE_RBAC_PROXY_VERSION}'/g' kube-state-metrics-deployment.yaml;
-      sed -i 's/{KUBE_STATE_METRICS_VERSION}/'\${KUBE_STATE_METRICS_VERSION}'/g' kube-state-metrics-deployment.yaml;
-      sed -i 's/{NODE_EXPORTER_VERSION}/'\${NODE_EXPORTER_VERSION}'/g' node-exporter-daemonset.yaml;
-      sed -i 's/{KUBE_RBAC_PROXY_VERSION}/'\${KUBE_RBAC_PROXY_VERSION}'/g' node-exporter-daemonset.yaml;
-      sed -i 's/{PROMETHEUS_ADAPTER_VERSION}/'\${PROMETHEUS_ADAPTER_VERSION}'/g' prometheus-adapter-deployment.yaml;
-      sed -i 's/{PROMETHEUS_VERSION}/'\${PROMETHEUS_VERSION}'/g' prometheus-prometheus.yaml;
-
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
-      sed -i 's/{PROMETHEUS_OPERATOR_VERSION}/'\${PROMETHEUS_OPERATOR_VERSION}'/g' prometheus-operator-deployment.yaml;
-      sed -i 's/{CONFIGMAP_RELOADER_VERSION}/'\${CONFIGMAP_RELOADER_VERSION}'/g' prometheus-operator-deployment.yaml;
-      sed -i 's/{CONFIGMAP_RELOAD_VERSION}/'\${CONFIGMAP_RELOAD_VERSION}'/g' prometheus-operator-deployment.yaml;
-      ${setRegistry}
-
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
-      kubectl create -f setup/;
-      `;
-  }
-
   private _getRemoveScript(): string {
     return `
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+    kubectl delete -f kube-scheduler-prometheus-discovery.yaml;
+    kubectl delete -f kube-controller-manager-prometheus-discovery.yaml;
+    kubectl delete -f manifests/;
+    kubectl delete -f setup/;
     `;
   }
 
@@ -271,7 +268,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
     if (this.env.registry) {
       // 내부 image registry 구축 경우 해주어야 할 작업들
-      await this._pushImageFileToRegistry({
+      await this._registryWork({
         callback
       });
     }
@@ -293,11 +290,12 @@ export default class PrometheusInstaller extends AbstractInstaller {
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
-  protected async _pushImageFileToRegistry(param: { callback: any; }) {
+  protected async _registryWork(param: { callback: any; }) {
     console.error('###### Start pushing the image at main master node... ######');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
+    mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
     console.error('###### Finish pushing the image at main master node... ######');
   }
@@ -332,7 +330,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
       sudo docker load < prometheus-adapter_\${PROMETHEUS_ADAPTER_VERSION}.tar;
       sudo docker load < alertmanager_\${ALERTMANAGER_VERSION}.tar;
       `;
-    } else {
+    } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       gitPullCommand += `
       sudo docker pull quay.io/prometheus/prometheus:\${PROMETHEUS_VERSION};
       sudo docker pull quay.io/coreos/prometheus-operator:\${PROMETHEUS_OPERATOR_VERSION};
@@ -371,5 +369,25 @@ export default class PrometheusInstaller extends AbstractInstaller {
       sudo docker push \${REGISTRY}/prometheus/alertmanager:\${ALERTMANAGER_VERSION};
       #rm -rf $PROMETHEUS_HOME;
       `;
+  }
+
+  private _getImagePathEditScript(): string {
+    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
+    return `
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
+    sed -i "s| quay.io/prometheus/alertmanager| ${this.env.registry}/prometheus/alertmanager|g" alertmanager-alertmanager.yaml;
+    sed -i "s| grafana/grafana| ${this.env.registry}/grafana|g" grafana-deployment.yaml;
+    sed -i "s| quay.io/coreos/kube-rbac-proxy| ${this.env.registry}/coreos/kube-rbac-proxy|g" kube-state-metrics-deployment.yaml;
+    sed -i "s| quay.io/coreos/kube-state-metrics| ${this.env.registry}/coreos/kube-state-metrics|g" kube-state-metrics-deployment.yaml;
+    sed -i "s| quay.io/prometheus/node-exporter| ${this.env.registry}/prometheus/node-exporter|g" node-exporter-daemonset.yaml;
+    sed -i "s| quay.io/coreos/kube-rbac-proxy| ${this.env.registry}/coreos/kube-rbac-proxy|g" node-exporter-daemonset.yaml;
+    sed -i "s| quay.io/coreos/k8s-prometheus-adapter-amd64| ${this.env.registry}/coreos/k8s-prometheus-adapter-amd64|g" prometheus-adapter-deployment.yaml;
+    sed -i "s| quay.io/prometheus/prometheus| ${this.env.registry}/prometheus/prometheus|g" prometheus-prometheus.yaml;
+
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
+    sed -i "s| quay.io/coreos/configmap-reload| ${this.env.registry}/coreos/configmap-reload|g" prometheus-operator-deployment.yaml
+    sed -i "s| quay.io/coreos/prometheus-config-reloader| ${this.env.registry}/coreos/prometheus-config-reloader|g" prometheus-operator-deployment.yaml
+    sed -i "s| quay.io/coreos/prometheus-operator| ${this.env.registry}/coreos/prometheus-operator|g" prometheus-operator-deployment.yaml
+    `;
   }
 }

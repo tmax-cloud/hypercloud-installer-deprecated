@@ -2,9 +2,9 @@
 /* eslint-disable global-require */
 import simpleGit, { SimpleGit } from 'simple-git';
 
-export async function clone(repoPath: string, localPath: string) {
+export async function clone(repoPath: string, localPath: string, option: any) {
   const git: SimpleGit = simpleGit();
-  return git.clone(repoPath, localPath).catch(err => {
+  return git.clone(repoPath, localPath, option).catch(err => {
     console.error(err);
   });
 }

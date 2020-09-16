@@ -30,15 +30,20 @@ const CONST = {
       IS_REQUIRED: true, // Optional
       DESC: '이벤트 모니터링 및 경고에 사용되는 무료 소프트웨어 응용 프로그램'
     },
-    HELM: {
-      NAME: 'Helm',
-      IS_REQUIRED: false, // Optional
-      DESC: '헬름'
+    // HELM: {
+    //   NAME: 'Helm',
+    //   IS_REQUIRED: false, // Optional
+    //   DESC: '헬름'
+    // },
+    HYPERAUTH: {
+      NAME: 'HyperAuth',
+      IS_REQUIRED: true, // Optional
+      DESC: 'HyperAuth'
     },
     HYPERCLOUD_OPERATOR: {
-      NAME: 'HyperCloud Operator',
-      IS_REQUIRED: false, // Optional
-      DESC: '하이퍼 클라우드 오퍼레이터'
+      NAME: 'HyperCloudOperator',
+      IS_REQUIRED: true, // Optional
+      DESC: 'HyperCloudOperator'
     }
   }
 };

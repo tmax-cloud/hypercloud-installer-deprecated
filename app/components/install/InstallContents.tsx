@@ -10,6 +10,8 @@ import CONST from '../../utils/constants/constant';
 import InstallContentsRookCeph from './rookCeph/InstallContentsRookCeph';
 import InstallContentsMetalLb from './metalLb/InstallContentsMetalLb';
 import InstallContentsPrometheus from './prometheus/InstallContentsPrometheus';
+import InstallContentsHyperAuth from './hyperauth/InstallContentsHyperAuth';
+import InstallContentsHyperCloudOperator from './hyperCloudOperator/InstallContentsHyperCloudOperator';
 
 function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
@@ -46,6 +48,14 @@ function InstallContents(props: any) {
         <Route
           path={`${match.path}/${CONST.PRODUCT.PROMETHEUS.NAME}`}
           component={InstallContentsPrometheus}
+        />
+        <Route
+          path={`${match.path}/${CONST.PRODUCT.HYPERAUTH.NAME}`}
+          component={InstallContentsHyperAuth}
+        />
+        <Route
+          path={`${match.path}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}`}
+          component={InstallContentsHyperCloudOperator}
         />
         <Redirect path="*" to={`${match.url}/main`} />
       </Switch>

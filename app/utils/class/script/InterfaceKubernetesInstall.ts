@@ -1,7 +1,7 @@
 import Node from '../Node';
 
 export interface InterfaceKubernetesInstall {
-  // 필수 구현 목록 (각 운영체제 별)
+  // 설치 시, 필수 구현되야 하는 기능
   setKubernetesRepo(): string;
   setCrioRepo(crioVersion: string): string;
   getMasterMultiplexingScript(
