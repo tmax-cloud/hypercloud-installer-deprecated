@@ -10,14 +10,16 @@ import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
 import IngressControllerInstaller from './ingressControllerInstaller';
 
 export default class HyperCloudOperatorInstaller extends AbstractInstaller {
-  // public static readonly INSTALL_HOME = ``;
-
   public static readonly IMAGE_DIR = `hypercloud-operator-install`;
+
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
 
   public static readonly HPCD_VERSION=`4.1.1.0`;
 
@@ -93,16 +95,16 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   private _step0() {
     let script = `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     tar -xzf hypercloud-operator.tar.gz;
 
-    sed -i 's/{HPCD_VERSION}/'${HyperCloudOperatorInstaller.HPCD_VERSION}'/g' ${HyperCloudOperatorInstaller.IMAGE_DIR}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+    sed -i 's/{HPCD_VERSION}/'${HyperCloudOperatorInstaller.HPCD_VERSION}'/g' ${HyperCloudOperatorInstaller.INSTALL_HOME}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;
 
     if (this.env.registry) {
       script += `
-      sed -i 's/ mysql:5.6/'${this.env.registry}'\\/mysql:5.6/g' ${HyperCloudOperatorInstaller.IMAGE_DIR}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
-      sed -i 's/ tmaxcloudck\\/hypercloud-operator/'${this.env.registry}'\\/tmaxcloudck\\/hypercloud-operator/g' ${HyperCloudOperatorInstaller.IMAGE_DIR}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+      sed -i 's/ mysql:5.6/'${this.env.registry}'\\/mysql:5.6/g' ${HyperCloudOperatorInstaller.INSTALL_HOME}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
+      sed -i 's/ tmaxcloudck\\/hypercloud-operator/'${this.env.registry}'\\/tmaxcloudck\\/hypercloud-operator/g' ${HyperCloudOperatorInstaller.INSTALL_HOME}/hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
 
       `;
     }
@@ -111,14 +113,14 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   private _step1() {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/1.initialization.yaml;
     `;
   }
 
   private _step2() {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UserCRD.yaml;
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UsergroupCRD.yaml;
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/TokenCRD.yaml;
@@ -137,21 +139,21 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   private _step3() {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/2.mysql-settings.yaml;
     `;
   }
 
   private _step4() {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
     `;
   }
 
   private _step5() {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;
   }
@@ -166,7 +168,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   private _getRemoveScript(): string {
     return `
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
 
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
@@ -189,7 +191,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/1.initialization.yaml;
 
-    rm -rf ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    rm -rf ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     `;
   }
 
@@ -197,8 +199,8 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     console.error('###### Start download yaml file from external... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
-    mkdir -p ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
-    cd ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    mkdir -p ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
     wget -O hypercloud-operator.tar.gz https://github.com/tmax-cloud/hypercloud-operator/archive/v${HyperCloudOperatorInstaller.HPCD_VERSION}.tar.gz;
     `;
     await mainMaster.exeCmd();
@@ -240,8 +242,8 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     console.error('###### Start sending the image file to main master node... ######');
     // TODO: wget -O hypercloud-operator.tar.gz https://github.com/tmax-cloud/hypercloud-operator/archive/v\${HPCD_VERSION}.tar.gz; 도 넘겨 줘야함
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${HyperCloudOperatorInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${HyperCloudOperatorInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${HyperCloudOperatorInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -256,8 +258,8 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${HyperCloudOperatorInstaller.IMAGE_DIR};
-    export HPCD_HOME=~/${HyperCloudOperatorInstaller.IMAGE_DIR};
+    mkdir -p ~/${HyperCloudOperatorInstaller.IMAGE_HOME};
+    export HPCD_HOME=~/${HyperCloudOperatorInstaller.IMAGE_HOME};
     export HPCD_VERSION=v${HyperCloudOperatorInstaller.HPCD_VERSION};
     export REGISTRY=${this.env.registry};
     cd $HPCD_HOME;

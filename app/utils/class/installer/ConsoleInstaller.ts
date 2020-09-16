@@ -11,13 +11,15 @@ import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptPrometheusFactory from '../script/ScriptPrometheusFactory';
 
 export default class ConsoleInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/Console`;
-
   public static readonly IMAGE_DIR=`console-install`;
+
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/Console`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${ConsoleInstaller.IMAGE_DIR}`;
 
   public static readonly CONSOLE_VERSION=`1.1.34.7`;
 
@@ -145,8 +147,8 @@ export default class ConsoleInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${ConsoleInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${ConsoleInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${ConsoleInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${ConsoleInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -161,8 +163,8 @@ export default class ConsoleInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${ConsoleInstaller.IMAGE_DIR};
-    export CONSOLE_HOME=~/${ConsoleInstaller.IMAGE_DIR};
+    mkdir -p ~/${ConsoleInstaller.IMAGE_HOME};
+    export CONSOLE_HOME=~/${ConsoleInstaller.IMAGE_HOME};
     export CONSOLE_VERSION=v${ConsoleInstaller.CONSOLE_VERSION};
     export REGISTRY=${this.env.registry};
     cd $CONSOLE_HOME;

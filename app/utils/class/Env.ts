@@ -19,7 +19,11 @@ export enum NETWORK_TYPE {
 }
 
 export default class Env {
-  public static TARGET_ARC_NAME = `archive_20.07.10`;
+  public static INSTALL_ROOT = `hypercloud_install`;
+
+  public static LOCAL_INSTALL_ROOT = `${rootPath}/${Env.INSTALL_ROOT}`;
+
+  // public static TARGET_ARC_NAME = `archive_20.07.10`;
 
   private _name: string;
 

@@ -11,14 +11,16 @@ import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import Node from '../Node';
 import ScriptRookCephFactory from '../script/ScriptRookCephFactory';
 
 export default class RookCephInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/rook-ceph`;
-
   public static readonly IMAGE_DIR=`rook-install`;
+
+  public static readonly INSTALL_HOME=`Env.INSTALL_ROOT}/hypercloud-install-guide/rook-ceph`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}`;
 
   public static readonly CEPH_VERSION=`14.2.9`;
 
@@ -372,8 +374,8 @@ data:
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${RookCephInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${RookCephInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${RookCephInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -388,8 +390,8 @@ data:
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${RookCephInstaller.IMAGE_DIR};
-    export ROOK_HOME=~/${RookCephInstaller.IMAGE_DIR};
+    mkdir -p ~/${RookCephInstaller.IMAGE_HOME};
+    export ROOK_HOME=~/${RookCephInstaller.IMAGE_HOME};
     export CEPH_VERSION=v${RookCephInstaller.CEPH_VERSION};
     export ROOK_VERSION=v${RookCephInstaller.ROOK_VERSION};
     export CEPHCSI_VERSION=v${RookCephInstaller.CEPHCSI_VERSION};

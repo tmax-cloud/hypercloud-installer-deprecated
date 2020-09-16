@@ -10,15 +10,17 @@ import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptCniFactory from '../script/ScriptCniFactory';
 import KubernetesInstaller from './KubernetesInstaller';
 import AbstractScript from '../script/AbstractScript';
 
 export default class IngressControllerInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/IngressNginx`;
-
   public static readonly IMAGE_DIR=`install-ingress-nginx`;
+
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/IngressNginx`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}`;
 
   public static readonly INGRESS_NGINX_NAME=`ingress-nginx-shared`;
 
@@ -160,8 +162,8 @@ export default class IngressControllerInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${IngressControllerInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${IngressControllerInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${IngressControllerInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -176,7 +178,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${IngressControllerInstaller.IMAGE_DIR};
+    mkdir -p ~/${IngressControllerInstaller.IMAGE_HOME};
     ${this._exportEnv()}
     cd $NGINX_INGRESS_HOME;
     `;
@@ -204,7 +206,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   private _exportEnv() {
     return `
-    export NGINX_INGRESS_HOME=~/${IngressControllerInstaller.IMAGE_DIR};
+    export NGINX_INGRESS_HOME=~/${IngressControllerInstaller.IMAGE_HOME};
     export INGRESS_NGINX_NAME=${IngressControllerInstaller.INGRESS_NGINX_NAME};
     export INGRESS_CLASS=${IngressControllerInstaller.INGRESS_CLASS};
     export NGINX_INGRESS_VERSION=${IngressControllerInstaller.NGINX_INGRESS_VERSION};

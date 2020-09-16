@@ -11,14 +11,16 @@ import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import Node from '../Node';
 import ScriptMatalLbFactory from '../script/ScriptMatalLbFactory';
 
 export default class MetalLbInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME = `hypercloud-install-guide/MetalLB`;
-
   public static readonly IMAGE_DIR = `metallb-install`;
+
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/MetalLB`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${MetalLbInstaller.IMAGE_DIR}`;
 
   public static readonly METALLB_VERSION=`0.8.2`;
 
@@ -133,8 +135,8 @@ export default class MetalLbInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${MetalLbInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${MetalLbInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${MetalLbInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${MetalLbInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -150,8 +152,8 @@ export default class MetalLbInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${MetalLbInstaller.IMAGE_DIR};
-    export METALLB_HOME=~/${MetalLbInstaller.IMAGE_DIR};
+    mkdir -p ~/${MetalLbInstaller.IMAGE_HOME};
+    export METALLB_HOME=~/${MetalLbInstaller.IMAGE_HOME};
     export METALLB_VERSION=v${MetalLbInstaller.METALLB_VERSION};
     export REGISTRY=${this.env.registry};
     cd $METALLB_HOME;

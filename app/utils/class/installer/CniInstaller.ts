@@ -10,15 +10,17 @@ import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptCniFactory from '../script/ScriptCniFactory';
 import KubernetesInstaller from './KubernetesInstaller';
 import AbstractScript from '../script/AbstractScript';
 
 export default class CniInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/CNI`;
-
   public static readonly IMAGE_DIR=`cni-install`;
+
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/CNI`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}`;
 
   public static readonly CNI_VERSION=`3.13.4`;
 
@@ -142,8 +144,8 @@ export default class CniInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${CniInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${CniInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${CniInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -159,8 +161,8 @@ export default class CniInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${CniInstaller.IMAGE_DIR};
-    export CNI_HOME=~/${CniInstaller.IMAGE_DIR};
+    mkdir -p ~/${CniInstaller.IMAGE_HOME};
+    export CNI_HOME=~/${CniInstaller.IMAGE_HOME};
     export CNI_VERSION=v${CniInstaller.CNI_VERSION};
     export CTL_VERSION=v${CniInstaller.CTL_VERSION};
     export REGISTRY=${this.env.registry};

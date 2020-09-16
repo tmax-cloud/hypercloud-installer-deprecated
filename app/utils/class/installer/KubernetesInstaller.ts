@@ -17,12 +17,17 @@ import CONST from '../../constants/constant';
 import ScriptKubernetesFactory from '../script/ScriptKubernetesFactory';
 
 export default class KubernetesInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/K8S_Master/installer`;
-
-  public static readonly IMAGE_REGISTRY_INSTALL_HOME=`hypercloud-install-guide/Image_Registry/installer`;
-
-
   public static readonly IMAGE_DIR=`k8s-install`;
+
+  public static readonly ARCHIVE_DIR=`archive_20.07.10`;
+
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/K8S_Master/installer`;
+
+  public static readonly IMAGE_REGISTRY_INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/Image_Registry/installer`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}`;
+
+  public static readonly ARCHIVE_HOME=`${Env.INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}`;
 
   public static readonly CRIO_VERSION = `1.17`;
 
@@ -268,8 +273,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _sendPackageFile() {
     console.error('###### Start sending the package file to each node (using scp)... ######');
-    const srcPath = `${rootPath}/${Env.TARGET_ARC_NAME}/`;
-    const destPath = `${Env.TARGET_ARC_NAME}/`;
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}/`;
+    const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     console.debug(`srcPath`, srcPath);
     console.debug(`destPath`, destPath);
     await Promise.all(
@@ -282,7 +287,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _installLocalPackageRepository(callback: any) {
     console.error('###### Start installing the local package repository at each node... ######');
-    const destPath = `${Env.TARGET_ARC_NAME}/`;
+    const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptKubernetesFactory.createScript(node.os.type);
@@ -295,7 +300,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _downloadGitFile() {
     console.error('###### Start downloading the GIT file to client local... ######');
-    const localPath = `${rootPath}/hypercloud-install-guide/`;
+    const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
     console.debug(`repoPath`, CONST.GIT_REPO);
     console.debug(`localPath`, localPath);
     await git.clone(CONST.GIT_REPO, localPath, [`-b${CONST.GIT_BRANCH}`]);
@@ -304,10 +309,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _sendGitFile() {
     console.error('###### Start sending the GIT file to each node (using scp)... ######');
-    const localPath = `${rootPath}/hypercloud-install-guide/`;
+    const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
+    const destPath = `${Env.INSTALL_ROOT}/hypercloud-install-guide/`;
     await Promise.all(
       this.env.nodeList.map(node => {
-        return scp.sendFile(node, localPath, `hypercloud-install-guide/`);
+        return scp.sendFile(node, localPath, destPath);
       })
     );
     console.error('###### Finish sending the GIT file to each node (using scp)... ######');
@@ -572,8 +578,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${KubernetesInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${KubernetesInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${KubernetesInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -587,7 +593,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   protected _getImagePushScript(registry: string): string {
-    const path = `~/${KubernetesInstaller.IMAGE_DIR}`;
+    const path = `~/${KubernetesInstaller.IMAGE_HOME}`;
     let gitPullCommand = `
     mkdir -p ${path};
     cd ${path};

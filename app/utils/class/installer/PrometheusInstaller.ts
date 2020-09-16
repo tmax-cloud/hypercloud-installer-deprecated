@@ -11,13 +11,15 @@ import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptPrometheusFactory from '../script/ScriptPrometheusFactory';
 
 export default class PrometheusInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME=`hypercloud-install-guide/Prometheus`;
-
   public static readonly IMAGE_DIR=`prometheus-install`;
+
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/Prometheus`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}`;
 
   public static readonly PROMETHEUS_VERSION=`2.11.0`;
 
@@ -285,8 +287,8 @@ export default class PrometheusInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${PrometheusInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${PrometheusInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${PrometheusInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -302,8 +304,8 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${PrometheusInstaller.IMAGE_DIR};
-    export PROMETHEUS_HOME=~/${PrometheusInstaller.IMAGE_DIR};
+    mkdir -p ~/${PrometheusInstaller.IMAGE_HOME};
+    export PROMETHEUS_HOME=~/${PrometheusInstaller.IMAGE_HOME};
     export PROMETHEUS_VERSION=v${PrometheusInstaller.PROMETHEUS_VERSION};
     export PROMETHEUS_OPERATOR_VERSION=v${PrometheusInstaller.PROMETHEUS_OPERATOR_VERSION};
     export NODE_EXPORTER_VERSION=v${PrometheusInstaller.NODE_EXPORTER_VERSION};

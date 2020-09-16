@@ -11,14 +11,16 @@ import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperAuthFactory from '../script/ScriptHyperAuthFactory';
 import CentosHyperAuthScript from '../script/CentosHyperAuthScript';
 
 export default class HyperAuthInstaller extends AbstractInstaller {
-  public static readonly INSTALL_HOME = `hypercloud-install-guide/HyperAuth`;
-
   public static readonly IMAGE_DIR = `hypercloud-operator-install`;
+
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/HyperAuth`;
+
+  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}`;
 
   public static readonly HPCD_VERSION=`1.0.3.4`;
 
@@ -174,8 +176,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   protected async _sendImageFile() {
     console.error('###### Start sending the image file to main master node... ######');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    const srcPath = `${rootPath}/${HyperAuthInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${HyperAuthInstaller.IMAGE_DIR}/`);
+    const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}/`;
+    await scp.sendFile(mainMaster, srcPath, `${HyperAuthInstaller.IMAGE_HOME}/`);
     console.error('###### Finish sending the image file to main master node... ######');
   }
 
@@ -190,8 +192,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   protected _getImagePushScript(): string {
     let gitPullCommand = `
-    mkdir -p ~/${HyperAuthInstaller.IMAGE_DIR};
-    export HPCD_HOME=~/${HyperAuthInstaller.IMAGE_DIR};
+    mkdir -p ~/${HyperAuthInstaller.IMAGE_HOME};
+    export HPCD_HOME=~/${HyperAuthInstaller.IMAGE_HOME};
     export HPCD_VERSION=v${HyperAuthInstaller.HPCD_VERSION};
     export REGISTRY=${this.env.registry};
     cd $HPCD_HOME;
