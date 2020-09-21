@@ -57,6 +57,7 @@ export function connectionTest(node: Node) {
   const ssh2 = require('ssh2');
   const connection = new ssh2();
 
+  console.debug('target node for connection test', node);
   return new Promise((resolve, reject) => {
     connection.connect({
       host: node.ip,

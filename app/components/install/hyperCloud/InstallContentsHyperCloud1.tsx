@@ -7,8 +7,8 @@ import productImage from '../../../../resources/assets/HyperCloud Operator_logo.
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 
-function InstallContentsHyperCloudOperator1(props: any) {
-  console.debug(InstallContentsHyperCloudOperator1.name, props);
+function InstallContentsHyperCloud1(props: any) {
+  console.debug(InstallContentsHyperCloud1.name, props);
   const { history, location, match } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
@@ -37,19 +37,19 @@ function InstallContentsHyperCloudOperator1(props: any) {
                 </div>
                 <div>
                   <span className={['large', 'thick'].join(' ')}>
-                    {CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}
+                    {CONST.PRODUCT.HYPERCLOUD.NAME}
                   </span>
                 </div>
                 <div>
                   <span className={['small', 'lightDark'].join(' ')}>
-                    {CONST.PRODUCT.HYPERCLOUD_OPERATOR.DESC}
+                    {CONST.PRODUCT.HYPERCLOUD.DESC}
                   </span>
                 </div>
               </div>
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME} 를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD.NAME} 를 설치할 수 있습니다.</span>
             <br />
             <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
           </div>
@@ -63,7 +63,7 @@ function InstallContentsHyperCloudOperator1(props: any) {
                 //   page: 2
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step2`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2`
                 );
               }}
             >
@@ -88,4 +88,4 @@ function InstallContentsHyperCloudOperator1(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperator1;
+export default InstallContentsHyperCloud1;

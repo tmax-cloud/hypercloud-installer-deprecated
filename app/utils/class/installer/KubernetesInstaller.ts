@@ -91,7 +91,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(registry: string, version: string, callback: any) {
-    console.error('###### Start installing main Master... ######');
+    console.error('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getK8sMainMasterInstallScript(
       mainMaster,
@@ -104,7 +104,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _installMaster(registry: string, version: string, callback: any) {
-    console.error('###### Start installing Master... ######');
+    console.error('@@@@@@ Start installing Master... @@@@@@');
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     const masterJoinCmd = await this._getMasterJoinCmd(mainMaster);
     await Promise.all(
@@ -124,7 +124,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _installWorker(registry: string, version: string, callback: any) {
-    console.error('###### Start installing Worker... ######');
+    console.error('@@@@@@ Start installing Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
     const workerJoinCmd = await this._getWorkerJoinCmd(mainMaster);
     await Promise.all(
@@ -143,7 +143,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _removeWorker() {
-    console.error('###### Start remove Worker... ######');
+    console.error('@@@@@@ Start remove Worker... @@@@@@');
     const { workerArr } = this.env.getNodesSortedByRole();
     await Promise.all(
       workerArr.map((worker: Node) => {
@@ -156,7 +156,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _removeMaster() {
-    console.error('###### Start remove Master... ######');
+    console.error('@@@@@@ Start remove Master... @@@@@@');
     const { masterArr } = this.env.getNodesSortedByRole();
     await Promise.all(
       masterArr.map((master: Node) => {
@@ -169,7 +169,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.error('###### Start remove main Master... ######');
+    console.error('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
     mainMaster.cmd = script.getK8sMasterRemoveScript();
@@ -180,7 +180,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   public async addWorker(registry: string, version: string, callback?: any) {
     await this._preWorkAddWorker(registry, version, callback);
 
-    console.error('###### Start adding Worker... ######');
+    console.error('@@@@@@ Start adding Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
     const workerJoinCmd = await this._getWorkerJoinCmd(mainMaster);
     await Promise.all(
@@ -199,7 +199,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   public async deleteWorker() {
-    console.error('###### Start deleting Worker... ######');
+    console.error('@@@@@@ Start deleting Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
     let command = '';
     workerArr.map(worker => {
@@ -222,7 +222,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     version: string,
     callback?: any
   ) {
-    console.error('###### Start pre work adding Worker... ######');
+    console.error('@@@@@@ Start pre work adding Worker... @@@@@@');
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
@@ -267,12 +267,12 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _downloadPackageFile() {
     // TODO: download package file
-    console.error('###### Start downloading the package file to client local... ######');
+    console.error('@@@@@@ Start downloading the package file to client local... @@@@@@');
     console.error('###### Finish downloading the package file to client local... ######');
   }
 
   private async _sendPackageFile() {
-    console.error('###### Start sending the package file to each node (using scp)... ######');
+    console.error('@@@@@@ Start sending the package file to each node (using scp)... @@@@@@');
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}/`;
     const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     console.debug(`srcPath`, srcPath);
@@ -286,7 +286,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _installLocalPackageRepository(callback: any) {
-    console.error('###### Start installing the local package repository at each node... ######');
+    console.error('@@@@@@ Start installing the local package repository at each node... @@@@@@');
     const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
@@ -299,7 +299,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _downloadGitFile() {
-    console.error('###### Start downloading the GIT file to client local... ######');
+    console.error('@@@@@@ Start downloading the GIT file to client local... @@@@@@');
     const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
     console.debug(`repoPath`, CONST.GIT_REPO);
     console.debug(`localPath`, localPath);
@@ -308,7 +308,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _sendGitFile() {
-    console.error('###### Start sending the GIT file to each node (using scp)... ######');
+    console.error('@@@@@@ Start sending the GIT file to each node (using scp)... @@@@@@');
     const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
     const destPath = `${Env.INSTALL_ROOT}/hypercloud-install-guide/`;
     await Promise.all(
@@ -320,7 +320,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _cloneGitFile(callback: any) {
-    console.error('###### Start clone the GIT file at each node... ######');
+    console.error('@@@@@@ Start clone the GIT file at each node... @@@@@@');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptKubernetesFactory.createScript(node.os.type);
@@ -331,8 +331,20 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.error('###### Finish clone the GIT file at each node... ######');
   }
 
+  private async _installPackage(callback: any, target: string) {
+    console.error('@@@@@@ Start package install... @@@@@@');
+    await Promise.all(
+      this.env.nodeList.map((node: Node) => {
+        const script = ScriptKubernetesFactory.createScript(node.os.type);
+        node.cmd = script.installPackage(target);
+        return node.exeCmd(callback);
+      })
+    );
+    console.error('###### Finish package install... ######');
+  }
+
   private async _installImageRegistry(registry: string, callback: any) {
-    console.error('###### Start installing the image registry at main master node... ######');
+    console.error('@@@@@@ Start installing the image registry at main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
     mainMaster.cmd = script.getImageRegistrySettingScript(
@@ -344,7 +356,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _setPublicPackageRepository(callback: any) {
-    console.error('###### Start setting the public package repository at each node... ######');
+    console.error('@@@@@@ Start setting the public package repository at each node... @@@@@@');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptKubernetesFactory.createScript(node.os.type);
@@ -402,11 +414,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
-      cp -f ~/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up mainMaster;
-      #rm -rf ~/hypercloud-install-guide;
+      #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       ${this._makeMasterCanSchedule(mainMaster.hostName)}
       `;
   }
@@ -430,11 +442,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
-      cp -f ~/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up master;
-      #rm -rf ~/hypercloud-install-guide;
+      #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       ${this._makeMasterCanSchedule(master.hostName)}
       `;
   }
@@ -455,11 +467,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
-      cp -f ~/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up worker;
-      #rm -rf ~/hypercloud-install-guide;
+      #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
 
@@ -504,7 +516,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _envSetting(param: { registry: string; version: string; callback: any; }) {
-    console.error('###### Start env setting... ######');
+    console.error('@@@@@@ Start env setting... @@@@@@');
     const { registry, version, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -524,6 +536,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
        * 1. git guide clone (각 노드) (현재 Kubernetes 설치 시에만 진행)
        */
       await this._cloneGitFile(callback);
+      await this._installPackage(callback, 'wget');
     }
 
     if (registry) {
@@ -538,7 +551,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { registry: string; version: string; callback: any; }) {
-    console.error('###### Start pre-installation... ######');
+    console.error('@@@@@@ Start pre-installation... @@@@@@');
     const { registry, version, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -571,12 +584,12 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download kubernetes image file
-    console.error('###### Start downloading the image file to client local... ######');
+    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
     console.error('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('###### Start sending the image file to main master node... ######');
+    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${KubernetesInstaller.IMAGE_HOME}/`);
@@ -584,7 +597,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   protected async _registryWork(param: { registry: any; callback: any; }) {
-    console.error('###### Start pushing the image at main master node... ######');
+    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { registry, callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript(registry);

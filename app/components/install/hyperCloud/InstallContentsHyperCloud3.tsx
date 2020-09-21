@@ -15,10 +15,13 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
+import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
+import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
+import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsHyperCloudOperator3(props: any) {
-  console.debug(InstallContentsHyperCloudOperator3.name, props);
+function InstallContentsHyperCloud3(props: any) {
+  console.debug(InstallContentsHyperCloud3.name, props);
   const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
@@ -61,10 +64,38 @@ function InstallContentsHyperCloudOperator3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
+    // operator install
     const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
     hyperCloudOperatorInstaller.env = nowEnv;
 
     await hyperCloudOperatorInstaller.install({
+      callback,
+      setProgress
+    });
+
+    // webhook install
+    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
+    hyperCloudWebhookInstaller.env = nowEnv;
+
+    await hyperCloudWebhookInstaller.install({
+      callback,
+      setProgress
+    });
+
+    // console install
+    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
+    hyperCloudConsoleInstaller.env = nowEnv;
+
+    await hyperCloudConsoleInstaller.install({
+      callback,
+      setProgress
+    });
+
+    // realm import
+    const hyperAuthInstaller = HyperAuthInstaller.getInstance;
+    hyperAuthInstaller.env = nowEnv;
+
+    await hyperAuthInstaller.realmImport({
       callback,
       setProgress
     });
@@ -100,7 +131,7 @@ function InstallContentsHyperCloudOperator3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2`
             );
           }}
         >
@@ -113,7 +144,7 @@ function InstallContentsHyperCloudOperator3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step4`
               );
             }}
           >
@@ -152,7 +183,7 @@ function InstallContentsHyperCloudOperator3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step1`
                 );
               }}
               color="primary"
@@ -169,4 +200,4 @@ function InstallContentsHyperCloudOperator3(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperator3;
+export default InstallContentsHyperCloud3;

@@ -60,7 +60,7 @@ export default class CniInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(type: string, version: string, callback: any) {
-    console.error('###### Start installing main Master... ######');
+    console.error('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     // const script = ScriptCniFactory.createScript(mainMaster.os.type)
     // mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
@@ -71,7 +71,7 @@ export default class CniInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster(type: string, version: string) {
-    console.error('###### Start remove main Master... ######');
+    console.error('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript(version);
     await mainMaster.exeCmd();
@@ -95,7 +95,7 @@ export default class CniInstaller extends AbstractInstaller {
     cd ~/${CniInstaller.INSTALL_HOME};
     kubectl delete -f calico_${CniInstaller.CNI_VERSION}.yaml;
     kubectl delete -f calicoctl_${CniInstaller.CTL_VERSION}.yaml;
-    ${CniInstaller.deleteCniConfigScript()};
+    ${CniInstaller.deleteCniConfigScript()}
     `;
   }
 
@@ -107,7 +107,7 @@ export default class CniInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { version: string; callback: any; }) {
-    console.error('###### Start pre-installation... ######');
+    console.error('@@@@@@ Start pre-installation... @@@@@@');
     const { version, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -137,12 +137,12 @@ export default class CniInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('###### Start downloading the image file to client local... ######');
+    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
     console.error('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('###### Start sending the image file to main master node... ######');
+    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${CniInstaller.IMAGE_HOME}/`);
@@ -150,7 +150,7 @@ export default class CniInstaller extends AbstractInstaller {
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('###### Start pushing the image at main master node... ######');
+    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();

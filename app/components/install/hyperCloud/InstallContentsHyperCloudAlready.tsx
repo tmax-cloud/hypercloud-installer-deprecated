@@ -22,6 +22,8 @@ import FinishImage from '../../../../resources/assets/img_finish.svg';
 import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
+import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
+import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -41,8 +43,8 @@ const useStyles = makeStyles(() =>
   })
 );
 
-function InstallContentsHyperCloudOperatorAlready(props: any) {
-  console.debug(InstallContentsHyperCloudOperatorAlready.name, props);
+function InstallContentsHyperCloudAlready(props: any) {
+  console.debug(InstallContentsHyperCloudAlready.name, props);
   const { history, match } = props;
 
   const appContext = useContext(AppContext);
@@ -50,7 +52,7 @@ function InstallContentsHyperCloudOperatorAlready(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const nowProduct = CONST.PRODUCT.HYPERCLOUD_OPERATOR;
+  const nowProduct = CONST.PRODUCT.HYPERCLOUD;
 
   // loading bar
   // const [loading, setLoading] = React.useState(false);
@@ -74,11 +76,21 @@ function InstallContentsHyperCloudOperatorAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME);
+    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.HYPERCLOUD.NAME);
 
+    // console delete
+    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
+    hyperCloudConsoleInstaller.env = nowEnv;
+    await hyperCloudConsoleInstaller.remove();
+
+    // webhook delete
+    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
+    hyperCloudWebhookInstaller.env = nowEnv;
+    await hyperCloudWebhookInstaller.remove();
+
+    // operator delete
     const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
     hyperCloudOperatorInstaller.env = nowEnv;
-
     await hyperCloudOperatorInstaller.remove();
   };
 
@@ -181,7 +193,7 @@ function InstallContentsHyperCloudOperatorAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    {CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME} 를 삭제하시겠습니까?
+                    {CONST.PRODUCT.HYPERCLOUD.NAME} 를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>
@@ -229,4 +241,4 @@ function InstallContentsHyperCloudOperatorAlready(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperatorAlready;
+export default InstallContentsHyperCloudAlready;

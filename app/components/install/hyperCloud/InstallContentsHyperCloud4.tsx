@@ -6,15 +6,15 @@ import * as env from '../../../utils/common/env';
 import FinishImage from '../../../../resources/assets/img_finish.svg';
 import routes from '../../../utils/constants/routes.json';
 
-function InstallContentsHyperCloudOperator4(props: any) {
-  console.debug(InstallContentsHyperCloudOperator4.name, props);
+function InstallContentsHyperCloud4(props: any) {
+  console.debug(InstallContentsHyperCloud4.name, props);
   const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME);
+  nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
   nowEnv.addProduct({
-    name: CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME
+    name: CONST.PRODUCT.HYPERCLOUD.NAME
   });
   // json 파일 저장
   env.updateEnv(nowEnv.name, nowEnv);
@@ -69,4 +69,4 @@ function InstallContentsHyperCloudOperator4(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperator4;
+export default InstallContentsHyperCloud4;

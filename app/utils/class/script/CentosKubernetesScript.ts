@@ -4,7 +4,7 @@ import Node, { ROLE } from '../Node';
 import AbstractCentosScript from './AbstractCentosScript';
 import { InterfaceKubernetesInstall } from './InterfaceKubernetesInstall';
 import CONST from '../../constants/constant';
-import { NETWORK_TYPE } from '../Env';
+import Env, { NETWORK_TYPE } from '../Env';
 import CniInstaller from '../installer/CniInstaller';
 import KubernetesInstaller from '../installer/KubernetesInstaller';
 
@@ -74,7 +74,7 @@ EOF`;
     const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
     return `
       cd ~/${KubernetesInstaller.INSTALL_HOME};
-      cp -f ~/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' k8s.config;
       sed -i 's|\\r$||g' install.sh;
@@ -87,7 +87,7 @@ EOF`;
       sudo yum remove -y keepalived;
       rm -rf /etc/keepalived/;
       ${this.deleteDockerScript()}
-      rm -rf ~/hypercloud-install-guide/;
+      rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/;
       yum install -y ipvsadm;
       ipvsadm --clear;
       rm -rf /var/lib/etcd/;

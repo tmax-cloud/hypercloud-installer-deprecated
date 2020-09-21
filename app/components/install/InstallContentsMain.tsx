@@ -90,7 +90,7 @@ function InstallContentsMain(props: any) {
     // }
     else if (productName === CONST.PRODUCT.HYPERAUTH.NAME) {
       image = HyperCloudOperatorImage;
-    } else if (productName === CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME) {
+    } else if (productName === CONST.PRODUCT.HYPERCLOUD.NAME) {
       image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.ROOK_CEPH.NAME) {
       image = RookCephImage;

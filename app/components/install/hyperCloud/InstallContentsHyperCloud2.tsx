@@ -15,8 +15,8 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 
-function InstallContentsHyperCloudOperator2(props: any) {
-  console.debug(InstallContentsHyperCloudOperator2.name, props);
+function InstallContentsHyperCloud2(props: any) {
+  console.debug(InstallContentsHyperCloud2.name, props);
   const { history, match, state, setState } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
@@ -32,7 +32,7 @@ function InstallContentsHyperCloudOperator2(props: any) {
   return (
     <div className={[styles.wrap].join(' ')}>
       <div>
-        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME} 를 환경에 설치 하시겠습니까?</span>
+        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD.NAME} 를 환경에 설치 하시겠습니까?</span>
       </div>
       <div
         style={{ marginTop: '50px' }}
@@ -49,7 +49,7 @@ function InstallContentsHyperCloudOperator2(props: any) {
               // type: state.type
             });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step3`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step3`
             );
           }}
         >
@@ -88,7 +88,7 @@ function InstallContentsHyperCloudOperator2(props: any) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                {CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME} 설정 화면에서 나가시겠습니까? 설정
+                {CONST.PRODUCT.HYPERCLOUD.NAME} 설정 화면에서 나가시겠습니까? 설정
                 내용은 저장되지 않습니다.
               </span>
             </DialogContentText>
@@ -100,7 +100,7 @@ function InstallContentsHyperCloudOperator2(props: any) {
               onClick={() => {
                 handleClose();
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step1`
                 );
               }}
             >
@@ -122,4 +122,4 @@ function InstallContentsHyperCloudOperator2(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperator2;
+export default InstallContentsHyperCloud2;

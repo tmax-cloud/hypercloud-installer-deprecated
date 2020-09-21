@@ -16,13 +16,15 @@ import ScriptHyperAuthFactory from '../script/ScriptHyperAuthFactory';
 import CentosHyperAuthScript from '../script/CentosHyperAuthScript';
 
 export default class HyperAuthInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR = `hypercloud-operator-install`;
+  public static readonly IMAGE_DIR = `hyperauth-install`;
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/HyperAuth`;
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}`;
 
-  public static readonly HPCD_VERSION=`1.0.3.4`;
+  public static readonly POSTGRES_VERSION=`9.6.2-alpine`;
+
+  public static readonly HYPERAUTH_VERSION=`1.0.3.4`;
 
   // singleton
   private static instance: HyperAuthInstaller;
@@ -41,21 +43,34 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   public async install(param: { callback: any; setProgress: Function; }) {
     const { callback, setProgress } = param;
 
-    // setProgress(10);
-    // await this._preWorkInstall({
-    //   callback
-    // });
-    // setProgress(60);
+    setProgress(10);
+    await this._preWorkInstall({
+      callback
+    });
+    setProgress(60);
     await this._installMainMaster(callback);
-    // setProgress(100);
+    setProgress(100);
   }
 
   public async remove() {
     await this._removeMainMaster();
   }
 
+  public async realmImport(param: { callback: any; setProgress: Function; }) {
+    const { callback, setProgress } = param;
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = `
+    export HYPERAUTH_SERVICE_IP=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    export HYPERCLOUD-CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    chmod 755 tmaxRealmImport.sh;
+    ./tmaxRealmImport.sh \${HYPERAUTH_SERVICE_IP} \${HYPERCLOUD-CONSOLE_IP};
+    `
+    await mainMaster.exeCmd(callback);
+  }
+
   private async _installMainMaster(callback: any) {
-    console.error('###### Start installing main Master... ######');
+    console.error('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. 초기화 작업
@@ -81,8 +96,11 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private _step1(): string {
+    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
+    sed -i 's/memory: "5Gi"/memory: "500Mi"/g' 1.initialization.yaml;
     kubectl apply -f 1.initialization.yaml;
     `;
   }
@@ -98,8 +116,11 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private _step3(): string {
+    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 2.hyperauth_deployment.yaml;
+    sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
     kubectl apply -f 2.hyperauth_deployment.yaml;
     `;
   }
@@ -133,22 +154,52 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
   }
 
+  private async rollbackApiServerYaml() {
+    const { mainMaster } = this.env.getNodesSortedByRole();
+
+    mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+    let apiServerYaml;
+    await mainMaster.exeCmd({
+      close: () => {},
+      stdout: (data: string) => {
+        apiServerYaml = YAML.parse(data.toString());
+      },
+      stderr: () => {},
+    });
+    console.error('apiServerYaml', apiServerYaml);
+    apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
+      return cmd.indexOf("--oidc") === -1;
+    })
+
+    console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+    mainMaster.cmd = `
+    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+    `
+    await mainMaster.exeCmd();
+  }
+
   private async _removeMainMaster() {
-    console.error('###### Start remove main Master... ######');
+    console.error('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
+
+    // kube-apiserver.yaml 수정
+    await this.rollbackApiServerYaml();
     console.error('###### Finish remove main Master... ######');
   }
 
   private _getRemoveScript(): string {
     return `
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    kubectl delete -f 2.hyperauth_deployment.yaml;
+    kubectl delete -f 1.initialization.yaml;
     `;
   }
 
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
-    console.error('###### Start pre-installation... ######');
+    console.error('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -169,12 +220,12 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('###### Start downloading the image file to client local... ######');
+    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
     console.error('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('###### Start sending the image file to main master node... ######');
+    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${HyperAuthInstaller.IMAGE_HOME}/`);
@@ -182,7 +233,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('###### Start pushing the image at main master node... ######');
+    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
@@ -193,35 +244,33 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   protected _getImagePushScript(): string {
     let gitPullCommand = `
     mkdir -p ~/${HyperAuthInstaller.IMAGE_HOME};
-    export HPCD_HOME=~/${HyperAuthInstaller.IMAGE_HOME};
-    export HPCD_VERSION=v${HyperAuthInstaller.HPCD_VERSION};
+    export HYPERAUTH_HOME=~/${HyperAuthInstaller.IMAGE_HOME};
+    export POSTGRES_VERSION=${HyperAuthInstaller.POSTGRES_VERSION};
+    export HYPERAUTH_VERSION=${HyperAuthInstaller.HYPERAUTH_VERSION};
     export REGISTRY=${this.env.registry};
-    cd $HPCD_HOME;
+    cd $HYPERAUTH_HOME;
     `;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       gitPullCommand += `
-      sudo docker load < mysql_5.6.tar;
-      sudo docker load < registry_2.6.2.tar;
-      sudo docker load < hypercloud-operator_b\${HPCD_VERSION}.tar;
+      sudo docker load < postgres_\${POSTGRES_VERSION}.tar;
+      sudo docker load < hyperauth_b\${HYPERAUTH_VERSION}.tar;
+      # sudo docker save tmaxcloudck/hyperauth:b\${HYPERAUTH_VERSION} > hyperauth_b\${HYPERAUTH_VERSION}.tar;
+      # sudo docker save postgres:\${POSTGRES_VERSION} > postgres_\${POSTGRES_VERSION}.tar;
       `;
     } else {
       gitPullCommand += `
-      sudo docker pull mysql:5.6;
-      sudo docker pull registry:2.6.2;
-      sudo docker pull tmaxcloudck/hypercloud-operator:b\${HPCD_VERSION};
-      wget -O hypercloud-operator.tar.gz https://github.com/tmax-cloud/hypercloud-operator/archive/v\${HPCD_VERSION}.tar.gz;
+      sudo docker pull postgres:\${POSTGRES_VERSION};
+      sudo docker pull tmaxcloudck/hyperauth:b\${HYPERAUTH_VERSION};
       `;
     }
     return `
       ${gitPullCommand}
-      sudo docker tag mysql:5.6 \${REGISTRY}/mysql:5.6
-      sudo docker tag registry:2.6.2 \${REGISTRY}/registry:2.6.2
-      sudo docker tag tmaxcloudck/hypercloud-operator:b\${HPCD_VERSION} \${REGISTRY}/tmaxcloudck/hypercloud-operator:b\${HPCD_VERSION}
+      sudo docker tag postgres:\${POSTGRES_VERSION} \${REGISTRY}/postgres:\${POSTGRES_VERSION}
+      sudo docker tag tmaxcloudck/hyperauth:b\${HYPERAUTH_VERSION}; \${REGISTRY}/tmaxcloudck/hyperauth:b\${HYPERAUTH_VERSION};
 
-      sudo docker push \${REGISTRY}/mysql:5.6
-      sudo docker push \${REGISTRY}/registry:2.6.2
-      sudo docker push \${REGISTRY}/tmaxcloudck/hypercloud-operator:b\${HPCD_VERSION}
-      #rm -rf $CNI_HOME;
+      sudo docker push \${REGISTRY}/postgres:\${POSTGRES_VERSION}
+      sudo docker push \${REGISTRY}/tmaxcloudck/hyperauth:b\${HYPERAUTH_VERSION};
+      #rm -rf $HYPERAUTH_HOME;
       `;
   }
 

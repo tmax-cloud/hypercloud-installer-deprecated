@@ -18,7 +18,7 @@ import ScriptRookCephFactory from '../script/ScriptRookCephFactory';
 export default class RookCephInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR=`rook-install`;
 
-  public static readonly INSTALL_HOME=`Env.INSTALL_ROOT}/hypercloud-install-guide/rook-ceph`;
+  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/rook-ceph`;
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}`;
 
@@ -64,10 +64,10 @@ export default class RookCephInstaller extends AbstractInstaller {
     );
 
     setProgress(10);
-    await this._preWorkInstall({
-      isCdi,
-      callback
-    });
+    // await this._preWorkInstall({
+    //   isCdi,
+    //   callback
+    // });
     setProgress(60);
     await this._installMainMaster(isCdi, callback);
     setProgress(100);
@@ -78,7 +78,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(isCdi: boolean, callback: any) {
-    console.error('###### Start installing main Master... ######');
+    console.error('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getInstallScript({
       isCdi
@@ -97,7 +97,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.error('###### Start remove rook-ceph... ######');
+    console.error('@@@@@@ Start remove rook-ceph... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
@@ -159,7 +159,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _setNtp(callback: any) {
-    console.error('###### Start setting ntp... ######');
+    console.error('@@@@@@ Start setting ntp... @@@@@@');
     const { mainMaster, masterArr, workerArr } = this.env.getNodesSortedByRole();
 
     // 기존 서버 목록 주석 처리
@@ -196,7 +196,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _installGdisk(callback: any) {
-    console.error('###### Start installing gdisk... ######');
+    console.error('@@@@@@ Start installing gdisk... @@@@@@');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptRookCephFactory.createScript(node.os.type)
@@ -213,10 +213,17 @@ export default class RookCephInstaller extends AbstractInstaller {
     sudo sgdisk --zap-all /dev/sdb;
     sudo ls /dev/mapper/ceph-* | sudo xargs -I% -- dmsetup remove %;
     sudo rm -rf /dev/ceph-*;
+    sudo dd if=/dev/zero of="/dev/sdb" bs=1M count=100 oflag=direct,dsync;
+    sudo blkdiscard /dev/sdb;
     `;
   }
 
   private async _EditYamlScript() {
+    /**
+     * 각 노드마다 OSD를 배포하도록 권장 (Taint 걸린 host 없는 걸 확인해야함)
+      총 OSD 개수는 3개 이상으로 권장
+      CephFS 및 RBD pool 설정 시 Replication 개수 3개 권장
+     */
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `cat ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`;
     let clusterYaml;
@@ -342,7 +349,7 @@ data:
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { isCdi?: boolean; callback: any; }) {
-    console.error('###### Start pre-installation... ######');
+    console.error('@@@@@@ Start pre-installation... @@@@@@');
     const { isCdi, callback } = param;
     await this._setNtp(callback);
     await this._installGdisk(callback);
@@ -367,12 +374,12 @@ data:
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('###### Start downloading the image file to client local... ######');
+    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
     console.error('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('###### Start sending the image file to main master node... ######');
+    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${RookCephInstaller.IMAGE_HOME}/`);
@@ -380,7 +387,7 @@ data:
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('###### Start pushing the image at main master node... ######');
+    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();

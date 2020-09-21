@@ -53,14 +53,12 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     await this._installMainMaster(callback);
   }
 
-  public async remove(param: { type: any; version: any; }) {
-    const { type, version } = param;
-
-    await this._removeMainMaster(type, version);
+  public async remove() {
+    await this._removeMainMaster();
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('###### Start installing main Master... ######');
+    console.error('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step0. deploy yaml 수정
@@ -109,23 +107,25 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     `;
   }
 
-  private async _removeMainMaster(type: string, version: string) {
-    console.error('###### Start remove main Master... ######');
+  private async _removeMainMaster() {
+    console.error('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    mainMaster.cmd = this._getRemoveScript(version);
+    mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
     console.error('###### Finish remove main Master... ######');
   }
 
 
-  private _getRemoveScript(version: string): string {
+  private _getRemoveScript(): string {
     return `
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/yaml/;
+    kubectl delete -f deploy.yaml;
     `;
   }
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { callback: any; }) {
-    console.error('###### Start pre-installation... ######');
+    console.error('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -155,12 +155,12 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('###### Start downloading the image file to client local... ######');
+    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
     console.error('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('###### Start sending the image file to main master node... ######');
+    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${IngressControllerInstaller.IMAGE_HOME}/`);
@@ -168,7 +168,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('###### Start pushing the image at main master node... ######');
+    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();

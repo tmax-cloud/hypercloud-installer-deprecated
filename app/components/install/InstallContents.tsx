@@ -11,7 +11,7 @@ import InstallContentsRookCeph from './rookCeph/InstallContentsRookCeph';
 import InstallContentsMetalLb from './metalLb/InstallContentsMetalLb';
 import InstallContentsPrometheus from './prometheus/InstallContentsPrometheus';
 import InstallContentsHyperAuth from './hyperauth/InstallContentsHyperAuth';
-import InstallContentsHyperCloudOperator from './hyperCloudOperator/InstallContentsHyperCloudOperator';
+import InstallContentsHyperCloudOperator from './hyperCloud/InstallContentsHyperCloud';
 
 function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
@@ -54,7 +54,7 @@ function InstallContents(props: any) {
           component={InstallContentsHyperAuth}
         />
         <Route
-          path={`${match.path}/${CONST.PRODUCT.HYPERCLOUD_OPERATOR.NAME}`}
+          path={`${match.path}/${CONST.PRODUCT.HYPERCLOUD.NAME}`}
           component={InstallContentsHyperCloudOperator}
         />
         <Redirect path="*" to={`${match.url}/main`} />

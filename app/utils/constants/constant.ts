@@ -5,7 +5,7 @@ const CONST = {
     KUBERNETES: {
       NAME: 'Kubernetes',
       IS_REQUIRED: true, // Required
-      DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 서비스',
+      DESC: '컨테이너화된 앱을 자동 배포하고 스케일링, 관리하는 시스템',
       SUPPORTED_VERSION: ['1.17.6']
     },
     CNI: {
@@ -18,17 +18,17 @@ const CONST = {
     METAL_LB: {
       NAME: 'MetalLB',
       IS_REQUIRED: true, // Optional
-      DESC: '로드 밸런싱 기능을 제공해주는 플러그인'
+      DESC: '로드 밸런싱 기능을 제공하는 플러그인'
     },
     ROOK_CEPH: {
       NAME: 'Rook Ceph',
       IS_REQUIRED: true, // Optional
-      DESC: '오픈 소스 소프트웨어 스토리지 플랫폼'
+      DESC: '스토리지 기능을 제공하는 플러그인'
     },
     PROMETHEUS: {
       NAME: 'Prometheus',
       IS_REQUIRED: true, // Optional
-      DESC: '이벤트 모니터링 및 경고에 사용되는 무료 소프트웨어 응용 프로그램'
+      DESC: '모니터링 및 경고 기능을 제공하는 플러그인'
     },
     // HELM: {
     //   NAME: 'Helm',
@@ -40,10 +40,10 @@ const CONST = {
       IS_REQUIRED: true, // Optional
       DESC: 'HyperAuth'
     },
-    HYPERCLOUD_OPERATOR: {
-      NAME: 'HyperCloudOperator',
+    HYPERCLOUD: {
+      NAME: 'HyperCloud',
       IS_REQUIRED: true, // Optional
-      DESC: 'HyperCloudOperator'
+      DESC: '쿠버네티스 기반의 오픈 클라우드 플랫폼'
     }
   }
 };

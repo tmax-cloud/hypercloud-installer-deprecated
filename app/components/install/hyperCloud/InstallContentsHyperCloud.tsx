@@ -1,15 +1,15 @@
 import React, { useReducer, useContext, useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router';
 import styles from '../InstallContents0.css';
-import InstallContentsHyperCloudOperator1 from './InstallContentsHyperCloudOperator1';
-import InstallContentsHyperCloudOperator2 from './InstallContentsHyperCloudOperator2';
-import InstallContentsHyperCloudOperator3 from './InstallContentsHyperCloudOperator3';
-import InstallContentsHyperCloudOperator4 from './InstallContentsHyperCloudOperator4';
-import InstallContentsHyperCloudOperatorAlready from './InstallContentsHyperCloudOperatorAlready';
+import InstallContentsHyperCloud1 from './InstallContentsHyperCloud1';
+import InstallContentsHyperCloud2 from './InstallContentsHyperCloud2';
+import InstallContentsHyperCloud3 from './InstallContentsHyperCloud3';
+import InstallContentsHyperCloud4 from './InstallContentsHyperCloud4';
+import InstallContentsHyperCloudAlready from './InstallContentsHyperCloudAlready';
 import InstallKubePlease from '../InstallKubePlease';
 
-function InstallContentsHyperCloudOperator(props: any) {
-  console.debug(InstallContentsHyperCloudOperator.name, props);
+function InstallContentsHyperCloud(props: any) {
+  console.debug(InstallContentsHyperCloud.name, props);
   const { history, location, match } = props;
 
   const [state, setState] = useState();
@@ -19,12 +19,12 @@ function InstallContentsHyperCloudOperator(props: any) {
       <Switch>
         <Route
           path={`${match.path}/step1`}
-          component={InstallContentsHyperCloudOperator1}
+          component={InstallContentsHyperCloud1}
         />
         <Route
           path={`${match.path}/step2`}
           render={() => (
-            <InstallContentsHyperCloudOperator2
+            <InstallContentsHyperCloud2
               history={history}
               match={match}
               location={location}
@@ -36,7 +36,7 @@ function InstallContentsHyperCloudOperator(props: any) {
         <Route
           path={`${match.path}/step3`}
           render={() => (
-            <InstallContentsHyperCloudOperator3
+            <InstallContentsHyperCloud3
               history={history}
               match={match}
               location={location}
@@ -48,7 +48,7 @@ function InstallContentsHyperCloudOperator(props: any) {
         <Route
           path={`${match.path}/step4`}
           render={() => (
-            <InstallContentsHyperCloudOperator4
+            <InstallContentsHyperCloud4
               history={history}
               match={match}
               location={location}
@@ -59,7 +59,7 @@ function InstallContentsHyperCloudOperator(props: any) {
         />
         <Route
           path={`${match.path}/already`}
-          component={InstallContentsHyperCloudOperatorAlready}
+          component={InstallContentsHyperCloudAlready}
         />
         <Route
           path={`${match.path}/impossible`}
@@ -70,4 +70,4 @@ function InstallContentsHyperCloudOperator(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudOperator;
+export default InstallContentsHyperCloud;
