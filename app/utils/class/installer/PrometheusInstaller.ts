@@ -72,7 +72,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getVersionEditScript();
     await mainMaster.exeCmd(callback);
@@ -99,15 +99,15 @@ export default class PrometheusInstaller extends AbstractInstaller {
     // kube-system namespace에 있는 모든 kube-schduler pod의 metadata.labels에k8s-app: kube-scheduler추가
     // kube-system namespace에 있는 모든 kube-contoroller-manager pod의 metadata.labels에k8s-app: kube-controller-manager 추가
     await this._EditYamlScript2();
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing main Master... ######');
   }
 
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+    console.debug('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove main Master... ######');
   }
 
   private _getVersionEditScript(): string {
@@ -258,7 +258,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { callback: any; }) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -275,31 +275,31 @@ export default class PrometheusInstaller extends AbstractInstaller {
       });
     }
 
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${PrometheusInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

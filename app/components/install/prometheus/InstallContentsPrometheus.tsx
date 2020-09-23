@@ -9,6 +9,7 @@ import InstallContentsPrometheus3 from './InstallContentsPrometheus3';
 import InstallContentsPrometheus4 from './InstallContentsPrometheus4';
 import InstallContentsPrometheusAlready from './InstallContentsPrometheusAlready';
 import InstallKubePlease from '../InstallKubePlease';
+import PrometheusInstaller from '../../../utils/class/installer/PrometheusInstaller';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -28,8 +29,7 @@ function InstallContentsPrometheus(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    version: '3.13.4',
-    type: 'Calico'
+    version: PrometheusInstaller.PROMETHEUS_VERSION
   });
 
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(

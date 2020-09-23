@@ -44,10 +44,8 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     await this._preWorkInstall({
       callback
     });
-    setProgress(20);
 
     await this._installMainMaster(callback);
-    setProgress(100);
   }
 
   public async remove() {
@@ -55,7 +53,7 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing webhook main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 0. hypercloud-webhook yaml 수정
@@ -85,11 +83,15 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     // Step 6. HyperCloud Audit Webhook Config 적용
     await this._step6();
 
+    // api-server yaml 수정 후, api server 재기동 되고 난 후에 다음 명령 실행 해야 함
+    // 10초 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
     // Step 7. test-yaml 배포
     mainMaster.cmd = this._step7();
     await mainMaster.exeCmd(callback);
 
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing webhook main Master... ######');
   }
 
   private _step0() {
@@ -180,12 +182,37 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     `;
   }
 
+  public async rollbackApiServerYaml() {
+    const { mainMaster } = this.env.getNodesSortedByRole();
+
+    mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+    let apiServerYaml;
+    await mainMaster.exeCmd({
+      close: () => {},
+      stdout: (data: string) => {
+        apiServerYaml = YAML.parse(data.toString());
+      },
+      stderr: () => {},
+    });
+    console.error('apiServerYaml', apiServerYaml);
+    apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
+      return cmd.indexOf("--audit") === -1;
+    })
+    delete apiServerYaml.spec.dnsPolicy;
+
+    console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+    mainMaster.cmd = `
+    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+    `
+    await mainMaster.exeCmd();
+  }
+
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+    console.debug('@@@@@@ Start remove webhook main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove webhook main Master... ######');
   }
 
   private _getRemoveScript(): string {
@@ -200,7 +227,7 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -216,30 +243,30 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
         callback
       });
     }
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudWebhookInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${HyperCloudWebhookInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

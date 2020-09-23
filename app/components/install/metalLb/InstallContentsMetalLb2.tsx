@@ -110,6 +110,16 @@ function InstallContentsMetalLb2(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.version}
+          </span>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>Address Pool</span>
         </div>
         <div>

@@ -39,6 +39,16 @@ function InstallContentsMetalLb3(props: any) {
     };
   }, []);
 
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.METAL_LB.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.METAL_LB.NAME,
+      version: state.version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
+
   // dialog
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -67,11 +77,19 @@ function InstallContentsMetalLb3(props: any) {
     const metalLbInstaller = MetalLbInstaller.getInstance;
     metalLbInstaller.env = nowEnv;
 
-    await metalLbInstaller.install({
-      data: state.data,
-      callback,
-      setProgress
-    });
+    try {
+      await metalLbInstaller.install({
+        data: state.data,
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await metalLbInstaller.remove();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

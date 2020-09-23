@@ -61,16 +61,17 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     export HYPERAUTH_SERVICE_IP=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
-    export HYPERCLOUD-CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    export HYPERCLOUD_CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    sed -i 's|\\r$||g' tmaxRealmImport.sh;
     chmod 755 tmaxRealmImport.sh;
-    ./tmaxRealmImport.sh \${HYPERAUTH_SERVICE_IP} \${HYPERCLOUD-CONSOLE_IP};
+    ./tmaxRealmImport.sh \${HYPERAUTH_SERVICE_IP} \${HYPERCLOUD_CONSOLE_IP};
     `
     await mainMaster.exeCmd(callback);
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. 초기화 작업
@@ -92,7 +93,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     // Step 4. Kubernetes OIDC 연동
     await this._step4();
 
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing main Master... ######');
   }
 
   private _step1(): string {
@@ -179,14 +180,14 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+    console.debug('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
 
     // kube-apiserver.yaml 수정
     await this.rollbackApiServerYaml();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove main Master... ######');
   }
 
   private _getRemoveScript(): string {
@@ -199,7 +200,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -215,30 +216,30 @@ export default class HyperAuthInstaller extends AbstractInstaller {
         callback
       });
     }
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${HyperAuthInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

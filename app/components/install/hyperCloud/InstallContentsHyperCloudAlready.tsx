@@ -92,6 +92,11 @@ function InstallContentsHyperCloudAlready(props: any) {
     const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
     hyperCloudOperatorInstaller.env = nowEnv;
     await hyperCloudOperatorInstaller.remove();
+
+    // webhook delete
+    // kube-apiserver.yaml 수정부분은 맨 마지막에 수행
+    // api server재기동에 시간이 걸려서, 다음 명령에서 kubectl이 동작하지 않음
+    await hyperCloudWebhookInstaller.rollbackApiServerYaml();
   };
 
   return (
@@ -132,21 +137,37 @@ function InstallContentsHyperCloudAlready(props: any) {
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>타입</span>
+              <span className={['medium', 'thick'].join(' ')}>
+                Operator Version
+              </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).type}
+                {nowEnv.isInstalled(nowProduct.NAME).operator_version}
               </span>
             </div>
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>버전</span>
+              <span className={['medium', 'thick'].join(' ')}>
+                Webhook Version
+              </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).version}
+                {nowEnv.isInstalled(nowProduct.NAME).webhook_version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>
+                Console Version
+              </span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {nowEnv.isInstalled(nowProduct.NAME).console_version}
               </span>
             </div>
           </div>

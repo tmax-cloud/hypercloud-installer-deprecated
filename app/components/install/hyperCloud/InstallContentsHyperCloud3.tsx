@@ -39,6 +39,18 @@ function InstallContentsHyperCloud3(props: any) {
     };
   }, []);
 
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.HYPERCLOUD.NAME,
+      operator_version: state.operator_version,
+      webhook_version: state.webhook_version,
+      console_version: state.console_version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
+
   // dialog
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -64,41 +76,56 @@ function InstallContentsHyperCloud3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    // operator install
     const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
     hyperCloudOperatorInstaller.env = nowEnv;
 
-    await hyperCloudOperatorInstaller.install({
-      callback,
-      setProgress
-    });
-
-    // webhook install
     const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
     hyperCloudWebhookInstaller.env = nowEnv;
 
-    await hyperCloudWebhookInstaller.install({
-      callback,
-      setProgress
-    });
-
-    // console install
     const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
     hyperCloudConsoleInstaller.env = nowEnv;
 
-    await hyperCloudConsoleInstaller.install({
-      callback,
-      setProgress
-    });
-
-    // realm import
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
 
-    await hyperAuthInstaller.realmImport({
-      callback,
-      setProgress
-    });
+    try {
+      // operator install
+      await hyperCloudOperatorInstaller.install({
+        callback,
+        setProgress
+      });
+      setProgress(30);
+
+      // webhook install
+      await hyperCloudWebhookInstaller.install({
+        callback,
+        setProgress
+      });
+      setProgress(60);
+
+      // console install
+      await hyperCloudConsoleInstaller.install({
+        callback,
+        setProgress
+      });
+      setProgress(90);
+
+      // realm import
+      await hyperAuthInstaller.realmImport({
+        callback,
+        setProgress
+      });
+      setProgress(100);
+    } catch (error) {
+      console.error(error);
+
+      await hyperCloudConsoleInstaller.remove();
+      await hyperCloudWebhookInstaller.remove();
+      await hyperCloudOperatorInstaller.remove();
+      await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

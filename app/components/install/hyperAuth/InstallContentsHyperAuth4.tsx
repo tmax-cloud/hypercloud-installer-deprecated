@@ -12,12 +12,13 @@ function InstallContentsHyperAuth4(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.HYPERAUTH.NAME);
-  nowEnv.addProduct({
-    name: CONST.PRODUCT.HYPERAUTH.NAME
-  });
-  // json 파일 저장
-  env.updateEnv(nowEnv.name, nowEnv);
+  // nowEnv.deleteProductByName(CONST.PRODUCT.HYPERAUTH.NAME);
+  // nowEnv.addProduct({
+  //   name: CONST.PRODUCT.HYPERAUTH.NAME,
+  //   version: state.version
+  // });
+  // // json 파일 저장
+  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -43,7 +44,7 @@ function InstallContentsHyperAuth4(props: any) {
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>버전</span>
+            <span className={['medium', 'thick'].join(' ')}>Version</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>

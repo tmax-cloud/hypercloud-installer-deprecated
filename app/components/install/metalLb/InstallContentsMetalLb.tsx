@@ -7,6 +7,7 @@ import InstallContentsMetalLb3 from './InstallContentsMetalLb3';
 import InstallContentsMetalLb4 from './InstallContentsMetalLb4';
 import InstallContentsMetalLbAlready from './InstallContentsMetalLbAlready';
 import InstallKubePlease from '../InstallKubePlease';
+import MetalLbInstaller from '../../../utils/class/installer/MetalLbInstaller';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -26,6 +27,7 @@ function InstallContentsMetalLb(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
+    version: MetalLbInstaller.METALLB_VERSION,
     data: []
   });
 

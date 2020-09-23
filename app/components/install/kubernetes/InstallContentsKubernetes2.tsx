@@ -61,33 +61,12 @@ function InstallContentsKubernetes2(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>
-            {CONST.PRODUCT.KUBERNETES.NAME} 버전
-          </span>
+          <span className={['medium'].join(' ')}>Version</span>
         </div>
         <div>
-          <FormControl variant="outlined" className={styles.select}>
-            {/* <InputLabel htmlFor="age-native-simple">Age</InputLabel> */}
-            <Select
-              native
-              value={state.version}
-              onChange={handleChangeVersion}
-              inputProps={{
-                name: 'age',
-                id: 'age-native-simple'
-              }}
-            >
-              {CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION.map(v => {
-                return (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                );
-              })}
-              {/* <option aria-label="None" value="" /> */}
-              {/* <option value="1.17.6">1.17.6</option> */}
-            </Select>
-          </FormControl>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.version}
+          </span>
         </div>
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>

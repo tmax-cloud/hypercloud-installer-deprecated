@@ -18,12 +18,13 @@ function InstallContentsRookCeph4(props: any) {
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.ROOK_CEPH.NAME);
-  nowEnv.addProduct({
-    name: CONST.PRODUCT.ROOK_CEPH.NAME
-  });
-  // json 파일 저장
-  env.updateEnv(nowEnv.name, nowEnv);
+  // nowEnv.deleteProductByName(CONST.PRODUCT.ROOK_CEPH.NAME);
+  // nowEnv.addProduct({
+  //   name: CONST.PRODUCT.ROOK_CEPH.NAME,
+  //   version: state.version
+  // });
+  // // json 파일 저장
+  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -48,14 +49,14 @@ function InstallContentsRookCeph4(props: any) {
           <img src={FinishImage} alt="Logo" />
         </div>
         <div style={{ marginBottom: '30px' }}>
-          {/* <div>
-            <span className={['medium', 'thick'].join(' ')}>버전</span>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>Version</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
               {state.version}
             </span>
-          </div> */}
+          </div>
         </div>
         {getRegistryJsx()}
         <div>

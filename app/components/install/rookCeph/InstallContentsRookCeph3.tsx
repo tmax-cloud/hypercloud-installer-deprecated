@@ -19,7 +19,7 @@ import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller'
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsRookCeph3(props: any) {
   console.debug(InstallContentsRookCeph3.name, props);
-  const { history, match } = props;
+  const { history, match, state } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState } = appContext;
@@ -38,6 +38,16 @@ function InstallContentsRookCeph3(props: any) {
       clearInterval(timer);
     };
   }, []);
+
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.ROOK_CEPH.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.ROOK_CEPH.NAME,
+      version: state.version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
 
   // dialog
   const [open, setOpen] = React.useState(false);
@@ -66,11 +76,20 @@ function InstallContentsRookCeph3(props: any) {
 
     const rookCephInstaller = RookCephInstaller.getInstance;
     rookCephInstaller.env = nowEnv;
-    await rookCephInstaller.install({
-      isCdi: false,
-      callback,
-      setProgress
-    });
+
+    try {
+      await rookCephInstaller.install({
+        isCdi: false,
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await rookCephInstaller.remove();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

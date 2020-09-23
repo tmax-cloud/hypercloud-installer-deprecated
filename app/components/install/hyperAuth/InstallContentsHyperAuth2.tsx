@@ -31,8 +31,15 @@ function InstallContentsHyperAuth2(props: any) {
 
   return (
     <div className={[styles.wrap].join(' ')}>
-      <div>
-        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERAUTH.NAME} 를 환경에 설치 하시겠습니까?</span>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.version}
+          </span>
+        </div>
       </div>
       <div
         style={{ marginTop: '50px' }}
@@ -44,10 +51,10 @@ function InstallContentsHyperAuth2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
-            setState({
-              // version: state.version,
-              // type: state.type
-            });
+            // setState({
+            //   // version: state.version,
+            //   // type: state.type
+            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step3`
             );

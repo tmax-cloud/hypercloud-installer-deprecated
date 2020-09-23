@@ -7,12 +7,15 @@ import InstallContentsHyperAuth3 from './InstallContentsHyperAuth3';
 import InstallContentsHyperAuth4 from './InstallContentsHyperAuth4';
 import InstallContentsHyperAuthAlready from './InstallContentsHyperAuthAlready';
 import InstallKubePlease from '../InstallKubePlease';
+import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 
 function InstallContentsHyperAuth(props: any) {
   console.debug(InstallContentsHyperAuth.name, props);
   const { history, location, match } = props;
 
-  const [state, setState] = useState();
+  const [state, setState] = useState({
+    version: HyperAuthInstaller.HYPERAUTH_VERSION
+  });
 
   return (
     <div className={['childUpDownCenter', styles.wrap].join(' ')}>

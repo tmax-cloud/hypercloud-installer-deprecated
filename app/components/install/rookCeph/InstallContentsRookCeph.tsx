@@ -7,6 +7,7 @@ import InstallContentsRookCeph3 from './InstallContentsRookCeph3';
 import InstallContentsRookCeph4 from './InstallContentsRookCeph4';
 import InstallContentsRookCephAlready from './InstallContentsRookCephAlready';
 import InstallKubePlease from '../InstallKubePlease';
+import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -26,8 +27,7 @@ function InstallContentsRookCeph(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    version: '3.13.4',
-    type: 'Calico'
+    version: RookCephInstaller.CEPH_VERSION
   });
 
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(

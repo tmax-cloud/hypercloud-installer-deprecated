@@ -14,6 +14,9 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
+import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
+import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
+import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 
 function InstallContentsHyperCloud2(props: any) {
   console.debug(InstallContentsHyperCloud2.name, props);
@@ -31,8 +34,35 @@ function InstallContentsHyperCloud2(props: any) {
 
   return (
     <div className={[styles.wrap].join(' ')}>
-      <div>
-        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD.NAME} 를 환경에 설치 하시겠습니까?</span>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Operator Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.operator_version}
+          </span>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Webhook Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.webhook_version}
+          </span>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Console Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.console_version}
+          </span>
+        </div>
       </div>
       <div
         style={{ marginTop: '50px' }}
@@ -44,10 +74,11 @@ function InstallContentsHyperCloud2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
-            setState({
-              // version: state.version,
-              // type: state.type
-            });
+            // setState({
+            //   operator_version: HyperCloudOperatorInstaller.HPCD_VERSION,
+            //   webhook_version: HyperCloudWebhookInstaller.WEBHOOK_VERSION,
+            //   console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
+            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step3`
             );

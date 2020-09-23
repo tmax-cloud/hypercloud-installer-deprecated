@@ -36,6 +36,16 @@ function InstallContentsHyperAuth3(props: any) {
     };
   }, []);
 
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.HYPERAUTH.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.HYPERAUTH.NAME,
+      version: state.version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
+
   // dialog
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -64,10 +74,18 @@ function InstallContentsHyperAuth3(props: any) {
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
 
-    await hyperAuthInstaller.install({
-      callback,
-      setProgress
-    });
+    try {
+      await hyperAuthInstaller.install({
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await hyperAuthInstaller.remove();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

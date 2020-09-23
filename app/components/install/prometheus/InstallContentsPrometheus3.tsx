@@ -19,7 +19,7 @@ import PrometheusInstaller from '../../../utils/class/installer/PrometheusInstal
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsPrometheus3(props: any) {
   console.debug(InstallContentsPrometheus3.name, props);
-  const { history, match } = props;
+  const { history, match, state } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState } = appContext;
@@ -38,6 +38,16 @@ function InstallContentsPrometheus3(props: any) {
       clearInterval(timer);
     };
   }, []);
+
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.PROMETHEUS.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.PROMETHEUS.NAME,
+      version: state.version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
 
   // dialog
   const [open, setOpen] = React.useState(false);
@@ -66,10 +76,19 @@ function InstallContentsPrometheus3(props: any) {
 
     const prometheusInstaller = PrometheusInstaller.getInstance;
     prometheusInstaller.env = nowEnv;
-    await prometheusInstaller.install({
-      callback,
-      setProgress
-    });
+
+    try {
+      await prometheusInstaller.install({
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await prometheusInstaller.remove();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

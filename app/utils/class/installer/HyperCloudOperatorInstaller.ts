@@ -44,7 +44,6 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     await this._preWorkInstall({
       callback
     });
-    setProgress(20);
 
     // ingress controller 설치
     const ingressControllerInstaller = IngressControllerInstaller.getInstance;
@@ -53,11 +52,9 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
       callback,
       setProgress
     });
-    setProgress(30);
 
     // operator 설치
     await this._installMainMaster(callback);
-    setProgress(80);
 
     // secret watcher 설치
     const secretWatcherInstaller = SecretWatcherInstaller.getInstance;
@@ -66,7 +63,6 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
       callback,
       setProgress
     });
-    setProgress(100);
   }
 
   public async remove() {
@@ -85,7 +81,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing hypercloud operator main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 0. install yaml 수정
@@ -100,19 +96,23 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step2();
     await mainMaster.exeCmd(callback);
 
-    // // Step 3. 2.mysql-settings.yaml 실행
+    // Step 3. 2.mysql-settings.yaml 실행
     mainMaster.cmd = this._step3();
     await mainMaster.exeCmd(callback);
 
-    // // Step 4. 3.mysql-create.yaml 실행
+    // Step 4. 3.mysql-create.yaml 실행
     mainMaster.cmd = this._step4();
     await mainMaster.exeCmd(callback);
 
-    // // Step 5. 4.hypercloud4-operator.yaml 실행
+    // Step 5. 4.hypercloud4-operator.yaml 실행
     mainMaster.cmd = this._step5();
     await mainMaster.exeCmd(callback);
 
-    console.error('###### Finish installing main Master... ######');
+    // Step 6. 6.default-auth-object-init.yaml 실행
+    mainMaster.cmd = this._step6();
+    await mainMaster.exeCmd(callback);
+
+    console.debug('###### Finish installing hypercloud operator main Master... ######');
   }
 
   private _step0() {
@@ -183,27 +183,36 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     `;
   }
 
+  private _step6() {
+    return `
+    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
+    kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/6.default-auth-object-init.yaml;
+    `;
+  }
+
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+    console.debug('@@@@@@ Start remove hypercloud operator main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove hypercloud operator main Master... ######');
   }
 
   private _getRemoveScript(): string {
     return `
     cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
+    kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/6.default-auth-object-init.yaml;
+
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
 
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
 
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/2.mysql-settings.yaml;
 
-    kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UserCRD.yaml;
-    kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UsergroupCRD.yaml;
-    kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/TokenCRD.yaml;
-    kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/ClientCRD.yaml;
+    # kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UserCRD.yaml;
+    # kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UsergroupCRD.yaml;
+    # kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/TokenCRD.yaml;
+    # kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/ClientCRD.yaml;
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Auth/UserSecurityPolicyCRD.yaml;
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Claim/NamespaceClaimCRD.yaml;
     kubectl delete -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_CRD/${HyperCloudOperatorInstaller.HPCD_VERSION}/Claim/ResourceQuotaClaimCRD.yaml;
@@ -221,7 +230,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   }
 
   private async _downloadYaml() {
-    console.error('@@@@@@ Start download yaml file from external... @@@@@@');
+    console.debug('@@@@@@ Start download yaml file from external... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     mkdir -p ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
@@ -229,12 +238,12 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     wget -O hypercloud-operator.tar.gz https://github.com/tmax-cloud/hypercloud-operator/archive/v${HyperCloudOperatorInstaller.HPCD_VERSION}.tar.gz;
     `;
     await mainMaster.exeCmd();
-    console.error('###### Finish download yaml file from external... ######');
+    console.debug('###### Finish download yaml file from external... ######');
   }
 
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -253,30 +262,30 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
         callback
       });
     }
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${HyperCloudOperatorInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

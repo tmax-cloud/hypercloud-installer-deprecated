@@ -33,11 +33,21 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 7000);
+    }, 5000);
     return () => {
       clearInterval(timer);
     };
   }, []);
+
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.KUBERNETES.NAME,
+      version: state.version
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
 
   // dialog
   const [open, setOpen] = React.useState(false);
@@ -67,12 +77,20 @@ function InstallContentsKubernetes3(props: any) {
     const kubernetesInstaller = KubernetesInstaller.getInstance;
     kubernetesInstaller.env = nowEnv;
 
-    await kubernetesInstaller.install({
-      registry: state.registry,
-      version: state.version,
-      callback,
-      setProgress
-    });
+    try {
+      await kubernetesInstaller.install({
+        registry: state.registry,
+        version: state.version,
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await kubernetesInstaller.remove();
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {

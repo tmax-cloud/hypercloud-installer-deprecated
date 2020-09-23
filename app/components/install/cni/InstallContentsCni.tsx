@@ -7,6 +7,7 @@ import InstallContentsCni3 from './InstallContentsCni3';
 import InstallContentsCni4 from './InstallContentsCni4';
 import InstallContentsCniAlready from './InstallContentsCniAlready';
 import InstallKubePlease from '../InstallKubePlease';
+import CniInstaller from '../../../utils/class/installer/CniInstaller';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -26,7 +27,7 @@ function InstallContentsCni(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    version: '3.13.4',
+    version: CniInstaller.CNI_VERSION,
     type: 'Calico'
   });
 

@@ -78,7 +78,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(isCdi: boolean, callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getInstallScript({
       isCdi
@@ -93,11 +93,11 @@ export default class RookCephInstaller extends AbstractInstaller {
     `;
     await mainMaster.exeCmd(callback);
 
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing main Master... ######');
   }
 
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove rook-ceph... @@@@@@');
+    console.debug('@@@@@@ Start remove rook-ceph... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
@@ -107,7 +107,7 @@ export default class RookCephInstaller extends AbstractInstaller {
         return node.exeCmd();
       })
     );
-    console.error('###### Finish remove rook-ceph... ######');
+    console.debug('###### Finish remove rook-ceph... ######');
   }
 
   private _getInstallScript(param: { isCdi: boolean }): string {
@@ -159,7 +159,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private async _setNtp(callback: any) {
-    console.error('@@@@@@ Start setting ntp... @@@@@@');
+    console.debug('@@@@@@ Start setting ntp... @@@@@@');
     const { mainMaster, masterArr, workerArr } = this.env.getNodesSortedByRole();
 
     // 기존 서버 목록 주석 처리
@@ -192,11 +192,11 @@ export default class RookCephInstaller extends AbstractInstaller {
         })
       );
     }
-    console.error('###### Finish setting ntp... ######');
+    console.debug('###### Finish setting ntp... ######');
   }
 
   private async _installGdisk(callback: any) {
-    console.error('@@@@@@ Start installing gdisk... @@@@@@');
+    console.debug('@@@@@@ Start installing gdisk... @@@@@@');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptRookCephFactory.createScript(node.os.type)
@@ -204,7 +204,7 @@ export default class RookCephInstaller extends AbstractInstaller {
         return node.exeCmd(callback);
       })
     );
-    console.error('###### Finish installing gdisk... ######');
+    console.debug('###### Finish installing gdisk... ######');
   }
 
   private _getRookCephRemoveConfigScript(): string{
@@ -349,7 +349,7 @@ data:
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { isCdi?: boolean; callback: any; }) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { isCdi, callback } = param;
     await this._setNtp(callback);
     await this._installGdisk(callback);
@@ -369,30 +369,30 @@ data:
     }
 
     // TODO: CDI
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${RookCephInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

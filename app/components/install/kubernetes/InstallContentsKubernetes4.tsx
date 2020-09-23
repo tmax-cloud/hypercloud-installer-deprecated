@@ -20,13 +20,13 @@ function InstallContentsKubernetes4(props: any) {
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
-  nowEnv.addProduct({
-    name: CONST.PRODUCT.KUBERNETES.NAME,
-    version: state.version
-  });
-  // json 파일 저장
-  env.updateEnv(nowEnv.name, nowEnv);
+  // nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
+  // nowEnv.addProduct({
+  //   name: CONST.PRODUCT.KUBERNETES.NAME,
+  //   version: state.version
+  // });
+  // // json 파일 저장
+  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.registry) {
@@ -54,7 +54,7 @@ function InstallContentsKubernetes4(props: any) {
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>버전</span>
+            <span className={['medium', 'thick'].join(' ')}>Version</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>

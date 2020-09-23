@@ -7,6 +7,7 @@ import InstallContentsKubernetes3 from './InstallContentsKubernetes3';
 import InstallContentsKubernetes4 from './InstallContentsKubernetes4';
 import InstallContentsKubernetesAlready from './InstallContentsKubernetesAlready';
 import CONST from '../../../utils/constants/constant';
+import KubernetesInstaller from '../../../utils/class/installer/KubernetesInstaller';
 
 // const initialState = {
 //   version: '1.17.3',
@@ -23,7 +24,7 @@ function InstallContentsKubernetes(props: any) {
   const { history, location, match } = props;
 
   const [state, setState] = useState({
-    version: CONST.PRODUCT.KUBERNETES.SUPPORTED_VERSION[0],
+    version: KubernetesInstaller.K8S_VERSION,
     registry: ''
   });
 

@@ -40,7 +40,7 @@ function InstallLnb(props: any) {
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
-  const nowEnv = env.loadEnvByName(match.params.envName);
+  let nowEnv = env.loadEnvByName(match.params.envName);
 
   const requiredProduct = product.getRequiredProduct();
   const optionalProduct = product.getOptionalProduct();
@@ -151,6 +151,7 @@ function InstallLnb(props: any) {
                         : [classes.nested, styles.listItemBox].join(' ')
                     }
                     onClick={() => {
+                      nowEnv = env.loadEnvByName(match.params.envName);
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
                     // disabled={disabled}

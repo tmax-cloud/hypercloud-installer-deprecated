@@ -136,14 +136,14 @@ function InstallContentsRookCephAlready(props: any) {
             </div> */}
           </div>
           <div>
-            {/* <div>
-              <span className={['medium', 'thick'].join(' ')}>버전</span>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
                 {nowEnv.isInstalled(nowProduct.NAME).version}
               </span>
-            </div> */}
+            </div>
           </div>
           <div>
             <span

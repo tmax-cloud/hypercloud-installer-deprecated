@@ -12,12 +12,15 @@ function InstallContentsHyperCloud4(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
-  nowEnv.addProduct({
-    name: CONST.PRODUCT.HYPERCLOUD.NAME
-  });
-  // json 파일 저장
-  env.updateEnv(nowEnv.name, nowEnv);
+  // nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
+  // nowEnv.addProduct({
+  //   name: CONST.PRODUCT.HYPERCLOUD.NAME,
+  //   operator_version: state.operator_version,
+  //   webhook_version: state.webhook_version,
+  //   console_version: state.console_version
+  // });
+  // // json 파일 저장
+  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -43,11 +46,37 @@ function InstallContentsHyperCloud4(props: any) {
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>버전</span>
+            <span className={['medium', 'thick'].join(' ')}>
+              Operator Version
+            </span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {state.version}
+              {state.operator_version}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>
+              Webhook Version
+            </span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.webhook_version}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>
+              Console Version
+            </span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.console_version}
             </span>
           </div>
         </div>

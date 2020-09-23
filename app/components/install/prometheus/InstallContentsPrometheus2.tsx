@@ -37,62 +37,15 @@ function InstallContentsPrometheus2(props: any) {
 
   return (
     <div className={[styles.wrap].join(' ')}>
-      {/* <div className={['childLeftRightLeft'].join(' ')}>
-        <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>PROMETHEUS</span>
-        </div>
-        <div>
-          <FormControl variant="outlined" className={styles.select}>
-            <InputLabel htmlFor="age-native-simple">Age</InputLabel>
-            <Select
-              native
-              value={state.type}
-              onChange={handleChangeType}
-              inputProps={{
-                name: 'age',
-                id: 'age-native-simple'
-              }}
-            >
-              {CONST.PRODUCT.PROMETHEUS.SUPPORTED_TYPE.map(v => {
-                return (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                );
-              })}
-            </Select>
-          </FormControl>
-        </div>
-      </div> */}
-      {/* <div className={['childLeftRightLeft'].join(' ')}>
+      <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>Version</span>
         </div>
         <div>
-          <FormControl variant="outlined" className={styles.select}>
-            <InputLabel htmlFor="age-native-simple">Age</InputLabel>
-            <Select
-              native
-              value={state.version}
-              onChange={handleChangeVersion}
-              inputProps={{
-                name: 'age',
-                id: 'age-native-simple'
-              }}
-            >
-              {CONST.PRODUCT.PROMETHEUS.SUPPORTED_VERSION.map(v => {
-                return (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                );
-              })}
-            </Select>
-          </FormControl>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.version}
+          </span>
         </div>
-      </div> */}
-      <div>
-        <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.PROMETHEUS.NAME} 를 환경에 설치 하시겠습니까?</span>
       </div>
       <div
         style={{ marginTop: '50px' }}
@@ -104,10 +57,10 @@ function InstallContentsPrometheus2(props: any) {
           className={['pink'].join(' ')}
           size="large"
           onClick={() => {
-            setState({
-              version: state.version,
-              type: state.type
-            });
+            // setState({
+            //   version: state.version,
+            //   type: state.type
+            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.PROMETHEUS.NAME}/step3`
             );

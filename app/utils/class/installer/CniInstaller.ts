@@ -53,32 +53,32 @@ export default class CniInstaller extends AbstractInstaller {
     setProgress(100);
   }
 
-  public async remove(param: { type: any; version: any; }) {
-    const { type, version } = param;
+  public async remove(param: { type: any; }) {
+    const { type } = param;
 
-    await this._removeMainMaster(type, version);
+    await this._removeMainMaster(type);
   }
 
   private async _installMainMaster(type: string, version: string, callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     // const script = ScriptCniFactory.createScript(mainMaster.os.type)
     // mainMaster.cmd = script.cloneGitFile(CONST.GIT_REPO, CONST.GIT_BRANCH);
     // mainMaster.cmd += this._getInstallScript(version);
-    mainMaster.cmd = this._getInstallScript(version);
+    mainMaster.cmd = this._getInstallScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing main Master... ######');
   }
 
-  private async _removeMainMaster(type: string, version: string) {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+  private async _removeMainMaster(type: string) {
+    console.debug('@@@@@@ Start remove main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
-    mainMaster.cmd = this._getRemoveScript(version);
+    mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove main Master... ######');
   }
 
-  private _getInstallScript(version: string): string {
+  private _getInstallScript(): string {
     return `
       cd ~/${CniInstaller.INSTALL_HOME};
       sed -i 's/v3.13.4/'v${CniInstaller.CNI_VERSION}'/g' calico_${CniInstaller.CNI_VERSION}.yaml;
@@ -90,7 +90,7 @@ export default class CniInstaller extends AbstractInstaller {
       `;
   }
 
-  private _getRemoveScript(version: string): string {
+  private _getRemoveScript(): string {
     return `
     cd ~/${CniInstaller.INSTALL_HOME};
     kubectl delete -f calico_${CniInstaller.CNI_VERSION}.yaml;
@@ -107,7 +107,7 @@ export default class CniInstaller extends AbstractInstaller {
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { version: string; callback: any; }) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { version, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -132,31 +132,31 @@ export default class CniInstaller extends AbstractInstaller {
         callback
       });
     }
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${CniInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

@@ -77,13 +77,10 @@ function InstallContentsHyperAuthAlready(props: any) {
 
     const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.HYPERAUTH.NAME);
 
-    // const cniInstaller = HyperAuthInstaller.getInstance;
-    cniInstaller.env = nowEnv;
+    const hyperAuthInstaller = HyperAuthInstaller.getInstance;
+    hyperAuthInstaller.env = nowEnv;
 
-    await cniInstaller.remove({
-      type,
-      version
-    });
+    await hyperAuthInstaller.remove();
   };
 
   return (
@@ -123,18 +120,18 @@ function InstallContentsHyperAuthAlready(props: any) {
             </MuiBox>
           </div>
           <div>
-            <div>
+            {/* <div>
               <span className={['medium', 'thick'].join(' ')}>타입</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
                 {nowEnv.isInstalled(nowProduct.NAME).type}
               </span>
-            </div>
+            </div> */}
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>버전</span>
+              <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>

@@ -21,7 +21,7 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperCloudConsoleInstaller.IMAGE_DIR}`;
 
-  public static readonly CONSOLE_VERSION=`4.1.4.1`;
+  public static readonly CONSOLE_VERSION=`4.1.4.6`;
 
   public static readonly CONSOLE_NAMESPACE=`console-system`;
 
@@ -48,10 +48,8 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
     await this._preWorkInstall({
       callback
     });
-    setProgress(20);
 
     await this._installMainMaster(callback);
-    setProgress(100);
   }
 
   public async remove() {
@@ -59,7 +57,7 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.error('@@@@@@ Start installing main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. Namespace, ResourceQuota, ServiceAccount, ClusterRole, ClusterRoleBinding 생성
@@ -82,7 +80,7 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step5();
     await mainMaster.exeCmd(callback);
 
-    console.error('###### Finish installing main Master... ######');
+    console.debug('###### Finish installing console main Master... ######');
   }
 
   private _step1() {
@@ -120,38 +118,50 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
     cd ~/${HyperCloudConsoleInstaller.INSTALL_HOME};
     sed -i 's/@@NAME_NS@@/${HyperCloudConsoleInstaller.CONSOLE_NAMESPACE}/g' 3.deployment-pod.yaml;
 
-    export HYPERCLOUD_OPERATOR_CLUSTER_IP=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.clusterIP}'\`
-    export HYPERCLOUD_OPERATOR_PORT=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.ports[0].port}'\`
+    export HYPERCLOUD_OPERATOR_CLUSTER_IP=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.clusterIP}'\`;
+    export HYPERCLOUD_OPERATOR_CLUSTER_IP=\${HYPERCLOUD_OPERATOR_CLUSTER_IP:-0.0.0.0}
+    export HYPERCLOUD_OPERATOR_PORT=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.ports[0].port}'\`;
+    export HYPERCLOUD_OPERATOR_PORT=\${HYPERCLOUD_OPERATOR_PORT:-28677}
     sed -i 's/@@HC4@@/'\${HYPERCLOUD_OPERATOR_CLUSTER_IP}':'\${HYPERCLOUD_OPERATOR_PORT}'/g' 3.deployment-pod.yaml;
 
     export PROMETHEUS_CLUSTER_IP=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="prometheus-k8s")].spec.clusterIP}'\`
+    export PROMETHEUS_CLUSTER_IP=\${PROMETHEUS_CLUSTER_IP:-0.0.0.0}
     export PROMETHEUS_PORT=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="prometheus-k8s")].spec.ports[0].port}'\`
+    export PROMETHEUS_PORT=\${PROMETHEUS_PORT:-9090}
     sed -i 's/@@PROM@@/'\${PROMETHEUS_CLUSTER_IP}':'\${PROMETHEUS_PORT}'/g' 3.deployment-pod.yaml;
 
     export GRAFANA_CLUSTER_IP=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="grafana")].spec.clusterIP}'\`
+    export GRAFANA_CLUSTER_IP=\${GRAFANA_CLUSTER_IP:-0.0.0.0}
     export GRAFANA_PORT=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="grafana")].spec.ports[0].port}'\`
+    export GRAFANA_PORT=\${GRAFANA_PORT:-3000}
     sed -i 's/@@GRAFANA@@/'\${GRAFANA_CLUSTER_IP}':'\${GRAFANA_PORT}'/g' 3.deployment-pod.yaml;
 
-    # sed -i 's/@@KIALI@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
-    # sed -i 's/@@JAEGER@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
-    # sed -i 's/@@APPROVAL@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
-    # sed -i 's/@@KUBEFLOW@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
+    sed -i 's/@@KIALI@@/0.0.0.0:20001/g' 3.deployment-pod.yaml;
+    sed -i 's/@@JAEGER@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
+    sed -i 's/@@APPROVAL@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
+    sed -i 's/@@KUBEFLOW@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
 
     export WEBHOOK_CLUSTER_IP=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-webhook-svc")].spec.clusterIP}'\`
+    export WEBHOOK_CLUSTER_IP=\${WEBHOOK_CLUSTER_IP:-0.0.0.0}
     export WEBHOOK_PORT=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-webhook-svc")].spec.ports[0].port}'\`
+    export WEBHOOK_PORT=\${WEBHOOK_PORT:-80}
     sed -i 's/@@WEBHOOK@@/'\${WEBHOOK_CLUSTER_IP}':'\${WEBHOOK_PORT}'/g' 3.deployment-pod.yaml;
 
-    # sed -i 's/@@VNC@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
+    sed -i 's/@@VNC@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
 
     export HYPERAUTH_CLUSTER_IP=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].spec.clusterIP}'\`
+    export HYPERAUTH_CLUSTER_IP=\${HYPERAUTH_CLUSTER_IP:-0.0.0.0}
     export HYPERAUTH_PORT=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].spec.ports[0].port}'\`
+    export HYPERAUTH_PORT=\${HYPERAUTH_PORT:-80}
     sed -i 's/@@HYPERAUTH@@/'\${HYPERAUTH_CLUSTER_IP}':'\${HYPERAUTH_PORT}'/g' 3.deployment-pod.yaml;
 
-    # sed -i 's/@@REALM@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
+    sed -i 's/@@REALM@@/tmax/g' 3.deployment-pod.yaml;
 
-    sed -i 's/@@KEYCLOAK@@/'\${HYPERAUTH_CLUSTER_IP}':'\${HYPERAUTH_PORT}'/g' 3.deployment-pod.yaml;
+    export HYPERAUTH_EXTERNAL_IP=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].status.loadBalancer.ingress[0].ip}'\`
+    export HYPERAUTH_EXTERNAL_IP=\${HYPERAUTH_EXTERNAL_IP:-0.0.0.0}
+    sed -i 's/@@KEYCLOAK@@/'\${HYPERAUTH_EXTERNAL_IP}'/g' 3.deployment-pod.yaml;
 
-    # sed -i 's/@@CLIENTID@@/${HyperCloudConsoleInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
+    sed -i 's/@@CLIENTID@@/hypercloud4/g' 3.deployment-pod.yaml;
     `;
 
     if (HyperCloudConsoleInstaller.HCDC_MODE) {
@@ -195,25 +205,26 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.error('@@@@@@ Start remove main Master... @@@@@@');
+    console.debug('@@@@@@ Start remove console main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.error('###### Finish remove main Master... ######');
+    console.debug('###### Finish remove console main Master... ######');
   }
 
   private _getRemoveScript(): string {
     return `
     cd ~/${HyperCloudConsoleInstaller.INSTALL_HOME};
     kubectl delete -f 3.deployment-pod.yaml;
-    kubectl delete -f 3.deployment-pod.yaml;
+    kubectl delete -f 2.svc-lb.yaml;
+    kubectl delete secret console-https-secret -n ${HyperCloudConsoleInstaller.CONSOLE_NAMESPACE};
     kubectl delete -f 1.initialization.yaml;
     #rm -rf ~/${HyperCloudConsoleInstaller.INSTALL_HOME};
     `;
   }
 
   private async _downloadYaml() {
-    console.error('@@@@@@ Start download yaml file from external... @@@@@@');
+    console.debug('@@@@@@ Start download yaml file from external... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     mkdir -p ~/${HyperCloudConsoleInstaller.INSTALL_HOME};
@@ -223,12 +234,12 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
     curl https://raw.githubusercontent.com/tmax-cloud/hypercloud-console4.1/hc-dev/install-yaml/3.deployment-pod.yaml > 3.deployment-pod.yaml;
     `;
     await mainMaster.exeCmd();
-    console.error('###### Finish download yaml file from external... ######');
+    console.debug('###### Finish download yaml file from external... ######');
   }
 
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
-    console.error('@@@@@@ Start pre-installation... @@@@@@');
+    console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -247,30 +258,30 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
         callback
       });
     }
-    console.error('###### Finish pre-installation... ######');
+    console.debug('###### Finish pre-installation... ######');
   }
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.error('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.error('###### Finish downloading the image file to client local... ######');
+    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
+    console.debug('###### Finish downloading the image file to client local... ######');
   }
 
   protected async _sendImageFile() {
-    console.error('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudConsoleInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${HyperCloudConsoleInstaller.IMAGE_HOME}/`);
-    console.error('###### Finish sending the image file to main master node... ######');
+    console.debug('###### Finish sending the image file to main master node... ######');
   }
 
   protected async _registryWork(param: { callback: any; }) {
-    console.error('@@@@@@ Start pushing the image at main master node... @@@@@@');
+    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.error('###### Finish pushing the image at main master node... ######');
+    console.debug('###### Finish pushing the image at main master node... ######');
   }
 
   protected _getImagePushScript(): string {

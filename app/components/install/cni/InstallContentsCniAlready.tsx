@@ -81,8 +81,7 @@ function InstallContentsCniAlready(props: any) {
     cniInstaller.env = nowEnv;
 
     await cniInstaller.remove({
-      type,
-      version
+      type
     });
   };
 
@@ -141,7 +140,7 @@ function InstallContentsCniAlready(props: any) {
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>버전</span>
+              <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>

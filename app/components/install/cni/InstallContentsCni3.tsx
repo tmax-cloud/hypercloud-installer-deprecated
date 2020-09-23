@@ -39,6 +39,17 @@ function InstallContentsCni3(props: any) {
     };
   }, []);
 
+  if (progress === 100) {
+    nowEnv.deleteProductByName(CONST.PRODUCT.CNI.NAME);
+    nowEnv.addProduct({
+      name: CONST.PRODUCT.CNI.NAME,
+      version: state.version,
+      type: state.type
+    });
+    // json 파일 저장
+    env.updateEnv(nowEnv.name, nowEnv);
+  }
+
   // dialog
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -67,12 +78,20 @@ function InstallContentsCni3(props: any) {
     const cniInstaller = CniInstaller.getInstance;
     cniInstaller.env = nowEnv;
 
-    await cniInstaller.install({
-      type: state.type,
-      version: state.version,
-      callback,
-      setProgress
-    });
+    try {
+      await cniInstaller.install({
+        type: state.type,
+        version: state.version,
+        callback,
+        setProgress
+      });
+    } catch (error) {
+      console.error(error);
+
+      await cniInstaller.remove(state.type);
+    } finally {
+      console.log();
+    }
   };
 
   React.useEffect(() => {
