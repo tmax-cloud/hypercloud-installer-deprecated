@@ -25,6 +25,7 @@ export default class RookCephInstaller extends AbstractInstaller {
   public static readonly CEPH_VERSION=`14.2.9`;
 
   public static readonly ROOK_VERSION=`1.3.6`;
+  // public static readonly ROOK_VERSION=`1.3.9`;
 
   public static readonly CEPHCSI_VERSION=`2.1.2`;
 
@@ -64,10 +65,10 @@ export default class RookCephInstaller extends AbstractInstaller {
     );
 
     setProgress(10);
-    // await this._preWorkInstall({
-    //   isCdi,
-    //   callback
-    // });
+    await this._preWorkInstall({
+      isCdi,
+      callback
+    });
     setProgress(60);
     await this._installMainMaster(isCdi, callback);
     setProgress(100);
@@ -168,7 +169,7 @@ export default class RookCephInstaller extends AbstractInstaller {
       // main master를 제외한 노드를 ntp client로 설정하기 위함
       let script = ScriptRookCephFactory.createScript(mainMaster.os.type)
       mainMaster.cmd = script.installNtp();
-      mainMaster.cmd += this._setNtpServer();
+      mainMaster.cmd += this._setNtpServer(mainMaster.os.type);
       await mainMaster.exeCmd(callback);
       workerArr.concat(masterArr);
       await Promise.all(
@@ -187,7 +188,7 @@ export default class RookCephInstaller extends AbstractInstaller {
         this.env.nodeList.map((node: Node) => {
           const script = ScriptRookCephFactory.createScript(node.os.type)
           node.cmd = script.installNtp();
-          node.cmd = this._setPublicNtp();
+          node.cmd += this._setPublicNtp();
           return node.exeCmd(callback);
         })
       );
@@ -208,13 +209,15 @@ export default class RookCephInstaller extends AbstractInstaller {
   }
 
   private _getRookCephRemoveConfigScript(): string{
+    // TODO: disk 이름 받아오는 것으로 변경해야함
+    const diskName = 'sdb';
     return `
     sudo rm -rf /var/lib/rook;
-    sudo sgdisk --zap-all /dev/sdb;
+    sudo sgdisk --zap-all /dev/${diskName};
     sudo ls /dev/mapper/ceph-* | sudo xargs -I% -- dmsetup remove %;
     sudo rm -rf /dev/ceph-*;
-    sudo dd if=/dev/zero of="/dev/sdb" bs=1M count=100 oflag=direct,dsync;
-    sudo blkdiscard /dev/sdb;
+    sudo dd if=/dev/zero of="/dev/${diskName}" bs=1M count=100 oflag=direct,dsync;
+    sudo blkdiscard /dev/${diskName};
     `;
   }
 
@@ -234,6 +237,7 @@ export default class RookCephInstaller extends AbstractInstaller {
       },
       stderr: () => {},
     });
+    // 리소스 최소값 설정
     // clusterYaml.spec.resources = {
     //   osd: {
     //     limits:{
@@ -269,11 +273,14 @@ export default class RookCephInstaller extends AbstractInstaller {
     clusterYaml.spec.storage.useAllNodes = true;
     clusterYaml.spec.storage.useAllDevices = true;
 
+    // TODO:
+    // 환경에 osd 설치가 가능한 디스크 개수 알아 내야 함
+    // 현재 임의 값으로 설정
+    const osdCnt = 3;
+
     mainMaster.cmd = '';
-    if (true) {
-      // TODO:
+    if (osdCnt < 3) {
       // osd 3개 이상 보장 못 할 경우
-      // 현재 항상 true로 설정
       mainMaster.cmd += `
       echo "kind: ConfigMap
 apiVersion: v1
@@ -297,19 +304,23 @@ data:
     // file_system.yaml에
     // preferredDuringSchedulingIgnoredDuringExecution 가 중복되어 2개가 있어서 파서에서 에러남
     // 임시로 sed 명령어로 바꾸는 것으로 해결
-    // 기본적으로 노드가 3개인걸로 yaml이 구성되어 있음
-    // 1개도 가능하도록 수정해 주어야 함
-    mainMaster.cmd = `
-    sed -i 's/requireSafeReplicaSize: true/requireSafeReplicaSize: false/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/block_pool.yaml;
-    sed -i 's/size: 3/size: 1/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/block_pool.yaml;
+    if (osdCnt < 3) {
+      // osd 3개 이상 보장 못 할 경우
+      mainMaster.cmd = `
+      sed -i 's/requireSafeReplicaSize: true/requireSafeReplicaSize: false/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/block_pool.yaml;
+      sed -i 's/size: 3/size: 1/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/block_pool.yaml;
 
-    sed -i 's/requireSafeReplicaSize: true/requireSafeReplicaSize: false/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/size: 3/size: 1/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      sed -i 's/requireSafeReplicaSize: true/requireSafeReplicaSize: false/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      sed -i 's/size: 3/size: 1/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      `;
+    }
 
-    # sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    # sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    # sed -i 's/#    cpu: "4"/    cpu: "2"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    # sed -i 's/#    memory: "4096Mi"/    memory: "2048Mi"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    // 리소스 최소값 설정
+    mainMaster.cmd += `
+    #sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    #sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    #sed -i 's/#    cpu: "4"/    cpu: "2"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    #sed -i 's/#    memory: "4096Mi"/    memory: "2048Mi"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
     `;
     await mainMaster.exeCmd();
   }
@@ -329,7 +340,7 @@ data:
     `;
   }
 
-  private _setNtpServer(): string {
+  private _setNtpServer(osType:  string): string {
     return `
     interfaceName=\`ls /sys/class/net | grep ens\`;
     inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;

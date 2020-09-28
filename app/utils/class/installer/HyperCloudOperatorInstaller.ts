@@ -177,8 +177,11 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   }
 
   private _step5() {
+    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
     return `
     cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
+    sed -i 's/memory: "1Gi"/memory: "500Mi"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+    sed -i 's/cpu: "1"/cpu: "0.5"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;
   }

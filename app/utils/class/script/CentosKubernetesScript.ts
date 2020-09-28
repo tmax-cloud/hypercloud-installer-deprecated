@@ -28,7 +28,7 @@ EOF`;
     yum-config-manager --enable 'CentOS-7 - Base';
     yum-config-manager --enable 'CentOS-7 - Extras';
     yum-config-manager --enable 'CentOS-7 - Updates';
-    sudo yum clean all && yum repolist;
+    sudo yum clean all;
 
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_7/devel:kubic:libcontainers:stable.repo;
     curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crioVersion}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:${crioVersion}.repo;
@@ -158,7 +158,7 @@ EOF
     yum-config-manager --disable 'CentOS-7 - Base';
     yum-config-manager --disable 'CentOS-7 - Extras';
     yum-config-manager --disable 'CentOS-7 - Updates';
-    sudo yum clean all && yum repolist;
+    sudo yum clean all;
     #rm -rf ${destPath};
     `;
   }

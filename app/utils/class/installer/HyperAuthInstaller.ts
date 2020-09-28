@@ -24,7 +24,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   public static readonly POSTGRES_VERSION=`9.6.2-alpine`;
 
-  public static readonly HYPERAUTH_VERSION=`1.0.3.4`;
+  public static readonly HYPERAUTH_VERSION=`1.0.5.6`;
 
   // singleton
   private static instance: HyperAuthInstaller;
@@ -121,13 +121,20 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 2.hyperauth_deployment.yaml;
-    sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
+    sed -i 's/cpu: "1"/cpu: "0.5"/g' 2.hyperauth_deployment.yaml;
     kubectl apply -f 2.hyperauth_deployment.yaml;
     `;
   }
 
   private async _step4() {
     const { mainMaster } = this.env.getNodesSortedByRole();
+
+    // FIXME:
+    // 일단 --oidc 부분 있으면 삭제
+    // hyperauth 삭제 할 때 --oidc부분을 삭제하면
+    // api-server가 에러남
+    // 그래서 설치 전에 해주는 것으로 임시로 변경해놓음
+    await this.rollbackApiServerYaml();
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
     let apiServerYaml;
@@ -186,7 +193,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     // kube-apiserver.yaml 수정
-    await this.rollbackApiServerYaml();
+    // await this.rollbackApiServerYaml();
     console.debug('###### Finish remove main Master... ######');
   }
 
@@ -194,6 +201,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     kubectl delete -f 2.hyperauth_deployment.yaml;
+    # kubectl delete secret hyperauth-https-secret -n hyperauth;
+    # rm -rf /etc/kubernetes/pki/hyperauth.crt;
     kubectl delete -f 1.initialization.yaml;
     `;
   }

@@ -51,7 +51,7 @@ export default class Node {
     this._hostName = hostName;
   }
 
-  public async exeCmd(callback?: any): any {
+  public async exeCmd(callback?: any) {
     const promise = await ssh.send(this, callback);
     // FIXME:cmd 초기화 하지 않으면 env.json에 저장됨...
     this.cmd = '';

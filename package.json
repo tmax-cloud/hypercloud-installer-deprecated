@@ -52,7 +52,7 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
+    "productName": "HyperCloud 4.1 Installer ",
     "appId": "org.develar.ElectronReact",
     "files": [
       "dist/",

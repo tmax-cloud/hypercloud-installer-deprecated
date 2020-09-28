@@ -50,14 +50,14 @@ function InstallContentsPrometheus4(props: any) {
           <img src={FinishImage} alt="Logo" />
         </div>
         <div style={{ marginBottom: '30px' }}>
-          {/* <div>
+          <div>
             <span className={['medium', 'thick'].join(' ')}>Version</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
               {state.version}
             </span>
-          </div> */}
+          </div>
         </div>
         {getRegistryJsx()}
         <div>

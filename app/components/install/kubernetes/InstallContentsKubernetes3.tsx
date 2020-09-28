@@ -33,7 +33,7 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 5000);
+    }, 7000);
     return () => {
       clearInterval(timer);
     };

@@ -82,8 +82,8 @@ export default class PrometheusInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // setup/ yaml 적용 후, 특정 pod가 뜨고 난 후 다음 작업 해야함
-    // 10초 대기
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    // 20초 대기
+    await new Promise(resolve => setTimeout(resolve, 20000));
 
     // Step 2. Prometheus 모듈들에 대한 deploy 및 RBAC 생성
     mainMaster.cmd = this._step2();

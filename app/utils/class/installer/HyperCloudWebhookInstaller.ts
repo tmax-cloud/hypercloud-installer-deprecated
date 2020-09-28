@@ -22,7 +22,7 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperCloudWebhookInstaller.IMAGE_DIR}`;
 
-  public static readonly WEBHOOK_VERSION=`b4.1.0.22`;
+  public static readonly WEBHOOK_VERSION=`4.1.0.22`;
 
   // singleton
   private static instance: HyperCloudWebhookInstaller;
@@ -99,7 +99,7 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     cd ~/${HyperCloudWebhookInstaller.INSTALL_HOME}/manifests;
     export WEBHOOK_VERSION=${HyperCloudWebhookInstaller.WEBHOOK_VERSION};
 
-    sed -i 's/{webhook_version}/'\${WEBHOOK_VERSION}'/g' 02_webhook-deployment.yaml;
+    sed -i 's/{webhook_version}/'b\${WEBHOOK_VERSION}'/g' 02_webhook-deployment.yaml;
     sed -i 's/{hostname}/'\${HOSTNAME}'/g' 02_webhook-deployment.yaml;
     `;
 
@@ -279,18 +279,18 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     `;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       gitPullCommand += `
-      sudo docker load < hypercloud-webhook_\${WEBHOOK_VERSION}.tar;
+      sudo docker load < hypercloud-webhook_b\${WEBHOOK_VERSION}.tar;
       `;
     } else {
       gitPullCommand += `
-      sudo docker pull tmaxcloudck/hypercloud-webhook:\${WEBHOOK_VERSION};
+      sudo docker pull tmaxcloudck/hypercloud-webhook:b\${WEBHOOK_VERSION};
       `;
     }
     return `
       ${gitPullCommand}
-      sudo docker tag tmaxcloudck/hypercloud-webhook:\${WEBHOOK_VERSION} \${REGISTRY}/hypercloud-webhook:\${WEBHOOK_VERSION};
+      sudo docker tag tmaxcloudck/hypercloud-webhook:b\${WEBHOOK_VERSION} \${REGISTRY}/hypercloud-webhook:b\${WEBHOOK_VERSION};
 
-      sudo docker push \${REGISTRY}/hypercloud-webhook:\${WEBHOOK_VERSION}
+      sudo docker push \${REGISTRY}/hypercloud-webhook:b\${WEBHOOK_VERSION}
       #rm -rf $WEBHOOK_HOME;
       `;
   }

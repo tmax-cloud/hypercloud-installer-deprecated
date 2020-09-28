@@ -62,7 +62,7 @@ const createWindow = async () => {
     height: 768,
     minWidth: 1024,
     minHeight: 768,
-    // icon: path.join(__dirname, './resource/assets/logo_installer.png'),
+    icon: path.join(__dirname, './resource/assets/test.png'),
     // webPreferences:
     //   process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
     //     ? {
