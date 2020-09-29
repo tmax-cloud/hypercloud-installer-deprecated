@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="6px" height="6px" viewBox="0 0 6 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_mark</title>
+    <g id="Ch1.Installer-Layout" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00_01_05_Kubernetes" transform="translate(-734.000000, -504.000000)" fill="#E61244">
+            <g id="Group-Copy-2" transform="translate(651.000000, 500.000000)">
+                <g id="ic_mark" transform="translate(83.000000, 4.000000)">
+                    <g id="mark" transform="translate(3.000000, 3.000000) rotate(-270.000000) translate(-3.000000, -3.000000) ">
+                        <rect id="Rectangle" x="0" y="2.4" width="6" height="1"></rect>
+                        <rect id="Rectangle" transform="translate(3.000000, 2.900000) rotate(-300.000000) translate(-3.000000, -2.900000) " x="0" y="2.4" width="6" height="1"></rect>
+                        <rect id="Rectangle" transform="translate(3.000000, 2.900000) scale(-1, 1) rotate(-300.000000) translate(-3.000000, -2.900000) " x="0" y="2.4" width="6" height="1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

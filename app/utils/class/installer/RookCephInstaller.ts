@@ -276,7 +276,7 @@ export default class RookCephInstaller extends AbstractInstaller {
     // TODO:
     // 환경에 osd 설치가 가능한 디스크 개수 알아 내야 함
     // 현재 임의 값으로 설정
-    const osdCnt = 3;
+    const osdCnt = 1;
 
     mainMaster.cmd = '';
     if (osdCnt < 3) {

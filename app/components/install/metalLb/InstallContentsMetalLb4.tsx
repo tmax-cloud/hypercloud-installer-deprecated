@@ -4,7 +4,7 @@ import styles from '../InstallContents4.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../../utils/constants/constant';
 import * as env from '../../../utils/common/env';
-import FinishImage from '../../../../resources/assets/img_finish.svg';
+import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import routes from '../../../utils/constants/routes.json';
 
 function InstallContentsMetalLb4(props: any) {
@@ -63,7 +63,7 @@ function InstallContentsMetalLb4(props: any) {
         <div>
           <Button
             variant="contained"
-            className={['white'].join(' ')}
+            className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
               history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);

@@ -58,7 +58,7 @@ function InstallContentsRookCeph2(props: any) {
         <Button
           variant="contained"
           style={{ marginRight: '10px' }}
-          className={['pink'].join(' ')}
+          className={['primary'].join(' ')}
           size="large"
           onClick={() => {
             // setState({
@@ -74,7 +74,7 @@ function InstallContentsRookCeph2(props: any) {
         </Button>
         <Button
           variant="contained"
-          className={['white'].join(' ')}
+          className={['secondary'].join(' ')}
           size="large"
           onClick={() => {
             handleClickOpen();
@@ -112,7 +112,7 @@ function InstallContentsRookCeph2(props: any) {
           </DialogContent>
           <DialogActions>
             <Button
-              className={['blue'].join(' ')}
+              className={['primary'].join(' ')}
               size="small"
               onClick={() => {
                 handleClose();
@@ -124,7 +124,7 @@ function InstallContentsRookCeph2(props: any) {
               나가기
             </Button>
             <Button
-              className={['white'].join(' ')}
+              className={['secondary'].join(' ')}
               onClick={handleClose}
               color="primary"
               size="small"

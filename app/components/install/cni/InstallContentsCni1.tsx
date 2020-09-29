@@ -59,7 +59,7 @@ function InstallContentsCni1(props: any) {
           <div>
             <Button
               variant="contained"
-              className={['blue'].join(' ')}
+              className={['primary'].join(' ')}
               size="large"
               onClick={() => {
                 // dispatchKubeInstall({

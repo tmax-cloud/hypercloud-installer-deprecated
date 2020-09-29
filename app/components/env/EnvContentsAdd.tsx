@@ -388,7 +388,7 @@ function EnvContentsAdd(props: any) {
     if (envBeforeEdit) {
       return envBeforeEdit.networkType;
     }
-    return NETWORK_TYPE.INTERNAL;
+    return NETWORK_TYPE.EXTERNAL;
   });
   const handleChangeType = (event: React.ChangeEvent<HTMLInputElement>) => {
     setType((event.target as HTMLInputElement).value);
@@ -436,7 +436,11 @@ function EnvContentsAdd(props: any) {
             <span style={{ color: 'red' }}>*</span>
           </div>
           <div>
-            <FormControl component="fieldset" disabled={envBeforeEdit !== null}>
+            <FormControl
+              component="fieldset"
+              disabled
+              //  disabled={envBeforeEdit !== null}
+            >
               {/* <FormLabel component="legend">Gender</FormLabel> */}
               <RadioGroup
                 aria-label="gender"
@@ -448,12 +452,12 @@ function EnvContentsAdd(props: any) {
                   <FormControlLabel
                     value={NETWORK_TYPE.INTERNAL}
                     control={<Radio />}
-                    label="Can Not access Internet (Internal)"
+                    label="내부망 (인터넷 접속 불가)"
                   />
                   <FormControlLabel
                     value={NETWORK_TYPE.EXTERNAL}
                     control={<Radio />}
-                    label="Can access Internet (External)"
+                    label="외부망 (인터넷 접속 가능)"
                   />
                 </div>
               </RadioGroup>
@@ -561,11 +565,11 @@ function EnvContentsAdd(props: any) {
               />
             )} */}
               <Button
-                className={['white', 'indicator'].join(' ')}
+                className={['secondary', styles.nodeAddButton].join(' ')}
                 variant="contained"
                 color="primary"
                 size="small"
-                startIcon={<AddIcon />}
+                // startIcon={<AddIcon />}
                 onClick={() => {
                   let hasError = false;
                   if (hasIpError()) hasError = true;
@@ -651,7 +655,7 @@ function EnvContentsAdd(props: any) {
                     });
                 }}
               >
-                추가
+                + 추가
               </Button>
             </div>
           </div>
@@ -742,13 +746,13 @@ function EnvContentsAdd(props: any) {
           className={[
             styles.rowBox,
             'childUpDownCenter',
-            'childLeftRightCenter'
+            'childLeftRightRight'
           ].join(' ')}
         >
           <Button
             variant="contained"
             style={{ marginRight: '10px' }}
-            className={['pink'].join(' ')}
+            className={['primary'].join(' ')}
             size="large"
             onClick={async () => {
               let hasError = false;
@@ -947,7 +951,7 @@ function EnvContentsAdd(props: any) {
           </Button>
           <Button
             variant="contained"
-            className={['white'].join(' ')}
+            className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
               handleClickOpen();
@@ -994,7 +998,7 @@ function EnvContentsAdd(props: any) {
             </DialogContent>
             <DialogActions>
               <Button
-                className={['blue'].join(' ')}
+                className={['primary'].join(' ')}
                 size="small"
                 onClick={() => {
                   handleClose();
@@ -1008,7 +1012,7 @@ function EnvContentsAdd(props: any) {
                 나가기
               </Button>
               <Button
-                className={['white'].join(' ')}
+                className={['secondary'].join(' ')}
                 size="small"
                 onClick={handleClose}
                 autoFocus

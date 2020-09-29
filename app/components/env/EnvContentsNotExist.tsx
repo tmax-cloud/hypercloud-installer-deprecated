@@ -28,7 +28,7 @@ function EnvContentsNotExist(props: any) {
             <Link to={routes.ENV.ADD}>
               <Button
                 variant="contained"
-                className={['pink'].join(' ')}
+                className={['primary'].join(' ')}
                 startIcon={<AddIcon />}
                 size="large"
               >

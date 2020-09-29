@@ -589,7 +589,7 @@ export default function EnvContentsExist(props: any) {
             variant="contained"
             startIcon={<DeleteIcon />}
             size="small"
-            className={['white'].join(' ')}
+            className={['secondary'].join(' ')}
             onClick={() => {
               handleClickOpen();
             }}
@@ -627,7 +627,7 @@ export default function EnvContentsExist(props: any) {
             </DialogContent>
             <DialogActions>
               <Button
-                className={['blue'].join(' ')}
+                className={['primary'].join(' ')}
                 onClick={() => {
                   // dialog 닫기
                   handleClose();
@@ -651,7 +651,7 @@ export default function EnvContentsExist(props: any) {
                 삭제
               </Button>
               <Button
-                className={['white'].join(' ')}
+                className={['secondary'].join(' ')}
                 onClick={handleClose}
                 color="primary"
                 size="small"

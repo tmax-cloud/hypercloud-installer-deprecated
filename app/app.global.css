@@ -166,8 +166,9 @@ title bar
 */
 /* title bar 설정*/
 .titlebar {
-  background-color: #363A41 !important;
-  background-image: url("../resources/assets/lnb_logo_bg.svg");
+  background-color: #28384F !important;
+  /* background-image: url("../resources/assets/lnb_logo_bg.svg"); */
+  background-image: url("../resources/assets/lnb_logo_bg_mint.png");
   background-repeat: no-repeat;
   height: 60px !important;
   position: relative !important;
@@ -216,7 +217,7 @@ font
   color:#6A6A6A;
 }
 .indicator{
-  color: #2165B4
+  color: #0992AC
 }
 /* weight */
 .thick {
@@ -240,30 +241,54 @@ button.small {
 }
 button.verySmall {
 }
-
 /* color */
-button.pink {
+button.primary {
+  background-color: #0992AC;
+  color:#FFFFFF;
+}
+button.primary:hover {
+  background-color: #067C92;
+  color:#FFFFFF;
+}
+button.primary:active {
+  background-color: #046A7D;
+  color:#FFFFFF;
+}
+
+button.secondary {
+  background-color: #FFFFFF;
+  color: #536882;
+  border: 1px solid #536882;
+}
+button.secondary:hover {
+  background-color: #E9F0F8;
+  color: #536882;
+  border: 1px solid #536882;
+}
+button.secondary:active {
+  background-color: #DDE8F7;
+  color: #536882;
+  border: 1px solid #536882;
+}
+
+/* button.pink {
   background-color: #EC3854;
-  color:white;
-  border-radius: 2px;
+  color:#FFFFFF;
 }
 button.pink:hover {
   background-color: #D22D46;
-  color:white;
-  border-radius: 2px;
+  color:#FFFFFF;
 }
 button.pink:active {
   background-color: #BA2E44;
-  color:white;
-  border-radius: 2px;
-}
+  color:#FFFFFF;
+} */
 
-button.white {
+/* button.white {
   background-color: #FFFFFF;
   color:#536882;
   border: 1px solid #C4C4C4;
   border-radius: 2px;
-
 }
 button.white:hover {
   background-color: #E9F0F8;
@@ -276,23 +301,20 @@ button.white:active {
   color:#536882;
   border: 1px solid #C4C4C4;
   border-radius: 2px;
-}
+} */
 
-button.blue {
+/* button.blue {
   background-color: #1E6CB9;
-  color:white;
-  border-radius: 2px;
+  color:#FFFFFF;
 }
 button.blue:hover {
   background-color: #175B9E;
-  color:white;
-  border-radius: 2px;
+  color:#FFFFFF;
 }
 button.blue:active {
   background-color: #0F4B86;
-  color:white;
-  border-radius: 2px;
-}
+  color:#FFFFFF;
+} */
 
 /*
 table
@@ -331,4 +353,27 @@ textfiled
 }
 .short > div {
   border-radius: 0px;
+}
+
+/*
+radio
+*/
+.MuiRadio-colorSecondary.Mui-checked {
+  color: #0992AC;
+}
+
+/*
+checkbox
+*/
+.MuiCheckbox-colorSecondary.Mui-checked {
+  color: #0992AC !important;
+}
+
+/*
+button disabled
+*/
+.MuiButton-contained.Mui-disabled {
+  color: #C4C4C4 !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid #C4C4C4 !important;
 }

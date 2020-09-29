@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="13px" viewBox="0 0 14 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_finish_blue</title>
+    <g id="Ch1.Installer-Layout" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00_00_013_Kubernetes-" transform="translate(-1286.000000, -344.000000)">
+            <g id="LNB" transform="translate(1236.000000, 123.000000)">
+                <g id="ic_finish_blue" transform="translate(50.000000, 221.000000)">
+                    <ellipse id="Oval" fill="#4085EE" cx="6.63541667" cy="6.5" rx="6.63541667" ry="6.5"></ellipse>
+                    <path d="M10.3553557,4.90060355 L5.92249662,9.12384782 C5.80365985,9.23649517 5.61178798,9.23649517 5.49253858,9.12384782 L2.79684197,6.5383228 C2.67883045,6.42526281 2.67883045,6.2416435 2.79684197,6.12899614 L3.44177903,5.51541879 C3.56102843,5.4023588 3.75372555,5.4023588 3.87132444,5.51541879 L5.71040599,7.2794021 L9.28169853,3.87646165 C9.39971005,3.76340167 9.59199455,3.76340167 9.71124395,3.87646165 L10.3553557,4.49086426 C10.4746051,4.60351162 10.4746051,4.78754356 10.3553557,4.90019092 L10.3553557,4.90060355 Z" id="check" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

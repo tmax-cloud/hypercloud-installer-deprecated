@@ -114,7 +114,7 @@ function InstallContentsPrometheus3(props: any) {
         {/* <Button
           variant="contained"
           style={{ marginRight: '10px' }}
-          className={['blue'].join(' ')}
+          className={['primary'].join(' ')}
           size="large"
           onClick={() => {
             // dispatchKubeInstall({
@@ -130,7 +130,7 @@ function InstallContentsPrometheus3(props: any) {
         {progress === 100 ? (
           <Button
             variant="contained"
-            className={['white'].join(' ')}
+            className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
               history.push(
@@ -143,7 +143,7 @@ function InstallContentsPrometheus3(props: any) {
         ) : (
           <Button
             variant="contained"
-            className={['white'].join(' ')}
+            className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
               handleClickOpen();

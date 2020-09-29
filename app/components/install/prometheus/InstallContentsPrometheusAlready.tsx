@@ -18,7 +18,7 @@ import styles from '../InstallContents1.css';
 import { AppContext } from '../../../containers/HomePage';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/Prometheus_logo.png';
-import FinishImage from '../../../../resources/assets/img_finish.svg';
+import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import PrometheusInstaller from '../../../utils/class/installer/PrometheusInstaller';
@@ -194,7 +194,7 @@ function InstallContentsPrometheusAlready(props: any) {
               </DialogContent>
               <DialogActions>
                 <Button
-                  className={['blue'].join(' ')}
+                  className={['primary'].join(' ')}
                   onClick={async () => {
                     try {
                       dispatchAppState({
@@ -221,7 +221,7 @@ function InstallContentsPrometheusAlready(props: any) {
                   삭제
                 </Button>
                 <Button
-                  className={['white'].join(' ')}
+                  className={['secondary'].join(' ')}
                   onClick={handleClose}
                   autoFocus
                 >

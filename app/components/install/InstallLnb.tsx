@@ -15,7 +15,7 @@ import styles from './InstallLnb.css';
 import CONST from '../../utils/constants/constant';
 import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
-import InstalledImage from '../../../resources/assets/ic_finish.svg';
+import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import * as product from '../../utils/common/product';
 import { InstallContext } from '../../containers/InstallPage';
 

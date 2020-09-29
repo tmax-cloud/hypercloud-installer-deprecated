@@ -89,7 +89,8 @@ function InstallContentsKubernetes2(props: any) {
           /> */}
           <FormControl
             component="fieldset"
-            disabled={nowEnv.networkType === NETWORK_TYPE.INTERNAL}
+            disabled
+            // disabled={nowEnv.networkType === NETWORK_TYPE.INTERNAL}
           >
             {/* <FormLabel component="legend">Gender</FormLabel> */}
             <RadioGroup
@@ -134,7 +135,7 @@ function InstallContentsKubernetes2(props: any) {
         <Button
           variant="contained"
           style={{ marginRight: '10px' }}
-          className={['pink'].join(' ')}
+          className={['primary'].join(' ')}
           size="large"
           onClick={() => {
             let registry = '';
@@ -155,7 +156,7 @@ function InstallContentsKubernetes2(props: any) {
         </Button>
         <Button
           variant="contained"
-          className={['white'].join(' ')}
+          className={['secondary'].join(' ')}
           size="large"
           onClick={() => {
             handleClickOpen();
@@ -193,7 +194,7 @@ function InstallContentsKubernetes2(props: any) {
           </DialogContent>
           <DialogActions>
             <Button
-              className={['blue'].join(' ')}
+              className={['primary'].join(' ')}
               size="small"
               onClick={() => {
                 handleClose();
@@ -205,7 +206,7 @@ function InstallContentsKubernetes2(props: any) {
               나가기
             </Button>
             <Button
-              className={['white'].join(' ')}
+              className={['secondary'].join(' ')}
               onClick={handleClose}
               color="primary"
               size="small"

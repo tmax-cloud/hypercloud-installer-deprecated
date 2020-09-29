@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="250px" height="60px" viewBox="0 0 250 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>lnb_logo_bg_mint</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="250" height="60"></rect>
+    </defs>
+    <g id="Ch1.Installer-Layout" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00_00_07_administration-" transform="translate(-360.000000, -123.000000)">
+            <g id="lnb_logo_bg_mint" transform="translate(360.000000, 123.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Mask"></g>
+                <ellipse id="Oval-Copy" fill="#0992AC" opacity="0.41796875" mask="url(#mask-2)" cx="101.5" cy="-22.5" rx="130.5" ry="69.5"></ellipse>
+                <path d="M53.586745,54 C137.348143,54 192,9.45233261 192,-45.5 C192,-100.452333 130.030275,-145 53.586745,-145 C-22.8567849,-145 -106,-132.18915 -106,-45.5 C-106,46.1511241 -5.8118796,54 53.586745,54 Z" id="Oval" fill="#0992AC" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

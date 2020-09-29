@@ -33,7 +33,7 @@ function EnvHeader(props: any) {
     ) {
       return (
         <Button
-          className={['pink'].join(' ')}
+          className={['primary'].join(' ')}
           variant="contained"
           startIcon={<AddIcon />}
           size="small"
