@@ -24,13 +24,6 @@ yarn dev
 
 To package apps for the local platform:
 
-window
 ```bash
-yarn package-win
-```
-
-linux
-```bash
-sudo apt-get install rpm
-yarn package-linux
+yarn package
 ```
