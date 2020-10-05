@@ -3,6 +3,7 @@
 - **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)**
 
 First, clone the repo via git and install dependencies:
+('yarn' must be installed!!)
 
 ```bash
 git clone --depth 1 --single-branch https://github.com/tmax-cloud/hypercloud-installer.git your-project-name
