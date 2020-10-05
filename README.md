@@ -4,7 +4,7 @@
 
 First, clone the repo via git and install dependencies:
 
-('yarn' must be installed!!)
+('yarn' and 'npm' must be installed!!)
 
 ```bash
 git clone --depth 1 --single-branch https://github.com/tmax-cloud/hypercloud-installer.git your-project-name
