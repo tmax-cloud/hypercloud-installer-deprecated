@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Button } from '@material-ui/core';
 import styles from '../InstallContents1.css';
 import routes from '../../../utils/constants/routes.json';
-import productImage from '../../../../resources/assets/Cni_logo.png';
+import productImage from '../../../../resources/assets/cni_logo.png';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 

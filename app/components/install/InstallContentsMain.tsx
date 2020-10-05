@@ -11,7 +11,7 @@ import * as env from '../../utils/common/env';
 import * as product from '../../utils/common/product';
 import CloudImage from '../../../resources/assets/ic_logo_hypercloud_mint.svg';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
-import CniImage from '../../../resources/assets/Cni_logo.png';
+import CniImage from '../../../resources/assets/cni_logo.png';
 import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
 import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
 import PrometheusImage from '../../../resources/assets/Prometheus_logo.png';

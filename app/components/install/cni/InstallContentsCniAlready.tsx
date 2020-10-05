@@ -17,7 +17,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
 import { AppContext } from '../../../containers/HomePage';
 import CONST from '../../../utils/constants/constant';
-import productImage from '../../../../resources/assets/Cni_logo.png';
+import productImage from '../../../../resources/assets/cni_logo.png';
 import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
