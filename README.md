@@ -16,3 +16,5 @@ hypercloud-installer 설치 파일 패키징
 ```bash
 yarn package
 ```
+
+release 디렉토리 확인
