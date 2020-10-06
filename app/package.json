@@ -6,7 +6,7 @@
   "main": "./main.prod.js",
   "author": {
     "name": "tmax-cloud",
-    "email": "",
+    "email": "ck2_3@tmax.co.kr",
     "url": "https://github.com/tmax-cloud/hypercloud-installer.git"
   },
   "scripts": {
