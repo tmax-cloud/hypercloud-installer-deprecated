@@ -12,7 +12,7 @@ import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './ingressControllerInstaller';
+import IngressControllerInstaller from './IngressControllerInstaller';
 import SecretWatcherInstaller from './SecretWatcherInstaller';
 
 export default class HyperCloudOperatorInstaller extends AbstractInstaller {

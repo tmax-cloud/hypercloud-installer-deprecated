@@ -10,7 +10,7 @@ import CONST from '../../utils/constants/constant';
 import InstallContentsRookCeph from './rookCeph/InstallContentsRookCeph';
 import InstallContentsMetalLb from './metalLb/InstallContentsMetalLb';
 import InstallContentsPrometheus from './prometheus/InstallContentsPrometheus';
-import InstallContentsHyperAuth from './hyperauth/InstallContentsHyperAuth';
+import InstallContentsHyperAuth from './hyperAuth/InstallContentsHyperAuth';
 import InstallContentsHyperCloudOperator from './hyperCloud/InstallContentsHyperCloud';
 
 function InstallContents(props: any) {
