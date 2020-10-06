@@ -11,7 +11,7 @@ yarn
 
 ## Packaging for Production
 
-hypercloud-nstaller 설치 파일 패키징
+hypercloud-installer 설치 파일 패키징
 
 ```bash
 yarn package
