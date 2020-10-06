@@ -1,13 +1,13 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "hypercloud-installer",
   "productName": "HyperCloud Installer",
-  "version": "1.1.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "version": "4.1.0",
+  "description": "",
   "main": "./main.prod.js",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "tmax-cloud",
+    "email": "",
+    "url": "https://github.com/tmax-cloud/hypercloud-installer.git"
   },
   "scripts": {
     "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
