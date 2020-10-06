@@ -1,10 +1,7 @@
 ## Install
 
-- **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)**
-
-First, clone the repo via git and install dependencies:
-
-('yarn' and 'npm' must be installed!!)
+저장소 복사 및 의존성 패키지 설치
+('yarn'과 'npm'이 설치되어 있어야 합니다.)
 
 ```bash
 git clone --depth 1 --single-branch https://github.com/tmax-cloud/hypercloud-installer.git your-project-name
@@ -12,17 +9,9 @@ cd your-project-name
 yarn
 ```
 
-## Starting Development
-
-Start the app in the `dev` environment. This starts the renderer process in [**hot-module-replacement**](https://webpack.js.org/guides/hmr-react/) mode and starts a webpack dev server that sends hot updates to the renderer process:
-
-```bash
-yarn dev
-```
-
 ## Packaging for Production
 
-To package apps for the local platform:
+hypercloud-nstaller 설치 파일 패키징
 
 ```bash
 yarn package
