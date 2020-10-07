@@ -3,7 +3,8 @@ import { Button } from '@material-ui/core';
 import styles from '../InstallContents4.css';
 import CONST from '../../../utils/constants/constant';
 import * as env from '../../../utils/common/env';
-import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
+// import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
+import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
 import routes from '../../../utils/constants/routes.json';
 
 function InstallContentsRookCeph4(props: any) {

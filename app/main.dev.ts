@@ -55,6 +55,8 @@ const createWindow = async () => {
   }
 
   mainWindow = new BrowserWindow({
+    // app에서 menu bar 삭제
+    // frame: true,
     frame: false,
     // backgroundColor: '#363A41',
     show: false,

@@ -9,7 +9,8 @@ import { AppContext } from '../../containers/HomePage';
 import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import * as product from '../../utils/common/product';
-import CloudImage from '../../../resources/assets/ic_logo_hypercloud_mint.svg';
+import CloudImage from '../../../resources/assets/ic_logo_hypercloud_blue.svg';
+// import CloudImage from '../../../resources/assets/ic_logo_hypercloud_mint.svg';
 import KubernetesImage from '../../../resources/assets/Kubernetes_logo.png';
 import CniImage from '../../../resources/assets/cni_logo.png';
 import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
@@ -17,7 +18,8 @@ import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
 import PrometheusImage from '../../../resources/assets/Prometheus_logo.png';
 import HelmImage from '../../../resources/assets/Helm_logo.png';
 import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
-import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
+// import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
+import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
