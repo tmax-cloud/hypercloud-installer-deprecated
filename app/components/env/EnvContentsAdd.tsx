@@ -607,7 +607,10 @@ function EnvContentsAdd(props: any) {
                               .replace(/"/gi, '')
                               .replace('\n', '');
 
-                            if (osType === OS_TYPE.CENTOS) {
+                            if (
+                              osType === OS_TYPE.CENTOS ||
+                              osType === OS_TYPE.PROLINUX
+                            ) {
                               os = new CentOS();
                             } else {
                               os = new Ubuntu();
