@@ -1,6 +1,7 @@
 ## Install
 
-저장소 복사 및 의존성 패키지 설치
+저장소 복사
+패키징에 필요한 의존성 패키지 설치
 ('yarn'과 'npm'이 설치되어 있어야 합니다.)
 
 ```bash
@@ -17,4 +18,4 @@ hypercloud-installer 설치 파일 패키징
 yarn package
 ```
 
-release 디렉토리 확인
+release 디렉토리에서 설치 파일 확인
