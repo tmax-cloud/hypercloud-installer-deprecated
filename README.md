@@ -21,3 +21,10 @@ $ yarn package
 ```
 
  - release 디렉토리에서 설치 파일 확인
+    - Linux
+       - Ubuntu
+          - .deb 파일 확인 (debian 계열 Linux 설치 파일)
+       - CentOS
+          - .rpm 파일 확인 (redhat 계열 Linux 설치 파일)
+    - Windows: 
+       - .msi 파일 확인
