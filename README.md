@@ -1,7 +1,9 @@
 ## Install
 
  - 저장소 복사 (zip 형태로 다운받아 압축해제해도 무관)
- - 패키징에 필요한 의존성 패키지 설치 ('yarn'과 'npm'이 설치되어 있어야 합니다.)
+ - 패키징에 필요한 의존성 패키지 설치 ('npm'과 'yarn'이 설치되어 있어야 합니다.)
+    - nodejs: https://nodejs.org/
+    - yarn: https://classic.yarnpkg.com/
 
 ```bash
 $ git clone --depth 1 --single-branch -b {version} https://github.com/tmax-cloud/hypercloud-installer.git {your-project-name}
