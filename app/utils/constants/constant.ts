@@ -44,6 +44,11 @@ const CONST = {
       NAME: 'HyperCloud',
       IS_REQUIRED: true, // Optional
       DESC: '쿠버네티스 기반의 오픈 클라우드 플랫폼'
+    },
+    TEKTON: {
+      NAME: 'Tekton',
+      IS_REQUIRED: true, // Optional
+      DESC: 'Tekton'
     }
   }
 };
