@@ -21,6 +21,7 @@ export default class TektonTriggerInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonTriggerInstaller.IMAGE_DIR}`;
 
+  // TODO: version 처리 안됨
   public static readonly VERSION=`0.4.0`;
 
   // singleton
@@ -102,7 +103,7 @@ export default class TektonTriggerInstaller extends AbstractInstaller {
     mainMaster.cmd = `
     mkdir -p ~/${TektonTriggerInstaller.INSTALL_HOME};
     cd ~/${TektonTriggerInstaller.INSTALL_HOME};
-    wget https://storage.googleapis.com/tekton-releases/triggers/previous/v${TektonTriggerInstaller.VERSION}/release.yaml -O tekton-triggers-v${TektonTriggerInstaller.VERSION}.yaml
+    wget https://storage.googleapis.com/tekton-releases/triggers/previous/v0.4.0/release.yaml -O tekton-triggers-v0.4.0.yaml;
     `;
     await mainMaster.exeCmd();
     console.debug('###### Finish download yaml file from external... ######');
@@ -175,6 +176,14 @@ export default class TektonTriggerInstaller extends AbstractInstaller {
       docker pull gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller@sha256:bf3517ddccace756e39cee0f0012bbe879c6b28d962a1c904a415e7c60ce5bc2;
       docker pull gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink@sha256:76c208ec1d73d9733dcaf850240e1b3990e5977709a03c2bd98ad5b20fab9867;
       docker pull gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook@sha256:d7f1526a9294e671c500f0071b61e050262fb27fb633b54d764a556969855764;
+
+      docker tag gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller@sha256:bf3517ddccace756e39cee0f0012bbe879c6b28d962a1c904a415e7c60ce5bc2 triggers-controller:v0.4.0
+      docker tag gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink@sha256:76c208ec1d73d9733dcaf850240e1b3990e5977709a03c2bd98ad5b20fab9867 triggers-eventlistenersink:v0.4.0
+      docker tag gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook@sha256:d7f1526a9294e671c500f0071b61e050262fb27fb633b54d764a556969855764 triggers-webhook:v0.4.0
+
+      #docker save triggers-controller:v0.4.0 > tekton-triggers-controller-v0.4.0.tar
+      #docker save triggers-eventlistenersink:v0.4.0 > tekton-triggers-eventlistenersink-v0.4.0.tar
+      #docker save triggers-webhook:v0.4.0 > tekton-triggers-webhook-v0.4.0.tar
       `;
     }
     return `

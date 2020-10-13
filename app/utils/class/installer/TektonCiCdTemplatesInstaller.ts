@@ -70,16 +70,16 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
     if (this.env.registry) {
       return `
       cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-s2i.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-git-clone.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-deploy.yaml
+      kubectl apply -f task-s2i.yaml
+      kubectl apply -f task-git-clone.yaml
+      kubectl apply -f task-deploy.yaml
       `;
     }
     return `
     cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-    kubectl apply -f task-s2i.yaml
-    kubectl apply -f task-git-clone.yaml
-    kubectl apply -f task-deploy.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-s2i.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-git-clone.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-deploy.yaml
     `;
   }
 
@@ -87,20 +87,20 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
     if (this.env.registry) {
       return `
       cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/apache/apache-template.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/django/django-template.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/nodejs/nodejs-template.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/tomcat/tomcat-template.yaml
-      kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/wildfly/wildfly-template.yaml
+      kubectl apply -f apache-template.yaml
+      kubectl apply -f django-template.yaml
+      kubectl apply -f nodejs-template.yaml
+      kubectl apply -f tomcat-template.yaml
+      kubectl apply -f wildfly-template.yaml
       `;
     }
     return `
     cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-    kubectl apply -f apache-template.yaml
-    kubectl apply -f django-template.yaml
-    kubectl apply -f nodejs-template.yaml
-    kubectl apply -f tomcat-template.yaml
-    kubectl apply -f wildfly-template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/apache/apache-template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/django/django-template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/nodejs/nodejs-template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/tomcat/tomcat-template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/wildfly/wildfly-template.yaml
     `;
   }
 
@@ -113,31 +113,33 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
   }
 
   private _getRemoveScript(): string {
+    // 설치의 역순으로 실행
     if (this.env.registry) {
       return `
       cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/apache/apache-template.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/django/django-template.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/nodejs/nodejs-template.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/tomcat/tomcat-template.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/wildfly/wildfly-template.yaml
+      kubectl delete -f wildfly-template.yaml
+      kubectl delete -f tomcat-template.yaml
+      kubectl delete -f nodejs-template.yaml
+      kubectl delete -f django-template.yaml
+      kubectl delete -f apache-template.yaml
 
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-s2i.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-git-clone.yaml
-      kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-deploy.yaml
+      kubectl delete -f task-deploy.yaml
+      kubectl delete -f task-git-clone.yaml
+      kubectl delete -f task-s2i.yaml
       `;
     }
     return `
     cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
-    kubectl delete -f apache-template.yaml
-    kubectl delete -f django-template.yaml
-    kubectl delete -f nodejs-template.yaml
-    kubectl delete -f tomcat-template.yaml
-    kubectl delete -f wildfly-template.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/wildfly/wildfly-template.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/tomcat/tomcat-template.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/nodejs/nodejs-template.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/django/django-template.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/apache/apache-template.yaml
 
-    kubectl delete -f task-s2i.yaml
-    kubectl delete -f task-git-clone.yaml
-    kubectl delete -f task-deploy.yaml
+
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-deploy.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-git-clone.yaml
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/hypercloud-operator/master/_catalog_museum/was/common-task/task-s2i.yaml
     `;
   }
 
@@ -239,6 +241,26 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
       docker pull tmaxcloudck/s2i-nodejs:12;
       docker pull tmaxcloudck/s2i-tomcat:latest;
       docker pull tmaxcloudck/s2i-wildfly:latest;
+
+      docker tag tmaxcloudck/cicd-util:1.1.4 cicd-util:1.1.4
+      docker tag tmaxcloudck/klar:v2.4.0 klar:v2.4.0
+      docker tag quay.io/openshift-pipeline/s2i:nightly s2i:nightly
+      docker tag quay.io/buildah/stable:latest buildah:latest
+      docker tag tmaxcloudck/s2i-apache:2.4 s2i-apache:2.4
+      docker tag tmaxcloudck/s2i-django:35 s2i-django:35
+      docker tag tmaxcloudck/s2i-nodejs:12 s2i-nodejs:12
+      docker tag tmaxcloudck/s2i-tomcat:latest s2i-tomcat:latest
+      docker tag tmaxcloudck/s2i-wildfly:latest s2i-wildfly:latest
+
+      #docker save cicd-util:1.1.4 > cicd-util_1.1.4.tar
+      #docker save klar:v2.4.0 > klar_v2.4.0.tar
+      #docker save s2i:nightly > s2i_nightly.tar
+      #docker save buildah:latest > buildah_latest.tar
+      #docker save s2i-apache:2.4 > s2i-apache_2.4.tar
+      #docker save s2i-django:35 > s2i-django_35.tar
+      #docker save s2i-nodejs:12 > s2i-nodejs_12.tar
+      #docker save s2i-tomcat:latest > s2i-tomcat_latest.tar
+      #docker save s2i-wildfly:latest > s2i-wildfly_latest.tar
       `;
     }
     return `
@@ -271,20 +293,17 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
     return `
     cd ~/${TektonCiCdTemplatesInstaller.INSTALL_HOME};
     export REGISTRY=${this.env.registry};
-    yq w -i task-s2i.yaml 'spec.steps[0].image' $REGISTRY/cicd-util:1.1.4
-    yq w -i task-s2i.yaml 'spec.steps[1].image' $REGISTRY/cicd-util:1.1.4
-    yq w -i task-s2i.yaml 'spec.steps[2].image' $REGISTRY/s2i:nightly
-    yq w -i task-s2i.yaml 'spec.steps[3].image' $REGISTRY/buildah:latest
-    yq w -i task-s2i.yaml 'spec.steps[4].image' $REGISTRY/buildah:latest
-    yq w -i task-deploy.yaml 'spec.steps[0].image' $REGISTRY/cicd-util:1.1.4
-    yq w -i task-deploy.yaml 'spec.steps[1].image' $REGISTRY/cicd-util:1.1.4
-    yq w -i task-git-clone.yaml 'spec.steps[0].image' $REGISTRY/git-init:v0.12.1 # Tekton Pipleine 설치 과정에서 설치된 이미지
+    sed -i "s/tmaxcloudck\\/cicd-util:.*/$REGISTRY\\/cicd-util:1.1.4/g" task-s2i.yaml
+    sed -i "s/quay\\.io\\/openshift-pipeline\\/s2i:.*/$REGISTRY\\/s2i:nightly/g" task-s2i.yaml
+    sed -i "s/quay\\.io\\/buildah\\/stable/$REGISTRY\\/buildah:latest/g" task-s2i.yaml
+    sed -i "s/tmaxcloudck\\/cicd-util:.*/$REGISTRY\\/cicd-util:1.1.4/g" task-deploy.yaml
+    sed -i "s/gcr\\.io\\/tekton-releases\\/github\\.com\\/tektoncd\\/pipeline\\/cmd\\/git-init:.*/$REGISTRY\\/git-init:v0.12.1/g" task-git-clone.yaml
 
-    yq w -i apache-template.yaml 'objects[4].spec.tasks[0].params[0].value' $REGISTRY/s2i-apache:2.4
-    yq w -i django-template.yaml 'objects[4].spec.tasks[0].params[0].value' $REGISTRY/s2i-django:35
-    yq w -i nodejs-template.yaml 'objects[4].spec.tasks[0].params[0].value' $REGISTRY/s2i-nodejs:12
-    yq w -i tomcat-template.yaml 'objects[4].spec.tasks[0].params[0].value' $REGISTRY/s2i-tomcat:latest
-    yq w -i wildfly-template.yaml 'objects[4].spec.tasks[0].params[0].value' $REGISTRY/s2i-wildfly:latest
+    sed -i "s/tmaxcloudck\\/s2i-apache:.*/$REGISTRY\\/s2i-apache:2.4/g" apache-template.yaml
+    sed -i "s/tmaxcloudck\\/s2i-django:.*/$REGISTRY\\/s2i-django:35/g" django-template.yaml
+    sed -i "s/tmaxcloudck\\/s2i-nodejs:.*/$REGISTRY\\/s2i-nodejs:12/g" nodejs-template.yaml
+    sed -i "s/tmaxcloudck\\/s2i-tomcat:.*/$REGISTRY\\/s2i-tomcat:8.5/g" tomcat-template.yaml
+    sed -i "s/tmaxcloudck\\/s2i-wildfly:.*/$REGISTRY\\/s2i-wildfly:18/g" wildfly-template.yaml
     `;
   }
 }

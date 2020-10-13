@@ -15,18 +15,14 @@ import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorF
 import IngressControllerInstaller from './ingressControllerInstaller';
 
 export default class TektonApprovalInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR = `console-install`;
+  public static readonly IMAGE_DIR = `approval-install`;
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/${TektonApprovalInstaller.IMAGE_DIR}`;
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonApprovalInstaller.IMAGE_DIR}`;
 
-  public static readonly CONSOLE_VERSION=`4.1.4.6`;
-
-  public static readonly CONSOLE_NAMESPACE=`console-system`;
-
-  public static readonly HCDC_MODE=false;
-
+  // TODO: version 처리 안됨
+  public static readonly CONSOLE_VERSION=`0.0.3`;
 
   // singleton
   private static instance: TektonApprovalInstaller;
@@ -60,147 +56,35 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     console.debug('@@@@@@ Start installing console main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
-    // Step 1. Namespace, ResourceQuota, ServiceAccount, ClusterRole, ClusterRoleBinding 생성
+    // Step 1. Approval 설치
     mainMaster.cmd = this._step1();
-    await mainMaster.exeCmd(callback);
-
-    // Step 2. Secret (TLS) 생성
-    mainMaster.cmd = this._step2();
-    await mainMaster.exeCmd(callback);
-
-    // Step 3. Service (Load Balancer) 생성
-    mainMaster.cmd = this._step3();
-    await mainMaster.exeCmd(callback);
-
-    // Step 4. Deployment (with Pod Template) 생성
-    mainMaster.cmd = this._step4();
-    await mainMaster.exeCmd(callback);
-
-    // Step 5. 동작 확인
-    mainMaster.cmd = this._step5();
     await mainMaster.exeCmd(callback);
 
     console.debug('###### Finish installing console main Master... ######');
   }
 
   private _step1() {
-    return `
-    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    sed -i 's/@@NAME_NS@@/${TektonApprovalInstaller.CONSOLE_NAMESPACE}/g' 1.initialization.yaml;
-    kubectl create -f 1.initialization.yaml;
-    `;
-  }
-
-  private _step2() {
-    // TODO: 현재 발급받은 인증서가 없는 경우만 고려됨
-    return `
-    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    mkdir -p tls;
-    cd tls;
-    openssl genrsa -out tls.key 2048;
-    openssl req -new -key tls.key -subj "/C=KR/ST=Seoul/L=Seoul/O=tmax" -out tls.csr;
-    openssl x509 -req -days 3650 -in tls.csr -signkey tls.key -out tls.crt;
-    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    kubectl create secret tls console-https-secret --cert=./tls/tls.crt --key=./tls/tls.key -n ${TektonApprovalInstaller.CONSOLE_NAMESPACE};
-    `;
-  }
-
-  private _step3() {
-    return `
-    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    sed -i 's/@@NAME_NS@@/${TektonApprovalInstaller.CONSOLE_NAMESPACE}/g' 2.svc-lb.yaml;
-    kubectl create -f 2.svc-lb.yaml;
-    `;
-  }
-
-  private _step4() {
-    let script = `
-    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    sed -i 's/@@NAME_NS@@/${TektonApprovalInstaller.CONSOLE_NAMESPACE}/g' 3.deployment-pod.yaml;
-
-    export HYPERCLOUD_OPERATOR_CLUSTER_IP=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.clusterIP}'\`;
-    export HYPERCLOUD_OPERATOR_CLUSTER_IP=\${HYPERCLOUD_OPERATOR_CLUSTER_IP:-0.0.0.0}
-    export HYPERCLOUD_OPERATOR_PORT=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-operator-service")].spec.ports[0].port}'\`;
-    export HYPERCLOUD_OPERATOR_PORT=\${HYPERCLOUD_OPERATOR_PORT:-28677}
-    sed -i 's/@@HC4@@/'\${HYPERCLOUD_OPERATOR_CLUSTER_IP}':'\${HYPERCLOUD_OPERATOR_PORT}'/g' 3.deployment-pod.yaml;
-
-    export PROMETHEUS_CLUSTER_IP=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="prometheus-k8s")].spec.clusterIP}'\`
-    export PROMETHEUS_CLUSTER_IP=\${PROMETHEUS_CLUSTER_IP:-0.0.0.0}
-    export PROMETHEUS_PORT=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="prometheus-k8s")].spec.ports[0].port}'\`
-    export PROMETHEUS_PORT=\${PROMETHEUS_PORT:-9090}
-    sed -i 's/@@PROM@@/'\${PROMETHEUS_CLUSTER_IP}':'\${PROMETHEUS_PORT}'/g' 3.deployment-pod.yaml;
-
-    export GRAFANA_CLUSTER_IP=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="grafana")].spec.clusterIP}'\`
-    export GRAFANA_CLUSTER_IP=\${GRAFANA_CLUSTER_IP:-0.0.0.0}
-    export GRAFANA_PORT=\`kubectl get svc -n monitoring -o jsonpath='{.items[?(@.metadata.name=="grafana")].spec.ports[0].port}'\`
-    export GRAFANA_PORT=\${GRAFANA_PORT:-3000}
-    sed -i 's/@@GRAFANA@@/'\${GRAFANA_CLUSTER_IP}':'\${GRAFANA_PORT}'/g' 3.deployment-pod.yaml;
-
-    sed -i 's/@@KIALI@@/0.0.0.0:20001/g' 3.deployment-pod.yaml;
-    sed -i 's/@@JAEGER@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
-    sed -i 's/@@APPROVAL@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
-    sed -i 's/@@KUBEFLOW@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
-
-    export WEBHOOK_CLUSTER_IP=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-webhook-svc")].spec.clusterIP}'\`
-    export WEBHOOK_CLUSTER_IP=\${WEBHOOK_CLUSTER_IP:-0.0.0.0}
-    export WEBHOOK_PORT=\`kubectl get svc -n hypercloud4-system -o jsonpath='{.items[?(@.metadata.name=="hypercloud4-webhook-svc")].spec.ports[0].port}'\`
-    export WEBHOOK_PORT=\${WEBHOOK_PORT:-80}
-    sed -i 's/@@WEBHOOK@@/'\${WEBHOOK_CLUSTER_IP}':'\${WEBHOOK_PORT}'/g' 3.deployment-pod.yaml;
-
-    sed -i 's/@@VNC@@/0.0.0.0:80/g' 3.deployment-pod.yaml;
-
-    export HYPERAUTH_CLUSTER_IP=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].spec.clusterIP}'\`
-    export HYPERAUTH_CLUSTER_IP=\${HYPERAUTH_CLUSTER_IP:-0.0.0.0}
-    export HYPERAUTH_PORT=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].spec.ports[0].port}'\`
-    export HYPERAUTH_PORT=\${HYPERAUTH_PORT:-80}
-    sed -i 's/@@HYPERAUTH@@/'\${HYPERAUTH_CLUSTER_IP}':'\${HYPERAUTH_PORT}'/g' 3.deployment-pod.yaml;
-
-    sed -i 's/@@REALM@@/tmax/g' 3.deployment-pod.yaml;
-
-    export HYPERAUTH_EXTERNAL_IP=\`kubectl get svc -n hyperauth -o jsonpath='{.items[?(@.metadata.name=="hyperauth")].status.loadBalancer.ingress[0].ip}'\`
-    export HYPERAUTH_EXTERNAL_IP=\${HYPERAUTH_EXTERNAL_IP:-0.0.0.0}
-    sed -i 's/@@KEYCLOAK@@/'\${HYPERAUTH_EXTERNAL_IP}'/g' 3.deployment-pod.yaml;
-
-    sed -i 's/@@CLIENTID@@/hypercloud4/g' 3.deployment-pod.yaml;
-    `;
-
-    if (TektonApprovalInstaller.HCDC_MODE) {
-      script += `
-      sed -i 's/@@HDC_FLAG@@/true/g' 3.deployment-pod.yaml;
-      # sed -i 's/@@PORTAL@@/???/g' 3.deployment-pod.yaml;
-      `;
-    } else {
-      script += `
-      sed -i 's/- --hdc-mode=@@HDC_FLAG@@//g' 3.deployment-pod.yaml;
-      sed -i 's/- --tmaxcloud-portal=@@PORTAL@@//g' 3.deployment-pod.yaml;
-      `;
-    }
-
-    script += `
-    sed -i 's/@@VER@@/${TektonApprovalInstaller.CONSOLE_VERSION}/g' 3.deployment-pod.yaml;
-    `;
-
     if (this.env.registry) {
-      script += `
-      sed -i 's| tmaxcloudck| ${this.env.registry}/tmaxcloudck|g' 3.deployment-pod.yaml;
+      return `
+      cd ~/${TektonApprovalInstaller.INSTALL_HOME};
+      kubectl apply -f crd.yaml;
+      kubectl apply -f namespace.yaml;
+      kubectl apply -f service_account.yaml;
+      kubectl apply -f role.yaml;
+      kubectl apply -f role_binding.yaml;
+      kubectl apply -f service.yaml;
+      kubectl apply -f updated.yaml;
       `;
     }
-
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    script+=`
-    sed -i "s/memory: '2Gi'/memory: '500Mi'/g" 3.deployment-pod.yaml;
-    sed -i "s/cpu: '1'/cpu: '0.5'/g" 3.deployment-pod.yaml;
-    `;
-
-    script+=`
-    kubectl create -f 3.deployment-pod.yaml;
-    `
-
-    return script;
-  }
-
-  private _step5() {
     return `
+    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/crds/tmax.io_approvals_crd.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/namespace.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service_account.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role_binding.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service.yaml;
+    kubectl apply -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/proxy-server.yaml;
     `;
   }
 
@@ -212,14 +96,30 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     console.debug('###### Finish remove console main Master... ######');
   }
 
+
   private _getRemoveScript(): string {
+    // 설치의 역순으로 실행
+    if (this.env.registry) {
+      return `
+      cd ~/${TektonApprovalInstaller.INSTALL_HOME};
+      kubectl delete -f updated.yaml;
+      kubectl delete -f service.yaml;
+      kubectl delete -f role_binding.yaml;
+      kubectl delete -f role.yaml;
+      kubectl delete -f service_account.yaml;
+      kubectl delete -f namespace.yaml;
+      kubectl delete -f crd.yaml;
+      `;
+    }
     return `
     cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    kubectl delete -f 3.deployment-pod.yaml;
-    kubectl delete -f 2.svc-lb.yaml;
-    kubectl delete secret console-https-secret -n ${TektonApprovalInstaller.CONSOLE_NAMESPACE};
-    kubectl delete -f 1.initialization.yaml;
-    #rm -rf ~/${TektonApprovalInstaller.INSTALL_HOME};
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/proxy-server.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role_binding.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service_account.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/namespace.yaml;
+    kubectl delete -f https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/crds/tmax.io_approvals_crd.yaml;
     `;
   }
 
@@ -229,9 +129,13 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     mainMaster.cmd = `
     mkdir -p ~/${TektonApprovalInstaller.INSTALL_HOME};
     cd ~/${TektonApprovalInstaller.INSTALL_HOME};
-    curl https://raw.githubusercontent.com/tmax-cloud/hypercloud-console4.1/hc-dev/install-yaml/1.initialization.yaml > 1.initialization.yaml;
-    curl https://raw.githubusercontent.com/tmax-cloud/hypercloud-console4.1/hc-dev/install-yaml/2.svc-lb.yaml > 2.svc-lb.yaml;
-    curl https://raw.githubusercontent.com/tmax-cloud/hypercloud-console4.1/hc-dev/install-yaml/3.deployment-pod.yaml > 3.deployment-pod.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/crds/tmax.io_approvals_crd.yaml crd.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/namespace.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service_account.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/role_binding.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/service.yaml;
+    wget https://raw.githubusercontent.com/tmax-cloud/approval-watcher/master/deploy/proxy-server.yaml;
     `;
     await mainMaster.exeCmd();
     console.debug('###### Finish download yaml file from external... ######');
@@ -280,6 +184,7 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
+    mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish pushing the image at main master node... ######');
   }
@@ -287,26 +192,46 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
   protected _getImagePushScript(): string {
     let gitPullCommand = `
     mkdir -p ~/${TektonApprovalInstaller.IMAGE_HOME};
-    export CONSOLE_HOME=~/${TektonApprovalInstaller.IMAGE_HOME};
-    export CONSOLE_VERSION=v${TektonApprovalInstaller.CONSOLE_VERSION};
+    export HOME=~/${TektonApprovalInstaller.IMAGE_HOME};
+    export VERSION=v${TektonApprovalInstaller.CONSOLE_VERSION};
     export REGISTRY=${this.env.registry};
-    cd $CONSOLE_HOME;
+    cd $HOME;
     `;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       gitPullCommand += `
-      sudo docker load < console_\${CONSOLE_VERSION}.tar;
+      docker load < approval-watcher-0.0.3.tar;
+      docker load < approval-step-server-0.0.3.tar;
       `;
     } else {
       gitPullCommand += `
-      sudo docker pull  tmaxcloudck/hypercloud-console:\${CONSOLE_VERSION};
+      docker pull tmaxcloudck/approval-watcher:0.0.3;
+      docker pull tmaxcloudck/approval-step-server:0.0.3;
+
+      docker tag tmaxcloudck/approval-watcher:0.0.3 approval-watcher:0.0.3;
+      docker tag tmaxcloudck/approval-step-server:0.0.3 approval-step-server:0.0.3;
+
+      #docker save approval-watcher:0.0.3 > approval-watcher-0.0.3.tar;
+      #docker save approval-step-server:0.0.3 > approval-step-server-0.0.3.tar;
       `;
     }
     return `
       ${gitPullCommand}
-      sudo docker tag tmaxcloudck/hypercloud-console:\${CONSOLE_VERSION} \${REGISTRY}/tmaxcloudck/hypercloud-console:\${CONSOLE_VERSION};
+      docker tag approval-watcher:0.0.3 $REGISTRY/approval-watcher:0.0.3;
+      docker tag approval-step-server:0.0.3 $REGISTRY/approval-step-server:0.0.3;
 
-      sudo docker push \${REGISTRY}/tmaxcloudck/hypercloud-console:\${CONSOLE_VERSION}
-      #rm -rf $CONSOLE_HOME;
+      docker push $REGISTRY/approval-watcher:0.0.3;
+      docker push $REGISTRY/approval-step-server:0.0.3;
+      #rm -rf $HOME;
       `;
+  }
+
+  private _getImagePathEditScript(): string {
+    // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
+    return `
+    cd ~/${TektonApprovalInstaller.INSTALL_HOME};
+    export REGISTRY=${this.env.registry};
+    cp proxy-server.yaml updated.yaml;
+    sed -i "s/tmaxcloudck\\/approval-watcher:latest/$REGISTRY\\/approval-watcher:0.0.3/g" updated.yaml;
+    `;
   }
 }
