@@ -148,13 +148,21 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   }
 
   private _getRemoveScript(): string {
+    // 설치의 역순
     return `
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME};
-    kubectl delete -f 3.deployment-pod.yaml;
-    kubectl delete -f 2.svc-lb.yaml;
-    kubectl delete secret console-https-secret -n ${CatalogControllerInstaller.CONSOLE_NAMESPACE};
-    kubectl delete -f 1.initialization.yaml;
-    #rm -rf ~/${CatalogControllerInstaller.INSTALL_HOME};
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    kubectl delete -f webhook-service.yaml;
+    kubectl delete -f webhook-deployment.yaml;
+    kubectl delete -f webhook-register.yaml;
+
+    kubectl delete -f controller-manager-service.yaml;
+    kubectl delete -f controller-manager-deployment.yaml;
+
+    kubectl delete -f rbac.yaml;
+    kubectl delete -f serviceaccounts.yaml;
+    kubectl delete namespace catalog;
+
+    kubectl delete -f crds/
     `;
   }
 
@@ -234,6 +242,8 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     } else {
       gitPullCommand += `
       docker pull quay.io/kubernetes-service-catalog/service-catalog:v\${CATALOG_VERSION}
+
+      #docker save quay.io/kubernetes-service-catalog/service-catalog:v\${CATALOG_VERSION} > service-catalog_v\${CATALOG_VERSION}.tar
       `;
     }
     return `
