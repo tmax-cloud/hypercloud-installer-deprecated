@@ -1,6 +1,7 @@
 export enum OS_TYPE {
   CENTOS = 'CentOS Linux',
-  UBUNTU = 'Ubuntu'
+  UBUNTU = 'Ubuntu',
+  PROLINUX = 'ProLinux'
 }
 
 export abstract class AbstractOs {
