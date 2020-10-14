@@ -36,31 +36,51 @@ function InstallContentsTekton2(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Operator Version</span>
+          <span className={['medium'].join(' ')}>Pipeline Version</span>
         </div>
         <div>
           <span className={['medium', 'lightDark'].join(' ')}>
-            {state.operator_version}
+            {state.pipeline_version}
           </span>
         </div>
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Webhook Version</span>
+          <span className={['medium'].join(' ')}>Trigger Version</span>
         </div>
         <div>
           <span className={['medium', 'lightDark'].join(' ')}>
-            {state.webhook_version}
+            {state.trigger_version}
           </span>
         </div>
       </div>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Console Version</span>
+          <span className={['medium'].join(' ')}>Approval Version</span>
         </div>
         <div>
           <span className={['medium', 'lightDark'].join(' ')}>
-            {state.console_version}
+            {state.approval_version}
+          </span>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>Mail-notifier Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.mailNotifier_version}
+          </span>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>CI/CD Templates Version</span>
+        </div>
+        <div>
+          <span className={['medium', 'lightDark'].join(' ')}>
+            {state.cicdTemplates_version}
           </span>
         </div>
       </div>

@@ -18,6 +18,11 @@ import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperClo
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
+import TektonPipelineInstaller from '../../../utils/class/installer/TektonPipelineInstaller';
+import TektonApprovalInstaller from '../../../utils/class/installer/TektonApprovalInstaller';
+import TektonCiCdTemplatesInstaller from '../../../utils/class/installer/TektonCiCdTemplatesInstaller';
+import TektonMailNotifierInstaller from '../../../utils/class/installer/TektonMailNotifierInstaller';
+import TektonTriggerInstaller from '../../../utils/class/installer/TektonTriggerInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsTekton3(props: any) {
@@ -43,9 +48,11 @@ function InstallContentsTekton3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.TEKTON.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.TEKTON.NAME,
-      operator_version: state.operator_version,
-      webhook_version: state.webhook_version,
-      console_version: state.console_version
+      pipeline_version: state.pipeline_version,
+      trigger_version: state.trigger_version,
+      approval_version: state.approval_version,
+      mailNotifier_version: state.mailNotifier_version,
+      cicdTemplates_version: state.cicdTemplates_version
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -76,42 +83,49 @@ function InstallContentsTekton3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
+    const tektonPipelineInstaller = TektonPipelineInstaller.getInstance;
+    const tektonTriggerInstaller = TektonTriggerInstaller.getInstance;
+    const tektonApprovalInstaller = TektonApprovalInstaller.getInstance;
+    const tektonMailNotifierInstaller = TektonMailNotifierInstaller.getInstance;
+    const tektonCiCdTemplatesInstaller = TektonCiCdTemplatesInstaller.getInstance;
 
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-
-    const hyperAuthInstaller = HyperAuthInstaller.getInstance;
-    hyperAuthInstaller.env = nowEnv;
+    tektonPipelineInstaller.env = nowEnv;
+    tektonTriggerInstaller.env = nowEnv;
+    tektonApprovalInstaller.env = nowEnv;
+    tektonMailNotifierInstaller.env = nowEnv;
+    tektonCiCdTemplatesInstaller.env = nowEnv;
 
     try {
-      // operator install
-      await hyperCloudOperatorInstaller.install({
+      // tektonPipelineInstaller install
+      await tektonPipelineInstaller.install({
         callback,
         setProgress
       });
-      setProgress(30);
+      setProgress(20);
 
-      // webhook install
-      await hyperCloudWebhookInstaller.install({
+      // tektonTriggerInstaller install
+      await tektonTriggerInstaller.install({
+        callback,
+        setProgress
+      });
+      setProgress(40);
+
+      // tektonApprovalInstaller install
+      await tektonApprovalInstaller.install({
         callback,
         setProgress
       });
       setProgress(60);
 
-      // console install
-      await hyperCloudConsoleInstaller.install({
+      // tektonMailNotifierInstaller install
+      await tektonMailNotifierInstaller.install({
         callback,
         setProgress
       });
-      setProgress(90);
+      setProgress(80);
 
-      // realm import
-      await hyperAuthInstaller.realmImport({
+      // tektonCiCdTemplatesInstaller install
+      await tektonCiCdTemplatesInstaller.install({
         callback,
         setProgress
       });
@@ -119,10 +133,11 @@ function InstallContentsTekton3(props: any) {
     } catch (error) {
       console.error(error);
 
-      await hyperCloudConsoleInstaller.remove();
-      await hyperCloudWebhookInstaller.remove();
-      await hyperCloudOperatorInstaller.remove();
-      await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+      await tektonPipelineInstaller.remove();
+      await tektonTriggerInstaller.remove();
+      await tektonApprovalInstaller.remove();
+      await tektonMailNotifierInstaller.remove();
+      await tektonCiCdTemplatesInstaller.remove();
     } finally {
       console.log();
     }

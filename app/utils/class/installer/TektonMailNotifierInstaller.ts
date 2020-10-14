@@ -22,7 +22,7 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonMailNotifierInstaller.IMAGE_DIR}`;
 
   // TODO: version 처리 안됨
-  public static readonly CONSOLE_VERSION=`0.0.4`;
+  public static readonly VERSION=`0.0.4`;
 
   // singleton
   private static instance: TektonMailNotifierInstaller;
@@ -95,10 +95,10 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     SMTP_PW=${smtpPw}
     NAMESPACE=approval-system
 
-    curl https://raw.githubusercontent.com/cqbqdd11519/mail-notifier/master/deploy/secret.yaml.template -s | \
-    sed "s/<SMTP Address (IP:PORT)>/'\${SMTP_SERVER}'/g" | \
-    sed "s/<SMTP User ID>/'\${SMTP_USER}'/g" | \
-    sed "s/<SMTP User PW>/'\${SMTP_PW}'/g" | \
+    curl https://raw.githubusercontent.com/cqbqdd11519/mail-notifier/master/deploy/secret.yaml.template -s | \\
+    sed "s/<SMTP Address (IP:PORT)>/'\${SMTP_SERVER}'/g" | \\
+    sed "s/<SMTP User ID>/'\${SMTP_USER}'/g" | \\
+    sed "s/<SMTP User PW>/'\${SMTP_PW}'/g" | \\
     kubectl apply --namespace \${NAMESPACE} -f -
     `;
   }
@@ -212,7 +212,7 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     let gitPullCommand = `
     mkdir -p ~/${TektonMailNotifierInstaller.IMAGE_HOME};
     export HOME=~/${TektonMailNotifierInstaller.IMAGE_HOME};
-    export VERSION=v${TektonMailNotifierInstaller.CONSOLE_VERSION};
+    export VERSION=v${TektonMailNotifierInstaller.VERSION};
     export REGISTRY=${this.env.registry};
     cd $HOME;
     `;
@@ -250,7 +250,7 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     cd ~/${TektonMailNotifierInstaller.INSTALL_HOME};
     export REGISTRY=${this.env.registry};
     cp server.yaml updated.yaml
-    sed -i "s/tmaxcloudck\\/mail-sender-server:v0.0.3/$REGISTRY\\/mail-sender-server:v0.0.3/g" updated.yaml;
+    sed -i "s/tmaxcloudck\\/mail-sender-server:v0.0.3/$REGISTRY\\/mail-sender-server:v0.0.3/g" updated.yaml
     `;
   }
 }

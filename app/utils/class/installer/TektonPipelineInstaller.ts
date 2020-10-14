@@ -259,10 +259,10 @@ export default class TektonPipelineInstaller extends AbstractInstaller {
     cd ~/${TektonPipelineInstaller.INSTALL_HOME};
     export REGISTRY=${this.env.registry};
     cp tekton-pipeline-v0.12.1.yaml updated.yaml
-    sed -i -E "s/gcr.io\\/tekton-releases\\/.*\\/([^@]*)@[^\n\\"]*/$REGISTRY\\/\1/g" updated.yaml
-    sed -i "s/tianon\\/true@[^\n\\"]*/$REGISTRY\\/tianon-true:v0.12.1/g" updated.yaml
-    sed -i "s/busybox@[^\n\\"]*/$REGISTRY\\/busybox:v0.12.1/g" updated.yaml
-    sed -i "s/google\\/cloud-sdk@[^\n\\"]*/$REGISTRY\\/google-cloud-sdk:v0.12.1/g" updated.yaml
+    sed -i -E "s/gcr.io\\/tekton-releases\\/.*\\/([^@]*)@[^\\n\\"]*/$REGISTRY\\/\\1/g" updated.yaml
+    sed -i "s/tianon\\/true@[^\\n\\"]*/$REGISTRY\\/tianon-true:v0.12.1/g" updated.yaml
+    sed -i "s/busybox@[^\\n\\"]*/$REGISTRY\\/busybox:v0.12.1/g" updated.yaml
+    sed -i "s/google\\/cloud-sdk@[^\\n\\"]*/$REGISTRY\\/google-cloud-sdk:v0.12.1/g" updated.yaml
     `;
   }
 }

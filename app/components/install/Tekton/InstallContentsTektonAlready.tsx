@@ -25,6 +25,11 @@ import routes from '../../../utils/constants/routes.json';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
+import TektonApprovalInstaller from '../../../utils/class/installer/TektonApprovalInstaller';
+import TektonCiCdTemplatesInstaller from '../../../utils/class/installer/TektonCiCdTemplatesInstaller';
+import TektonMailNotifierInstaller from '../../../utils/class/installer/TektonMailNotifierInstaller';
+import TektonPipelineInstaller from '../../../utils/class/installer/TektonPipelineInstaller';
+import TektonTriggerInstaller from '../../../utils/class/installer/TektonTriggerInstaller';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -79,25 +84,24 @@ function InstallContentsTektonAlready(props: any) {
 
     const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.TEKTON.NAME);
 
-    // console delete
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-    await hyperCloudConsoleInstaller.remove();
+    const tektonPipelineInstaller = TektonPipelineInstaller.getInstance;
+    const tektonTriggerInstaller = TektonTriggerInstaller.getInstance;
+    const tektonApprovalInstaller = TektonApprovalInstaller.getInstance;
+    const tektonMailNotifierInstaller = TektonMailNotifierInstaller.getInstance;
+    const tektonCiCdTemplatesInstaller = TektonCiCdTemplatesInstaller.getInstance;
 
-    // webhook delete
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-    await hyperCloudWebhookInstaller.remove();
+    tektonPipelineInstaller.env = nowEnv;
+    tektonTriggerInstaller.env = nowEnv;
+    tektonApprovalInstaller.env = nowEnv;
+    tektonMailNotifierInstaller.env = nowEnv;
+    tektonCiCdTemplatesInstaller.env = nowEnv;
 
-    // operator delete
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
-    await hyperCloudOperatorInstaller.remove();
-
-    // webhook delete
-    // kube-apiserver.yaml 수정부분은 맨 마지막에 수행
-    // api server재기동에 시간이 걸려서, 다음 명령에서 kubectl이 동작하지 않음
-    await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+    // 설치 역순
+    await tektonCiCdTemplatesInstaller.remove();
+    await tektonMailNotifierInstaller.remove();
+    await tektonApprovalInstaller.remove();
+    await tektonTriggerInstaller.remove();
+    await tektonPipelineInstaller.remove();
   };
 
   return (
@@ -139,36 +143,60 @@ function InstallContentsTektonAlready(props: any) {
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>
-                Operator Version
+                Pipeline Version
               </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).operator_version}
+                {nowEnv.isInstalled(nowProduct.NAME).pipeline_version}
               </span>
             </div>
           </div>
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>
-                Webhook Version
+                Trigger Version
               </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).webhook_version}
+                {nowEnv.isInstalled(nowProduct.NAME).trigger_version}
               </span>
             </div>
           </div>
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>
-                Console Version
+                Approval Version
               </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).console_version}
+                {nowEnv.isInstalled(nowProduct.NAME).approval_version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>
+                Mail-notifier Version
+              </span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {nowEnv.isInstalled(nowProduct.NAME).mailNotifier_version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>
+                CI/CD Templates Version
+              </span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {nowEnv.isInstalled(nowProduct.NAME).cicdTemplates_version}
               </span>
             </div>
           </div>

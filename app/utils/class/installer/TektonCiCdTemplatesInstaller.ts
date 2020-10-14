@@ -21,7 +21,7 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonCiCdTemplatesInstaller.IMAGE_DIR}`;
 
-  public static readonly CONSOLE_VERSION=`4.1.4.6`;
+  public static readonly VERSION=`4.1.4.6`;
 
   // singleton
   private static instance: TektonCiCdTemplatesInstaller;
@@ -214,7 +214,7 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
     let gitPullCommand = `
     mkdir -p ~/${TektonCiCdTemplatesInstaller.IMAGE_HOME};
     export HOME=~/${TektonCiCdTemplatesInstaller.IMAGE_HOME};
-    export VERSION=v${TektonCiCdTemplatesInstaller.CONSOLE_VERSION};
+    export VERSION=v${TektonCiCdTemplatesInstaller.VERSION};
     export REGISTRY=${this.env.registry};
     cd $HOME;
     `;

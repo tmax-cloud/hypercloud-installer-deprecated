@@ -48,36 +48,60 @@ function InstallContentsTekton4(props: any) {
         <div style={{ marginBottom: '30px' }}>
           <div>
             <span className={['medium', 'thick'].join(' ')}>
-              Operator Version
+              Pipeline Version
             </span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {state.operator_version}
+              {state.pipeline_version}
             </span>
           </div>
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
             <span className={['medium', 'thick'].join(' ')}>
-              Webhook Version
+              Trigger Version
             </span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {state.webhook_version}
+              {state.trigger_version}
             </span>
           </div>
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
             <span className={['medium', 'thick'].join(' ')}>
-              Console Version
+              Approval Version
             </span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {state.console_version}
+              {state.approval_version}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>
+              Mail-notifier Version
+            </span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.mailNotifier_version}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>
+              CI/CD Templates Version
+            </span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.cicdTemplates_version}
             </span>
           </div>
         </div>

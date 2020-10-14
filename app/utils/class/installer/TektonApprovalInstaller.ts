@@ -22,7 +22,7 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
   public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonApprovalInstaller.IMAGE_DIR}`;
 
   // TODO: version 처리 안됨
-  public static readonly CONSOLE_VERSION=`0.0.3`;
+  public static readonly VERSION=`0.0.3`;
 
   // singleton
   private static instance: TektonApprovalInstaller;
@@ -193,7 +193,7 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     let gitPullCommand = `
     mkdir -p ~/${TektonApprovalInstaller.IMAGE_HOME};
     export HOME=~/${TektonApprovalInstaller.IMAGE_HOME};
-    export VERSION=v${TektonApprovalInstaller.CONSOLE_VERSION};
+    export VERSION=v${TektonApprovalInstaller.VERSION};
     export REGISTRY=${this.env.registry};
     cd $HOME;
     `;
@@ -231,7 +231,7 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
     cd ~/${TektonApprovalInstaller.INSTALL_HOME};
     export REGISTRY=${this.env.registry};
     cp proxy-server.yaml updated.yaml;
-    sed -i "s/tmaxcloudck\\/approval-watcher:latest/$REGISTRY\\/approval-watcher:0.0.3/g" updated.yaml;
+    sed -i "s/tmaxcloudck\\/approval-watcher:latest/$REGISTRY\\/approval-watcher:0.0.3/g" updated.yaml
     `;
   }
 }

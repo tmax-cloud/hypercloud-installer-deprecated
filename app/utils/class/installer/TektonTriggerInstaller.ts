@@ -205,7 +205,7 @@ export default class TektonTriggerInstaller extends AbstractInstaller {
     cd ~/${TektonTriggerInstaller.INSTALL_HOME};
     export REGISTRY=${this.env.registry};
     cp tekton-triggers-v0.4.0.yaml updated.yaml;
-    sed -i -E "s/gcr.io\\/tekton-releases\\/.*\\/([^@]*)@[^\n\\"]*/$REGISTRY\\/triggers-\1:v0.4.0/g" updated.yaml;
+    sed -i -E "s/gcr.io\\/tekton-releases\\/.*\\/([^@]*)@[^\\n\\"]*/$REGISTRY\\/triggers-\\1:v0.4.0/g" updated.yaml;
     `;
   }
 }
