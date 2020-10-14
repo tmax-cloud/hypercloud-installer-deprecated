@@ -19,8 +19,9 @@ export default class AbstractCentosScript extends AbstractScript {
     yum install -y wget;
 
     # jq
-    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm;
-    sudo yum install jq -y
+    curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq;
+    chmod a+x /usr/local/bin/jq;
+    jq -V;
     `;
   }
 }

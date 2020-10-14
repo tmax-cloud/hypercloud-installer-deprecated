@@ -42,7 +42,7 @@ export default class Node {
     this._port = port;
     this._user = user;
     this._password = password;
-    if (os.type === OS_TYPE.CENTOS) {
+    if (os.type === OS_TYPE.CENTOS || os.type === OS_TYPE.PROLINUX) {
       this._os = new CentOS();
     } else {
       this._os = new Ubuntu();
