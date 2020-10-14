@@ -45,6 +45,11 @@ const CONST = {
       IS_REQUIRED: true, // Optional
       DESC: '쿠버네티스 기반의 오픈 클라우드 플랫폼'
     },
+    CATALOG_CONTROLLER: {
+      NAME: 'Catalog Controller',
+      IS_REQUIRED: true, // Optional
+      DESC: 'Catalog Controller'
+    },
     TEKTON: {
       NAME: 'Tekton',
       IS_REQUIRED: true, // Optional
