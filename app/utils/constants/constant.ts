@@ -49,6 +49,11 @@ const CONST = {
       NAME: 'Catalog Controller',
       IS_REQUIRED: true, // Optional
       DESC: 'Catalog Controller'
+    },
+    TEKTON: {
+      NAME: 'Tekton',
+      IS_REQUIRED: true, // Optional
+      DESC: 'Tekton'
     }
   }
 };
