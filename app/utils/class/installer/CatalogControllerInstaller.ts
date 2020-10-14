@@ -40,11 +40,13 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   public async install(param: { callback: any; setProgress: Function; }) {
     const { callback, setProgress } = param;
 
+    setProgress(10);
     await this._preWorkInstall({
       callback
     });
-
+    setProgress(60);
     await this._installMainMaster(callback);
+    setProgress(100);
   }
 
   public async remove() {

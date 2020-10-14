@@ -47,37 +47,11 @@ function InstallContentsCatalogController4(props: any) {
         </div>
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>
-              Operator Version
-            </span>
+            <span className={['medium', 'thick'].join(' ')}>Version</span>
           </div>
           <div>
             <span className={['medium', 'lightDark'].join(' ')}>
-              {state.operator_version}
-            </span>
-          </div>
-        </div>
-        <div style={{ marginBottom: '30px' }}>
-          <div>
-            <span className={['medium', 'thick'].join(' ')}>
-              Webhook Version
-            </span>
-          </div>
-          <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
-              {state.webhook_version}
-            </span>
-          </div>
-        </div>
-        <div style={{ marginBottom: '30px' }}>
-          <div>
-            <span className={['medium', 'thick'].join(' ')}>
-              Console Version
-            </span>
-          </div>
-          <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
-              {state.console_version}
+              {state.version}
             </span>
           </div>
         </div>

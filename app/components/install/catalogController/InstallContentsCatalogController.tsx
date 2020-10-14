@@ -11,15 +11,14 @@ import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstalle
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
+import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 function InstallContentsCatalogController(props: any) {
   console.debug(InstallContentsCatalogController.name, props);
   const { history, location, match } = props;
 
   const [state, setState] = useState({
-    operator_version: HyperCloudOperatorInstaller.HPCD_VERSION,
-    webhook_version: HyperCloudWebhookInstaller.WEBHOOK_VERSION,
-    console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
+    version: CatalogControllerInstaller.VERSION
   });
 
   return (

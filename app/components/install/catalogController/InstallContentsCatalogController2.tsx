@@ -36,31 +36,11 @@ function InstallContentsCatalogController2(props: any) {
     <div className={[styles.wrap].join(' ')}>
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Operator Version</span>
+          <span className={['medium'].join(' ')}>Version</span>
         </div>
         <div>
           <span className={['medium', 'lightDark'].join(' ')}>
-            {state.operator_version}
-          </span>
-        </div>
-      </div>
-      <div className={['childLeftRightLeft'].join(' ')}>
-        <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Webhook Version</span>
-        </div>
-        <div>
-          <span className={['medium', 'lightDark'].join(' ')}>
-            {state.webhook_version}
-          </span>
-        </div>
-      </div>
-      <div className={['childLeftRightLeft'].join(' ')}>
-        <div className={[styles.titleBox].join(' ')}>
-          <span className={['medium'].join(' ')}>Console Version</span>
-        </div>
-        <div>
-          <span className={['medium', 'lightDark'].join(' ')}>
-            {state.console_version}
+            {state.version}
           </span>
         </div>
       </div>

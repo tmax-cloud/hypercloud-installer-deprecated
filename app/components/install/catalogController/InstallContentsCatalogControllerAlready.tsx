@@ -25,6 +25,7 @@ import routes from '../../../utils/constants/routes.json';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
+import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -79,25 +80,9 @@ function InstallContentsCatalogControllerAlready(props: any) {
 
     const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.CATALOG_CONTROLLER.NAME);
 
-    // console delete
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-    await hyperCloudConsoleInstaller.remove();
-
-    // webhook delete
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-    await hyperCloudWebhookInstaller.remove();
-
-    // operator delete
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
-    await hyperCloudOperatorInstaller.remove();
-
-    // webhook delete
-    // kube-apiserver.yaml 수정부분은 맨 마지막에 수행
-    // api server재기동에 시간이 걸려서, 다음 명령에서 kubectl이 동작하지 않음
-    await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+    const catalogControllerInstaller = CatalogControllerInstaller.getInstance;
+    catalogControllerInstaller.env = nowEnv;
+    await catalogControllerInstaller.remove();
   };
 
   return (
@@ -139,36 +124,12 @@ function InstallContentsCatalogControllerAlready(props: any) {
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>
-                Operator Version
+                Version
               </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).operator_version}
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <span className={['medium', 'thick'].join(' ')}>
-                Webhook Version
-              </span>
-            </div>
-            <div>
-              <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).webhook_version}
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <span className={['medium', 'thick'].join(' ')}>
-                Console Version
-              </span>
-            </div>
-            <div>
-              <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).console_version}
+                {nowEnv.isInstalled(nowProduct.NAME).version}
               </span>
             </div>
           </div>

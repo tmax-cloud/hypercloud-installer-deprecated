@@ -18,6 +18,7 @@ import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperClo
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
+import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsCatalogController3(props: any) {
@@ -43,9 +44,7 @@ function InstallContentsCatalogController3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.CATALOG_CONTROLLER.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.CATALOG_CONTROLLER.NAME,
-      operator_version: state.operator_version,
-      webhook_version: state.webhook_version,
-      console_version: state.console_version
+      version: state.version
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -76,53 +75,18 @@ function InstallContentsCatalogController3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
-
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-
-    const hyperAuthInstaller = HyperAuthInstaller.getInstance;
-    hyperAuthInstaller.env = nowEnv;
+    const catalogControllerInstaller = CatalogControllerInstaller.getInstance;
+    catalogControllerInstaller.env = nowEnv;
 
     try {
-      // operator install
-      await hyperCloudOperatorInstaller.install({
+      await catalogControllerInstaller.install({
         callback,
         setProgress
       });
-      setProgress(30);
-
-      // webhook install
-      await hyperCloudWebhookInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(60);
-
-      // console install
-      await hyperCloudConsoleInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(90);
-
-      // realm import
-      await hyperAuthInstaller.realmImport({
-        callback,
-        setProgress
-      });
-      setProgress(100);
     } catch (error) {
       console.error(error);
 
-      await hyperCloudConsoleInstaller.remove();
-      await hyperCloudWebhookInstaller.remove();
-      await hyperCloudOperatorInstaller.remove();
-      await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+      await catalogControllerInstaller.remove();
     } finally {
       console.log();
     }
