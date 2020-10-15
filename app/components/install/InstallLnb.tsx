@@ -6,7 +6,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import { Select, Tooltip } from '@material-ui/core';
+import { MenuItem, Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -53,8 +53,8 @@ function InstallLnb(props: any) {
     // setOpen(!open);
   };
 
-  const handleChange = () => {
-    history.push(`${routes.INSTALL.HOME}/${nowEnv.name}`);
+  const handleChange = (e) => {
+    history.push(`${routes.INSTALL.HOME}/${e.target.value}`);
   };
 
   const getItem = (productName: string, disabled: boolean) => {
@@ -94,7 +94,7 @@ function InstallLnb(props: any) {
         <Select native value={nowEnv.name} onChange={handleChange}>
           {env.loadEnvList().map((e: any) => {
             return (
-              <option key={e.name} value={e.name}>
+              <option style={{ color: 'black' }} key={e.name} value={e.name}>
                 {e.name}
               </option>
             );

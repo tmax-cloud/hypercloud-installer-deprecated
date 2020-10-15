@@ -14,6 +14,7 @@ import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperAuthFactory from '../script/ScriptHyperAuthFactory';
 import CentosHyperAuthScript from '../script/CentosHyperAuthScript';
+import * as Common from '../../common/common';
 
 export default class HyperAuthInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `hyperauth-install`;
@@ -79,8 +80,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // 특정 pod가 뜨고 난 후 다음 작업 해야함
-    // 15초 대기
-    await new Promise(resolve => setTimeout(resolve, 15000));
+    // 30초 대기
+    await new Promise(resolve => setTimeout(resolve, 30000));
 
     // Step 2. SSL 인증서 생성
     mainMaster.cmd = this._step2(mainMaster.os.type);
@@ -155,11 +156,13 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
     console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
     mainMaster.cmd = `
-    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
     export hyperCloudServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
     sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://$hyperCloudServiceIp/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
     `
     await mainMaster.exeCmd();
+
+    await Common.waitApiServerUntilNomal(mainMaster);
   }
 
   private async rollbackApiServerYaml() {
@@ -184,6 +187,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
     `
     await mainMaster.exeCmd();
+
+    await Common.waitApiServerUntilNomal(mainMaster);
   }
 
   private async _removeMainMaster() {

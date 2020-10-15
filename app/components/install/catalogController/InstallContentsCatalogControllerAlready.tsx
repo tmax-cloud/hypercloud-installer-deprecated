@@ -25,7 +25,7 @@ import routes from '../../../utils/constants/routes.json';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
-import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
+import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -45,8 +45,8 @@ const useStyles = makeStyles(() =>
   })
 );
 
-function InstallContentsHyperCloudAlready(props: any) {
-  console.debug(InstallContentsHyperCloudAlready.name, props);
+function InstallContentsCatalogControllerAlready(props: any) {
+  console.debug(InstallContentsCatalogControllerAlready.name, props);
   const { history, match } = props;
 
   const appContext = useContext(AppContext);
@@ -54,7 +54,7 @@ function InstallContentsHyperCloudAlready(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const nowProduct = CONST.PRODUCT.HYPERCLOUD;
+  const nowProduct = CONST.PRODUCT.CATALOG_CONTROLLER;
 
   // loading bar
   // const [loading, setLoading] = React.useState(false);
@@ -78,32 +78,11 @@ function InstallContentsHyperCloudAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.HYPERCLOUD.NAME);
+    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.CATALOG_CONTROLLER.NAME);
 
-    // console delete
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-    await hyperCloudConsoleInstaller.remove();
-
-    // webhook delete
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-    await hyperCloudWebhookInstaller.remove();
-
-    // operator delete
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
-    await hyperCloudOperatorInstaller.remove();
-
-    // template service broker delete
-    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
-    templateSeviceBrokerInstaller.env = nowEnv;
-    await templateSeviceBrokerInstaller.remove();
-
-    // webhook delete
-    // kube-apiserver.yaml 수정부분은 맨 마지막에 수행
-    // api server재기동에 시간이 걸려서, 다음 명령에서 kubectl이 동작하지 않음
-    await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+    const catalogControllerInstaller = CatalogControllerInstaller.getInstance;
+    catalogControllerInstaller.env = nowEnv;
+    await catalogControllerInstaller.remove();
   };
 
   return (
@@ -145,36 +124,12 @@ function InstallContentsHyperCloudAlready(props: any) {
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>
-                Operator Version
+                Version
               </span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).operator_version}
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <span className={['medium', 'thick'].join(' ')}>
-                Webhook Version
-              </span>
-            </div>
-            <div>
-              <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).webhook_version}
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <span className={['medium', 'thick'].join(' ')}>
-                Console Version
-              </span>
-            </div>
-            <div>
-              <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).console_version}
+                {nowEnv.isInstalled(nowProduct.NAME).version}
               </span>
             </div>
           </div>
@@ -221,7 +176,7 @@ function InstallContentsHyperCloudAlready(props: any) {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   <span className={['lightDark', 'small'].join(' ')}>
-                    {CONST.PRODUCT.HYPERCLOUD.NAME} 를 삭제하시겠습니까?
+                    {CONST.PRODUCT.CATALOG_CONTROLLER.NAME} 를 삭제하시겠습니까?
                   </span>
                 </DialogContentText>
               </DialogContent>
@@ -269,4 +224,4 @@ function InstallContentsHyperCloudAlready(props: any) {
   );
 }
 
-export default InstallContentsHyperCloudAlready;
+export default InstallContentsCatalogControllerAlready;

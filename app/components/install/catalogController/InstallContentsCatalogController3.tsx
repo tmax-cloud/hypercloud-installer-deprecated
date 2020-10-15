@@ -18,13 +18,13 @@ import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperClo
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
-import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
-import * as Common from '../../../utils/common/common';
+import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
-function InstallContentsHyperCloud3(props: any) {
-  console.debug(InstallContentsHyperCloud3.name, props);
+function InstallContentsCatalogController3(props: any) {
+  console.debug(InstallContentsCatalogController3.name, props);
   const { history, match, state } = props;
+
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   // progress bar
@@ -41,12 +41,10 @@ function InstallContentsHyperCloud3(props: any) {
   }, []);
 
   if (progress === 100) {
-    nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
+    nowEnv.deleteProductByName(CONST.PRODUCT.CATALOG_CONTROLLER.NAME);
     nowEnv.addProduct({
-      name: CONST.PRODUCT.HYPERCLOUD.NAME,
-      operator_version: state.operator_version,
-      webhook_version: state.webhook_version,
-      console_version: state.console_version
+      name: CONST.PRODUCT.CATALOG_CONTROLLER.NAME,
+      version: state.version
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -77,67 +75,18 @@ function InstallContentsHyperCloud3(props: any) {
       stderr: (data: string) => appendToProgressScreen(logRef, data)
     };
 
-    const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
-    hyperCloudOperatorInstaller.env = nowEnv;
-
-    const hyperCloudWebhookInstaller = HyperCloudWebhookInstaller.getInstance;
-    hyperCloudWebhookInstaller.env = nowEnv;
-
-    const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
-    hyperCloudConsoleInstaller.env = nowEnv;
-
-    const hyperAuthInstaller = HyperAuthInstaller.getInstance;
-    hyperAuthInstaller.env = nowEnv;
-
-    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
-    templateSeviceBrokerInstaller.env = nowEnv;
+    const catalogControllerInstaller = CatalogControllerInstaller.getInstance;
+    catalogControllerInstaller.env = nowEnv;
 
     try {
-      // operator install
-      await hyperCloudOperatorInstaller.install({
+      await catalogControllerInstaller.install({
         callback,
         setProgress
       });
-      setProgress(20);
-
-      // console install
-      await hyperCloudConsoleInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(40);
-
-      // 30초 대기 console pod 정상 동작 할 때 까지
-      await new Promise(resolve => setTimeout(resolve, 30000));
-
-      // realm import
-      await hyperAuthInstaller.realmImport({
-        callback,
-        setProgress
-      });
-      setProgress(60);
-
-      // template service broker install
-      await templateSeviceBrokerInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(80);
-
-      // webhook install
-      await hyperCloudWebhookInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(100);
     } catch (error) {
       console.error(error);
 
-      await hyperCloudConsoleInstaller.remove();
-      await hyperCloudWebhookInstaller.remove();
-      await hyperCloudOperatorInstaller.remove();
-      await templateSeviceBrokerInstaller.remove();
-      await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+      await catalogControllerInstaller.remove();
     } finally {
       console.log();
     }
@@ -173,7 +122,7 @@ function InstallContentsHyperCloud3(props: any) {
             //   page: 2
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CATALOG_CONTROLLER.NAME}/step2`
             );
           }}
         >
@@ -186,7 +135,7 @@ function InstallContentsHyperCloud3(props: any) {
             size="large"
             onClick={() => {
               history.push(
-                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step4`
+                `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CATALOG_CONTROLLER.NAME}/step4`
               );
             }}
           >
@@ -225,7 +174,7 @@ function InstallContentsHyperCloud3(props: any) {
                 //   page: 1
                 // });
                 history.push(
-                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step1`
+                  `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CATALOG_CONTROLLER.NAME}/step1`
                 );
               }}
               color="primary"
@@ -242,4 +191,4 @@ function InstallContentsHyperCloud3(props: any) {
   );
 }
 
-export default InstallContentsHyperCloud3;
+export default InstallContentsCatalogController3;
