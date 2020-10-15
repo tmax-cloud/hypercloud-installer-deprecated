@@ -17,7 +17,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
 import { AppContext } from '../../../containers/HomePage';
 import CONST from '../../../utils/constants/constant';
-import productImage from '../../../../resources/assets/HyperCloud Operator_logo.png';
+import productImage from '../../../../resources/assets/Tekton_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
 import * as env from '../../../utils/common/env';

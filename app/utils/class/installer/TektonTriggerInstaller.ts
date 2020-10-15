@@ -53,14 +53,14 @@ export default class TektonTriggerInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing trigger main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. Trigger 설치
     mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing console main Master... ######');
+    console.debug('###### Finish installing trigger main Master... ######');
   }
 
   private _step1() {

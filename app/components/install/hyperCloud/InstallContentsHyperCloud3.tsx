@@ -18,12 +18,13 @@ import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperClo
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
+import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
+import * as Common from '../../../utils/common/common';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsHyperCloud3(props: any) {
   console.debug(InstallContentsHyperCloud3.name, props);
   const { history, match, state } = props;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   // progress bar
@@ -88,30 +89,43 @@ function InstallContentsHyperCloud3(props: any) {
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
 
+    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
+    templateSeviceBrokerInstaller.env = nowEnv;
+
     try {
       // operator install
       await hyperCloudOperatorInstaller.install({
         callback,
         setProgress
       });
-      setProgress(30);
-
-      // webhook install
-      await hyperCloudWebhookInstaller.install({
-        callback,
-        setProgress
-      });
-      setProgress(60);
+      setProgress(20);
 
       // console install
       await hyperCloudConsoleInstaller.install({
         callback,
         setProgress
       });
-      setProgress(90);
+      setProgress(40);
+
+      // 30초 대기 console pod 정상 동작 할 때 까지
+      await new Promise(resolve => setTimeout(resolve, 30000));
 
       // realm import
       await hyperAuthInstaller.realmImport({
+        callback,
+        setProgress
+      });
+      setProgress(60);
+
+      // template service broker install
+      await templateSeviceBrokerInstaller.install({
+        callback,
+        setProgress
+      });
+      setProgress(80);
+
+      // webhook install
+      await hyperCloudWebhookInstaller.install({
         callback,
         setProgress
       });
@@ -122,6 +136,7 @@ function InstallContentsHyperCloud3(props: any) {
       await hyperCloudConsoleInstaller.remove();
       await hyperCloudWebhookInstaller.remove();
       await hyperCloudOperatorInstaller.remove();
+      await templateSeviceBrokerInstaller.remove();
       await hyperCloudWebhookInstaller.rollbackApiServerYaml();
     } finally {
       console.log();

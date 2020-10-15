@@ -19,6 +19,7 @@ export function send(node: any, cb?: SendCb) {
         console.debug('Client :: ready');
         console.debug('node', node);
         conn.exec(node.cmd, (err, stream) => {
+          console.log(node.cmd);
           if (err) throw err;
           stream
             .on('close', (code, signal) => {

@@ -14,6 +14,7 @@ import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
 import IngressControllerInstaller from './ingressControllerInstaller';
+import * as Common from '../../common/common';
 
 export default class HyperCloudWebhookInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `hypercloud-webhook-install`;
@@ -82,10 +83,6 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
     // Step 6. HyperCloud Audit Webhook Config 적용
     await this._step6();
-
-    // api-server yaml 수정 후, api server 재기동 되고 난 후에 다음 명령 실행 해야 함
-    // 10초 대기
-    await new Promise(resolve => setTimeout(resolve, 10000));
 
     // Step 7. test-yaml 배포
     mainMaster.cmd = this._step7();
@@ -173,6 +170,8 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
     `
     await mainMaster.exeCmd();
+
+    await Common.waitApiServerUntilNomal(mainMaster);
   }
 
   private _step7() {

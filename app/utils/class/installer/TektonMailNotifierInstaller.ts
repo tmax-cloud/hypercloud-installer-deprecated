@@ -53,7 +53,7 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing mail-notifier main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. SMTP 서버 설정
@@ -64,14 +64,14 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step2();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing console main Master... ######');
+    console.debug('###### Finish installing mail-notifier main Master... ######');
   }
 
   private _step1() {
     // FIXME: SMTP_SERVER, SMTP_USER, SMTP_PW 입력 받아야 함
-    const smtpServer = '';
-    const smtpUser = '';
-    const smtpPw = '';
+    const smtpServer = 'test.com';
+    const smtpUser = 'test';
+    const smtpPw = '1234';
 
     if (this.env.registry) {
       return `

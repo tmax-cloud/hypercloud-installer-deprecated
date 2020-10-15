@@ -16,8 +16,8 @@ import CniImage from '../../../resources/assets/cni_logo.png';
 import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
 import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
 import PrometheusImage from '../../../resources/assets/Prometheus_logo.png';
-import HelmImage from '../../../resources/assets/Helm_logo.png';
 import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
+import TektonImage from '../../../resources/assets/Tekton_logo.png';
 // import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
 
@@ -86,11 +86,7 @@ function InstallContentsMain(props: any) {
       image = CniImage;
     } else if (productName === CONST.PRODUCT.METAL_LB.NAME) {
       image = MetalLbImage;
-    }
-    // else if (productName === CONST.PRODUCT.HELM.NAME) {
-    //   image = HelmImage;
-    // }
-    else if (productName === CONST.PRODUCT.HYPERAUTH.NAME) {
+    } else if (productName === CONST.PRODUCT.HYPERAUTH.NAME) {
       image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.HYPERCLOUD.NAME) {
       image = HyperCloudOperatorImage;
@@ -98,6 +94,10 @@ function InstallContentsMain(props: any) {
       image = RookCephImage;
     } else if (productName === CONST.PRODUCT.PROMETHEUS.NAME) {
       image = PrometheusImage;
+    } else if (productName === CONST.PRODUCT.CATALOG_CONTROLLER.NAME) {
+      image = HyperCloudOperatorImage;
+    } else if (productName === CONST.PRODUCT.TEKTON.NAME) {
+      image = TektonImage;
     }
     return (
       <span>

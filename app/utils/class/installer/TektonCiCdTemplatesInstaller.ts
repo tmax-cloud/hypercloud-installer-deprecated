@@ -52,7 +52,7 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing ci/cd main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. 필수 Task 설치
@@ -63,7 +63,7 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step2();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing console main Master... ######');
+    console.debug('###### Finish installing ci/cd main Master... ######');
   }
 
   private _step1() {

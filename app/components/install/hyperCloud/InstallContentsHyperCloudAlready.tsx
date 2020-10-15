@@ -25,6 +25,7 @@ import routes from '../../../utils/constants/routes.json';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
+import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -93,6 +94,11 @@ function InstallContentsHyperCloudAlready(props: any) {
     const hyperCloudOperatorInstaller = HyperCloudOperatorInstaller.getInstance;
     hyperCloudOperatorInstaller.env = nowEnv;
     await hyperCloudOperatorInstaller.remove();
+
+    // template service broker delete
+    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
+    templateSeviceBrokerInstaller.env = nowEnv;
+    await templateSeviceBrokerInstaller.remove();
 
     // webhook delete
     // kube-apiserver.yaml 수정부분은 맨 마지막에 수행

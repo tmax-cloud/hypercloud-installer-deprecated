@@ -30,30 +30,25 @@ const CONST = {
       IS_REQUIRED: true, // Optional
       DESC: '모니터링 및 경고 기능을 제공하는 플러그인'
     },
-    // HELM: {
-    //   NAME: 'Helm',
-    //   IS_REQUIRED: false, // Optional
-    //   DESC: '헬름'
-    // },
+    CATALOG_CONTROLLER: {
+      NAME: 'Catalog Controller',
+      IS_REQUIRED: true, // Optional
+      DESC: 'Catalog Controller'
+    },
     HYPERAUTH: {
       NAME: 'HyperAuth',
       IS_REQUIRED: true, // Optional
-      DESC: 'HyperAuth'
+      DESC: 'HyperCloud 인증 플러그 인'
     },
     HYPERCLOUD: {
       NAME: 'HyperCloud',
       IS_REQUIRED: true, // Optional
       DESC: '쿠버네티스 기반의 오픈 클라우드 플랫폼'
     },
-    CATALOG_CONTROLLER: {
-      NAME: 'Catalog Controller',
-      IS_REQUIRED: true, // Optional
-      DESC: 'Catalog Controller'
-    },
     TEKTON: {
       NAME: 'Tekton',
       IS_REQUIRED: true, // Optional
-      DESC: 'Tekton'
+      DESC: 'CI/CD 기능을 제공하는 플러그 인'
     }
   }
 };

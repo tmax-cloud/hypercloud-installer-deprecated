@@ -53,14 +53,14 @@ export default class TektonPipelineInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing pipeline main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. Pipelines 설치
     mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing console main Master... ######');
+    console.debug('###### Finish installing pipeline main Master... ######');
   }
 
   private _step1() {

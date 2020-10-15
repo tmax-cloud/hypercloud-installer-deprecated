@@ -53,14 +53,14 @@ export default class TektonApprovalInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing console main Master... @@@@@@');
+    console.debug('@@@@@@ Start installing approval main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. Approval 설치
     mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing console main Master... ######');
+    console.debug('###### Finish installing approval main Master... ######');
   }
 
   private _step1() {
