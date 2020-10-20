@@ -167,23 +167,22 @@ function InstallContentsMain(props: any) {
                     className={classes.paper}
                     onClick={() => {
                       // kubernetes 미설치시, 설치페이지 이동 불가
-                      // if (!disabled) {
-                      //   product.goProductInstallPage(P.NAME, nowEnv, history);
-                      // }
-                      product.goProductInstallPage(P.NAME, nowEnv, history);
+                      if (!disabled) {
+                        product.goProductInstallPage(P.NAME, nowEnv, history);
+                      }
                     }}
                     variant="outlined"
                   >
                     <div
                       // kubernetes 미설치시, disabled
-                      // style={
-                      //   !disabled
-                      //     ? {}
-                      //     : {
-                      //         pointerEvents: 'none',
-                      //         opacity: '0.4'
-                      //       }
-                      // }
+                      style={
+                        !disabled
+                          ? {}
+                          : {
+                              pointerEvents: 'none',
+                              opacity: '0.4'
+                            }
+                      }
                       className={[
                         '',
                         'childLeftRightCenter',

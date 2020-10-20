@@ -1,6 +1,6 @@
 .wrap {
   background: #28384F;
-  color: white;
+  color: white !important;
   font-weight: bold;
   /* padding: 10px; */
   /* width: 25%; */
@@ -46,7 +46,6 @@
 .lnb nav {
   padding: 0 !important;
 }
-
 
 /* @media (max-width: 600px) {
   .wrap {

@@ -267,6 +267,37 @@ function EnvContentsAdd(props: any) {
     return false;
   };
 
+  const [hostName, setHostName] = useState('');
+  const [hostNameError, setHostNameError] = useState('');
+  const hasHostNameError = (target = hostName, setFunc = setHostNameError) => {
+    if (target.length === 0) {
+      setFunc('Host Name을 입력해주세요');
+      return true;
+    }
+
+    for (let i = 0; i < state.data.length; i += 1) {
+      if (state.data[i].hostName === target) {
+        setFunc('중복 된 Host Name이 존재합니다.');
+        return true;
+      }
+    }
+
+    setFunc('');
+    return false;
+  };
+
+  const [user, setUser] = useState('');
+  const [userError, setUserError] = useState('');
+  const hasUserError = (target = user, setFunc = setUserError) => {
+    if (target.length === 0) {
+      setFunc('사용자를 입력해주세요');
+      return true;
+    }
+
+    setFunc('');
+    return false;
+  };
+
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const hasPasswordError = (target = password, setFunc = setPasswordError) => {
@@ -293,6 +324,8 @@ function EnvContentsAdd(props: any) {
   const initValue = () => {
     setIp('');
     setPort('');
+    setHostName('');
+    setUser('');
     setPassword('');
   };
 
@@ -473,59 +506,121 @@ function EnvContentsAdd(props: any) {
               <span className={['dark', 'medium'].join(' ')}>노드</span>
               <span style={{ color: 'red' }}>*</span>
             </div>
-            <div>
+            <div
+              style={{
+                width: '70%',
+                height: '150px',
+                display: 'flex',
+                flexWrap: 'wrap'
+              }}
+              className={styles.nodeDiv}
+            >
               <div>
-                <TextField
-                  required
-                  className={['medium'].join(' ')}
-                  id="outlined-required"
-                  label="IP"
-                  placeholder="예: 192.168.32.128"
-                  variant="outlined"
-                  size="small"
-                  value={ip}
-                  onChange={e => {
-                    setIp(e.target.value);
-                    // hasIpError(e.target.value);
-                  }}
-                  onBlur={e => {
-                    hasIpError(e.target.value);
-                  }}
-                  error={ipError.length !== 0}
-                  helperText={ipError}
-                />
+                <div>
+                  <TextField
+                    required
+                    className={['medium'].join(' ')}
+                    id="outlined-required"
+                    label="IP"
+                    placeholder="ex) 192.168.32.128"
+                    variant="outlined"
+                    size="small"
+                    value={ip}
+                    onChange={e => {
+                      setIp(e.target.value);
+                      // hasIpError(e.target.value);
+                    }}
+                    onBlur={e => {
+                      hasIpError(e.target.value);
+                    }}
+                    error={ipError.length !== 0}
+                    helperText={ipError}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="left">
               <div>
-                <TextField
-                  required
-                  className={['medium'].join(' ')}
-                  id="outlined-required"
-                  label="Port"
-                  placeholder="0~65535"
-                  variant="outlined"
-                  size="small"
-                  value={port}
-                  onChange={e => {
-                    setPort(e.target.value);
-                    // hasPortError(e.target.value);
-                  }}
-                  onBlur={e => {
-                    hasPortError(e.target.value);
-                  }}
-                  error={portError.length !== 0}
-                  helperText={portError}
-                />
+                <div>
+                  <TextField
+                    required
+                    className={['short'].join(' ')}
+                    id="outlined-required"
+                    label="포트"
+                    placeholder="0~65535"
+                    variant="outlined"
+                    size="small"
+                    value={port}
+                    onChange={e => {
+                      setPort(e.target.value);
+                      // hasPortError(e.target.value);
+                    }}
+                    onBlur={e => {
+                      hasPortError(e.target.value);
+                    }}
+                    error={portError.length !== 0}
+                    helperText={portError}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="left">
-              <div className="left">
-                <Tooltip
-                  title="root 계정 비밀번호를 입력해 주세요."
-                  placement="top"
-                  arrow
-                >
+              <div>
+                <div>
+                  <Tooltip
+                    title="설정할 Host Name을 입력합니다."
+                    placement="top"
+                    arrow
+                  >
+                    <TextField
+                      required
+                      className={['medium'].join(' ')}
+                      id="outlined-required"
+                      label="Host Name"
+                      placeholder="ex) master-1"
+                      variant="outlined"
+                      size="small"
+                      value={hostName}
+                      onChange={e => {
+                        setHostName(e.target.value);
+                        // hasIpError(e.target.value);
+                      }}
+                      onBlur={e => {
+                        hasHostNameError(e.target.value);
+                      }}
+                      error={hostNameError.length !== 0}
+                      helperText={hostNameError}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <Tooltip
+                    title="root권한을 가진 사용자를 입력합니다."
+                    placement="top"
+                    arrow
+                  >
+                    <TextField
+                      required
+                      className={['medium'].join(' ')}
+                      id="outlined-required"
+                      label="사용자"
+                      placeholder="Text"
+                      variant="outlined"
+                      size="small"
+                      value={user}
+                      onChange={e => {
+                        setUser(e.target.value);
+                        // hasIpError(e.target.value);
+                      }}
+                      onBlur={e => {
+                        hasUserError(e.target.value);
+                      }}
+                      error={userError.length !== 0}
+                      helperText={userError}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+              <div>
+                <div className="left">
                   <TextField
                     required
                     className={['medium'].join(' ')}
@@ -553,7 +648,7 @@ function EnvContentsAdd(props: any) {
                       )
                     }}
                   />
-                </Tooltip>
+                </div>
               </div>
             </div>
             <div>
@@ -574,6 +669,8 @@ function EnvContentsAdd(props: any) {
                   let hasError = false;
                   if (hasIpError()) hasError = true;
                   if (hasPortError()) hasError = true;
+                  if (hasHostNameError()) hasError = true;
+                  if (hasUserError()) hasError = true;
                   if (hasPasswordError()) hasError = true;
                   if (hasError) return;
 
@@ -585,7 +682,7 @@ function EnvContentsAdd(props: any) {
                       ip,
                       port,
                       password,
-                      user: 'root'
+                      user
                     })
                     .then(async () => {
                       console.debug('ready');
@@ -596,7 +693,7 @@ function EnvContentsAdd(props: any) {
                           ip,
                           port,
                           password,
-                          user: 'root',
+                          user,
                           cmd: `awk -F= '/^NAME/{print $2}' /etc/os-release`
                         },
                         {
@@ -633,6 +730,8 @@ function EnvContentsAdd(props: any) {
                         data.splice(0, 0, {
                           ip,
                           port,
+                          hostName,
+                          user,
                           password,
                           os
                         });
@@ -677,13 +776,13 @@ function EnvContentsAdd(props: any) {
                   <TableRow>
                     <TableCell
                       align="center"
-                      style={{ padding: '0px', width: '20%' }}
+                      style={{ padding: '0px', width: '10%' }}
                     >
                       <span>마스터 노드</span>
                     </TableCell>
                     <TableCell
                       align="center"
-                      style={{ padding: '0px', width: '40%' }}
+                      style={{ padding: '0px', width: '20%' }}
                     >
                       <span>IP</span>
                     </TableCell>
@@ -696,6 +795,18 @@ function EnvContentsAdd(props: any) {
                     <TableCell
                       align="center"
                       style={{ padding: '0px', width: '20%' }}
+                    >
+                      <span>Host Name</span>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ padding: '0px', width: '20%' }}
+                    >
+                      <span>사용자</span>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{ padding: '0px', width: '10%' }}
                     >
                       <span>제거</span>
                     </TableCell>
@@ -711,7 +822,7 @@ function EnvContentsAdd(props: any) {
                         align="center"
                         component="th"
                         scope="row"
-                        style={{ padding: '0px', width: '20%' }}
+                        style={{ padding: '0px', width: '10%' }}
                       >
                         <Checkbox
                           checked={isSelected(row.ip)}
@@ -720,7 +831,7 @@ function EnvContentsAdd(props: any) {
                       </TableCell>
                       <TableCell
                         align="center"
-                        style={{ padding: '0px', width: '40%' }}
+                        style={{ padding: '0px', width: '20%' }}
                       >
                         {row.ip}
                       </TableCell>
@@ -733,6 +844,18 @@ function EnvContentsAdd(props: any) {
                       <TableCell
                         align="center"
                         style={{ padding: '0px', width: '20%' }}
+                      >
+                        {row.hostName}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ padding: '0px', width: '20%' }}
+                      >
+                        {row.user}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ padding: '0px', width: '10%' }}
                       >
                         {getRemoveButton(row)}
                       </TableCell>
@@ -793,11 +916,11 @@ function EnvContentsAdd(props: any) {
                       new Node(
                         node.ip,
                         node.port,
-                        'root',
+                        node.user,
                         node.password,
                         node.os,
                         ROLE.WORKER,
-                        Common.getRandomString()
+                        node.hostName
                       )
                     );
                   }
@@ -937,11 +1060,11 @@ function EnvContentsAdd(props: any) {
                     new Node(
                       node.ip,
                       node.port,
-                      'root',
+                      node.user,
                       node.password,
                       node.os,
                       role,
-                      Common.getRandomString()
+                      node.hostName
                     )
                   );
                 }

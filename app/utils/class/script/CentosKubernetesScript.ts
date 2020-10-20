@@ -22,6 +22,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 EOF`;
   }
 
+  // FIXME: CentOS부분 prolinux에서 문제 생길 여지 있음
   setCrioRepo(crioVersion: string): string {
     return `
     sudo yum install -y yum-utils;
@@ -145,6 +146,7 @@ EOF`;
     `;
   }
 
+  // FIXME: CentOS부분 prolinux에서 문제 생길 여지 있음
   setPackageRepository(destPath: string): string {
     return `
     cp -rT ${destPath} /tmp/localrepo;

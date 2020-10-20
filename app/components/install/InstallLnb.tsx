@@ -53,7 +53,7 @@ function InstallLnb(props: any) {
     // setOpen(!open);
   };
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     history.push(`${routes.INSTALL.HOME}/${e.target.value}`);
   };
 
@@ -112,6 +112,7 @@ function InstallLnb(props: any) {
             <ListSubheader
               component="div"
               id="nested-list-subheader"
+              className="childUpDownCenter"
               disableSticky
               onClick={() => {
                 history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
@@ -128,7 +129,26 @@ function InstallLnb(props: any) {
             {/* <ListItemIcon>
               <DraftsIcon />
             </ListItemIcon> */}
-            <ListItemText primary="필수 제품" />
+            {nowEnv.isAllRequiredProductInstall() ? (
+              <ListItemText primary="필수 제품" />
+            ) : (
+              <div
+                className={['childLeftRightLeft', 'childUpDownCenter'].join(
+                  ' '
+                )}
+              >
+                <div>
+                  <ListItemText primary="필수 제품" />
+                </div>
+                <Tooltip
+                  title="쿠버네티스 제품을 설치해야 그 외 모듈을 설치할 수 있습니다."
+                  placement="right"
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </Tooltip>
+                <div />
+              </div>
+            )}
           </ListItem>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
@@ -155,7 +175,7 @@ function InstallLnb(props: any) {
                       nowEnv = env.loadEnvByName(match.params.envName);
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
-                    // disabled={disabled}
+                    disabled={disabled}
                   >
                     {/* <ListItemIcon>
                   <StarBorder />
