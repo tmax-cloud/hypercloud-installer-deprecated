@@ -548,6 +548,8 @@ export default function EnvContentsExist(props: any) {
                     <TableRow>
                       <TableCell>IP</TableCell>
                       <TableCell>Port</TableCell>
+                      <TableCell>Host Name</TableCell>
+                      <TableCell>User</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody
@@ -562,6 +564,8 @@ export default function EnvContentsExist(props: any) {
                           {nodeRow.ip}
                         </TableCell>
                         <TableCell>{nodeRow.port}</TableCell>
+                        <TableCell>{nodeRow.hostName}</TableCell>
+                        <TableCell>{nodeRow.user}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
