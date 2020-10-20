@@ -47,17 +47,10 @@
   width: 200px !important;
 }
 
-/* .nodeAddButton {
+.nodeAddButton {
   width: 65px;
   height: 35px;
   background-color: white;
   border: 1px solid #0992AC !important;
   color: #0992AC !important;
-} */
-.nodeAddButton {
-  width: 65px;
-  height: 35px;
-  background-color: white;
-  /* border: 1px solid #0992AC !important;
-  color: #0992AC !important; */
 }

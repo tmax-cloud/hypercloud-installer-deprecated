@@ -167,8 +167,7 @@ title bar
 /* title bar 설정*/
 .titlebar {
   background-color: #28384F !important;
-  /* background-image: url("../resources/assets/lnb_logo_bg_mint.png"); */
-  background-image: url("../resources/assets/lnb_logo_bg_blue.svg");
+  background-image: url("../resources/assets/lnb_logo_bg_mint.png");
   background-repeat: no-repeat;
   height: 60px !important;
   position: relative !important;
@@ -243,18 +242,6 @@ button.verySmall {
 }
 /* color */
 button.primary {
-  background-color: #EC3854;
-  color:#FFFFFF;
-}
-button.primary:hover {
-  background-color: #D22D46;
-  color:#FFFFFF;
-}
-button.primary:active {
-  background-color:#BA2E44;
-  color:#FFFFFF;
-}
-/* button.primary {
   background-color: #0992AC;
   color:#FFFFFF;
 }
@@ -265,21 +252,8 @@ button.primary:hover {
 button.primary:active {
   background-color: #046A7D;
   color:#FFFFFF;
-} */
-
+}
 button.secondary {
-  background-color: #1E6CB9;
-  color:#FFFFFF;
-}
-button.secondary:hover {
-  background-color: #175B9E;
-  color:#FFFFFF;
-}
-button.secondary:active {
-  background-color: #0F4B86;
-  color:#FFFFFF;
-}
-/* button.secondary {
   background-color: #FFFFFF;
   color: #536882;
   border: 1px solid #536882;
@@ -293,7 +267,7 @@ button.secondary:active {
   background-color: #DDE8F7;
   color: #536882;
   border: 1px solid #536882;
-} */
+}
 
 
 /*
@@ -338,22 +312,16 @@ textfiled
 /*
 radio
 */
-/* .MuiRadio-colorSecondary.Mui-checked {
-  color: #0992AC;
-} */
 .MuiRadio-colorSecondary.Mui-checked {
-  color: #EC3854;
+  color: #0992AC;
 }
 
 
 /*
 checkbox
 */
-/* .MuiCheckbox-colorSecondary.Mui-checked {
-  color: #0992AC !important;
-} */
 .MuiCheckbox-colorSecondary.Mui-checked {
-  color: #EC3854 !important;
+  color: #0992AC !important;
 }
 
 /*

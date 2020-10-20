@@ -21,7 +21,7 @@ import { AppContext } from '../../../containers/HomePage';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/Kubernetes_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
-import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
+import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import KubernetesInstaller from '../../../utils/class/installer/KubernetesInstaller';

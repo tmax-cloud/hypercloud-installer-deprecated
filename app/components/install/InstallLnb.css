@@ -26,9 +26,9 @@
   margin-left: 10px;
 }
 
-/* .listItemBox{
+.listItemBox{
   color: white;
-} */
+}
 .listItemBox:hover{
   /* background-color: #0992AC !important; */
   color: #0992AC   !important;
