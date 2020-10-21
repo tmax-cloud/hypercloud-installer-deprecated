@@ -81,6 +81,7 @@ function InstallContentsKubernetes3(props: any) {
       await kubernetesInstaller.install({
         registry: state.registry,
         version: state.version,
+        podSubnet: state.podSubnet,
         callback,
         setProgress
       });

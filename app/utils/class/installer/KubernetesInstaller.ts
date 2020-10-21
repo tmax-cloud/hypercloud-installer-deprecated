@@ -47,8 +47,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { registry: string; version: string; callback: any; setProgress: Function; }) {
-    const { registry, version, callback, setProgress } = param;
+  public async install(param: { registry: string; version: string; podSubnet: string; callback: any; setProgress: Function; }) {
+    const { registry, version, podSubnet, callback, setProgress } = param;
 
     await this._envSetting({
       registry,
@@ -67,6 +67,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     await this._installMainMaster(
       registry,
       version,
+      podSubnet,
       callback
     )
     setProgress(60);
@@ -92,13 +93,14 @@ export default class KubernetesInstaller extends AbstractInstaller {
     await this._removeMainMaster();
   }
 
-  private async _installMainMaster(registry: string, version: string, callback: any) {
+  private async _installMainMaster(registry: string, version: string, podSubnet: string, callback: any) {
     console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getK8sMainMasterInstallScript(
       mainMaster,
       registry,
       version,
+      podSubnet,
       masterArr.length > 0
     );
     await mainMaster.exeCmd(callback);
@@ -394,6 +396,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     mainMaster: Node,
     registry: string,
     version: string,
+    podSubnet: string,
     isMultiMaster: boolean
   ): string {
     const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
@@ -416,6 +419,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
+      sudo sed -i "s|$podSubnet|${podSubnet}|g" ./k8s.config;
       cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;

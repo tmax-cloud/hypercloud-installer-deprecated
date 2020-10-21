@@ -25,7 +25,8 @@ function InstallContentsKubernetes(props: any) {
 
   const [state, setState] = useState({
     version: KubernetesInstaller.K8S_VERSION,
-    registry: ''
+    registry: '',
+    podSubnet: ''
   });
 
   // const appContext = useContext(AppContext);

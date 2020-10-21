@@ -194,7 +194,7 @@ title bar
 font
 */
 /* size */
-.verLarge {
+.veryLarge {
   font-size: 22px;
 }
 .large {
@@ -231,7 +231,7 @@ font
 button
 */
 /* size */
-button.verLarge {
+button.veryLarge {
 }
 button.large {
 }
@@ -318,6 +318,7 @@ textfiled
   padding: 8px 0 8px 5px;
 }
 .long > div {
+  width: 400px;
   border-radius: 0px;
 }
 .medium input {
@@ -325,6 +326,7 @@ textfiled
   padding: 8px 0 8px 5px;
 }
 .medium > div {
+  width: 200px;
   border-radius: 0px;
 }
 .short input {
@@ -332,6 +334,7 @@ textfiled
   padding: 8px 0 8px 5px;
 }
 .short > div {
+  width: 100px;
   border-radius: 0px;
 }
 

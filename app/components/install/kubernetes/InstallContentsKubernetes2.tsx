@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Select,
@@ -11,7 +11,8 @@ import {
   IconButton,
   RadioGroup,
   FormControlLabel,
-  Radio
+  Radio,
+  TextField
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../../utils/constants/constant';
@@ -19,6 +20,7 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import { NETWORK_TYPE } from '../../../utils/class/Env';
+import * as validation from '../../../utils/common/validation';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
@@ -55,6 +57,35 @@ function InstallContentsKubernetes2(props: any) {
   };
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const [ip, setIp] = useState('');
+  const [ipError, setIpError] = useState('');
+  const hasIpError = (target = ip, setFunc = setIpError) => {
+    if (target.length === 0) {
+      setFunc('IP를 입력해주세요');
+      return true;
+    }
+
+    if (!validation.checkIpFormat(target)) {
+      setFunc('IP 형식을 확인해 주세요.');
+      return true;
+    }
+
+    setFunc('');
+    return false;
+  };
+
+  const [mask, setMask] = useState('');
+  const [maskError, setMaskError] = useState('');
+  const hasMaskError = (target = mask, setFunc = setMaskError) => {
+    if (target.length === 0) {
+      setFunc('net mask를 입력해주세요');
+      return true;
+    }
+
+    setFunc('');
+    return false;
   };
 
   return (
@@ -128,6 +159,57 @@ function InstallContentsKubernetes2(props: any) {
           </div>
         </div>
       </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>네트워크 대역</span>
+        </div>
+        <div>
+          <TextField
+            required
+            className={['medium'].join(' ')}
+            id="outlined-required"
+            // label="Name"
+            placeholder="192.168.1.0"
+            variant="outlined"
+            size="small"
+            value={ip}
+            onChange={e => {
+              setIp(e.target.value);
+              // hasNameError(e.target.value);
+            }}
+            onBlur={e => {
+              hasIpError(e.target.value);
+            }}
+            error={ipError.length !== 0}
+            helperText={ipError}
+          />
+          <span
+            style={{ margin: '0px 5px' }}
+            className={['veryLarge'].join(' ')}
+          >
+            /
+          </span>
+          <TextField
+            required
+            className={['short'].join(' ')}
+            id="outlined-required"
+            // label="Name"
+            placeholder="24"
+            variant="outlined"
+            size="small"
+            value={mask}
+            onChange={e => {
+              setMask(e.target.value);
+              // hasNameError(e.target.value);
+            }}
+            onBlur={e => {
+              hasMaskError(e.target.value);
+            }}
+            error={maskError.length !== 0}
+            helperText={maskError}
+          />
+        </div>
+      </div>
       <div
         style={{ marginTop: '50px' }}
         className={['childLeftRightCenter'].join(' ')}
@@ -138,6 +220,12 @@ function InstallContentsKubernetes2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
+            // error validation
+            let hasError = false;
+            if (hasIpError()) hasError = true;
+            if (hasMaskError()) hasError = true;
+            if (hasError) return;
+
             let registry = '';
             if (registryType === 'private') {
               const { mainMaster } = nowEnv.getNodesSortedByRole();
@@ -145,6 +233,7 @@ function InstallContentsKubernetes2(props: any) {
             }
             setState({
               version: state.version,
+              podSubnet: `${ip}/${mask}`,
               registry
             });
             history.push(
