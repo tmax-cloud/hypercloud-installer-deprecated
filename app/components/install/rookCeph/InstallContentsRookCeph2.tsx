@@ -14,8 +14,11 @@ import CONST from '../../../utils/constants/constant';
 import routes from '..././../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
+import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
 
 function InstallContentsRookCeph2(props: any) {
+
+
   console.debug(InstallContentsRookCeph2.name, props);
   const { history, match, state, setState } = props;
 
@@ -23,6 +26,19 @@ function InstallContentsRookCeph2(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
+
+  const getDiskListPossibleOsd = async () => {
+    const rookCephInstaller = RookCephInstaller.getInstance;
+    rookCephInstaller.env = nowEnv;
+    const possibleOsdDiskList = await rookCephInstaller.getDiskListPossibleOsd();
+    console.error(possibleOsdDiskList);
+  };
+
+  React.useEffect(() => {
+    getDiskListPossibleOsd();
+
+    return () => {};
+  }, []);
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
