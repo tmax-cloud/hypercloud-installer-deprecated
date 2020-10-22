@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable array-callback-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
@@ -24,8 +25,8 @@ export default class RookCephInstaller extends AbstractInstaller {
 
   public static readonly CEPH_VERSION=`14.2.9`;
 
-  public static readonly ROOK_VERSION=`1.3.6`;
-  // public static readonly ROOK_VERSION=`1.3.9`;
+  // public static readonly ROOK_VERSION=`1.3.6`;
+  public static readonly ROOK_VERSION=`1.3.9`;
 
   public static readonly CEPHCSI_VERSION=`2.1.2`;
 
@@ -465,5 +466,89 @@ data:
       sudo docker push \${REGISTRY}/k8scsi/csi-attacher:\${ATTACHER_VERSION};
       #rm -rf $ROOK_HOME;
       `;
+  }
+
+  public async getDiskListPossibleOsd() {
+    const hostNameDiskList={};
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        let diskList: string[]=[];
+        node.cmd = `lsblk --all --noheadings --list --output KNAME`
+        await node.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            const output = data.toString();
+            diskList = output.split('\n');
+            // 개행으로 나누면, 마지막 공백들어옴 삭제
+            diskList.pop();
+            hostNameDiskList[node.hostName]=diskList;
+          },
+          stderr: () => {},
+        });
+      })
+    );
+
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        const diskList = hostNameDiskList[node.hostName];
+        const filteredDiskList: never[] = [];
+        for (let i=0; i< diskList.length; i+=1) {
+          const disk = diskList[i];
+          let result: string[]=[];
+          node.cmd = `lsblk /dev/${disk} --bytes --nodeps --pairs --paths --output SIZE,TYPE,MOUNTPOINT`
+          await node.exeCmd({
+            close: () => {},
+            stdout: (data: string) => {
+              const output = data.toString();
+              result = output.split(' ');
+              const temp={}
+              result.map((r)=>{
+                const s=r.split('=');
+                const key = s[0];
+                const value = s[1].replace(/"/gi,'');
+                temp[key]=value;
+              })
+              const size = temp.SIZE;
+              const type = temp.TYPE;
+              const mountpoint = temp.MOUNTPOINT;
+              console.log(size, type, mountpoint);
+              if (size>=10737418200) {
+                if (type==="disk" || type==="part") {
+                  if (!mountpoint.trim()){
+                    filteredDiskList.push(disk);
+                  }
+                }
+              }
+            },
+            stderr: () => {},
+          });
+        }
+        hostNameDiskList[node.hostName]=filteredDiskList;
+      })
+    );
+
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        const diskList = hostNameDiskList[node.hostName];
+        const filteredDiskList: never[] = [];
+        for (let i=0; i< diskList.length; i+=1) {
+          const disk = diskList[i];
+          node.cmd = `lsblk --noheadings --pairs /dev/${disk} | wc -l`
+          await node.exeCmd({
+            close: () => {},
+            stdout: (data: string) => {
+              const output = data.toString();
+              if (output == 1) {
+                filteredDiskList.push(disk);
+              }
+            },
+            stderr: () => {},
+          });
+        }
+        hostNameDiskList[node.hostName]=filteredDiskList;
+      })
+    );
+
+    return hostNameDiskList;
   }
 }
