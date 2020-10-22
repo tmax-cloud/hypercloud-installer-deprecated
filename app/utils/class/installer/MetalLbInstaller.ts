@@ -95,7 +95,7 @@ export default class MetalLbInstaller extends AbstractInstaller {
     }
     console.error('ipRangeText', ipRangeText);
     return `
-    # interfaceName=\`ls /sys/class/net | grep ens\`;
+    # interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
     # inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
     # network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
     # prefix=\`ipcalc -p \${inet} | cut -d"=" -f2\`;

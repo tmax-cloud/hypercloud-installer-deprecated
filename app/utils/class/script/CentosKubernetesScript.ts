@@ -52,7 +52,7 @@ EOF`;
     }
     return `
     sudo yum install -y keepalived;
-    interfaceName=\`ls /sys/class/net | grep ens\`;
+    interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
     echo "vrrp_instance VI_1 {
     state ${state}
     interface \${interfaceName}

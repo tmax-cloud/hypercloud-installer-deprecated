@@ -342,7 +342,7 @@ data:
 
   private _setNtpServer(osType:  string): string {
     return `
-    interfaceName=\`ls /sys/class/net | grep ens\`;
+    interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
     inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
     network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
     netmask=\`ipcalc -m \${inet} | cut -d"=" -f2\`;
