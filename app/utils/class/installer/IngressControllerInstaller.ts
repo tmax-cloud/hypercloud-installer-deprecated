@@ -76,7 +76,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     // 치환 되기 전에 원래대로 만들고 치환함.
     let script = `
     ${this._exportEnv()}
-    cd ~/${IngressControllerInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml/;
 
     sed -i 's/'\${INGRESS_NGINX_NAME}'/ingress-nginx/g' deploy.yaml;
     sed -i 's/--ingress-class='\${INGRESS_CLASS}'/--ingress-class=nginx/g' deploy.yaml;
@@ -89,12 +89,25 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     sed -i 's/ingress-controller-leader-nginx/ingress-controller-leader-'\${INGRESS_CLASS}'/g' deploy.yaml;
     sed -i 's/{nginx_ingress_version}/'\${NGINX_INGRESS_VERSION}'/g' deploy.yaml;
     sed -i 's/{kube_webhook_certgen_version}/'\${KUBE_WEBHOOK_CERTGEN_VERSION}'/g' deploy.yaml;
+
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml/;
+
+    sed -i 's/'\${NGINX_INGRESS_VERSION}'/{nginx_ingress_version}/g' deploy.yaml;
+    sed -i 's/'\${KUBE_WEBHOOK_CERTGEN_VERSION}'/{kube_webhook_certgen_version}/g' deploy.yaml;
+
+    sed -i 's/{nginx_ingress_version}/'\${NGINX_INGRESS_VERSION}'/g' deploy.yaml
+    sed -i 's/{kube_webhook_certgen_version}/'\${KUBE_WEBHOOK_CERTGEN_VERSION}'/g' deploy.yaml
     `;
 
     if (this.env.registry) {
       script += `
-      sed -i 's/quay.io\\/kubernetes-ingress-controller\\/nginx-ingress-controller/'\${REGISTRY}'\\/kubernetes-ingress-controller\\/nginx-ingress-controller/g' deploy.yaml
-      sed -i 's/docker.io\\/jettech\\/kube-webhook-certgen/'\${REGISTRY}'\\/jettech\\/kube-webhook-certgen/g' deploy.yaml
+      cd ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml/;
+      sed -i 's/quay.io\\/kubernetes-ingress-controller\\/nginx-ingress-controller/'\${REGISTRY}'\\/kubernetes-ingress-controller\\/nginx-ingress-controller/g' deploy.yaml;
+      sed -i 's/docker.io\\/jettech\\/kube-webhook-certgen/'\${REGISTRY}'\\/jettech\\/kube-webhook-certgen/g' deploy.yaml;
+
+      cd ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml/;
+      sed -i 's/quay.io\\/kubernetes-ingress-controller\\/nginx-ingress-controller/'\${REGISTRY}'\\/kubernetes-ingress-controller\\/nginx-ingress-controller/g' deploy.yaml;
+      sed -i 's/docker.io\\/jettech\\/kube-webhook-certgen/'\${REGISTRY}'\\/jettech\\/kube-webhook-certgen/g' deploy.yaml;
       `;
     }
     return script;
@@ -102,7 +115,10 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   private _step1() {
     return `
-    cd ~/${IngressControllerInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml/;
+    kubectl apply -f deploy.yaml;
+
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml/;
     kubectl apply -f deploy.yaml;
     `;
   }
@@ -118,10 +134,28 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   private _getRemoveScript(): string {
     return `
-    cd ~/${IngressControllerInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml/;
+    kubectl delete -f deploy.yaml;
+
+    cd ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml/;
     kubectl delete -f deploy.yaml;
     `;
   }
+
+  // private async _downloadYaml() {
+  //   console.debug('@@@@@@ Start download yaml file from external... @@@@@@');
+  //   const { mainMaster } = this.env.getNodesSortedByRole();
+  //   mainMaster.cmd = `
+  //   mkdir -p ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml;
+  //   cd ~/${IngressControllerInstaller.INSTALL_HOME}/shared/yaml;
+  //   wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/master/IngressNginx/shared/yaml/deploy.yaml;
+  //   mkdir -p ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml;
+  //   cd ~/${IngressControllerInstaller.INSTALL_HOME}/system/yaml;
+  //   wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/master/IngressNginx/system/yaml/deploy.yaml
+  //   `;
+  //   await mainMaster.exeCmd();
+  //   console.debug('###### Finish download yaml file from external... ######');
+  // }
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { callback: any; }) {
@@ -139,6 +173,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
       /**
        * 1. public 패키지 레포 등록 (각 노드) (필요 시)
        */
+      // await this._downloadYaml();
     }
 
     if (this.env.registry) {
@@ -191,6 +226,9 @@ export default class IngressControllerInstaller extends AbstractInstaller {
       gitPullCommand += `
       sudo docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:\${NGINX_INGRESS_VERSION};
       sudo docker pull jettech/kube-webhook-certgen:\${KUBE_WEBHOOK_CERTGEN_VERSION};
+
+      #sudo docker save quay.io/kubernetes-ingress-controller/nginx-ingress-controller:\${NGINX_INGRESS_VERSION} > ingress-nginx_\${NGINX_INGRESS_VERSION}.tar
+      #sudo docker save jettech/kube-webhook-certgen:\${KUBE_WEBHOOK_CERTGEN_VERSION} > kube-webhook-certgen_\${KUBE_WEBHOOK_CERTGEN_VERSION}.tar
       `;
     }
     return `
