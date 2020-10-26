@@ -507,7 +507,8 @@ export default function EnvContentsExist(props: any) {
             </IconButton>
           </TableCell>
           <TableCell component="th" id={labelId} scope="row" padding="none">
-            <a className={['indicator'].join(' ')}
+            <a
+              className={['indicator'].join(' ')}
               onClick={() => {
                 history.push(`${routes.INSTALL.HOME}/${row.name}`);
               }}

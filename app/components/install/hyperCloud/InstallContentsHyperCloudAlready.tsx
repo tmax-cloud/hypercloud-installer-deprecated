@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
+import { shell } from 'electron';
 import styles from '../InstallContents1.css';
 import { AppContext } from '../../../containers/HomePage';
 import CONST from '../../../utils/constants/constant';
@@ -96,7 +97,8 @@ function InstallContentsHyperCloudAlready(props: any) {
     await hyperCloudOperatorInstaller.remove();
 
     // template service broker delete
-    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
+    const templateSeviceBrokerInstaller =
+      TemplateSeviceBrokerInstaller.getInstance;
     templateSeviceBrokerInstaller.env = nowEnv;
     await templateSeviceBrokerInstaller.remove();
 
@@ -177,6 +179,27 @@ function InstallContentsHyperCloudAlready(props: any) {
                 {nowEnv.isInstalled(nowProduct.NAME).console_version}
               </span>
             </div>
+          </div>
+          <div>
+            <span className={['small', 'indicator'].join(' ')}>
+              <a
+              onClick={async () => {
+                const { mainMaster } = nowEnv.getNodesSortedByRole();
+                mainMaster.cmd = `kubectl get svc -n console-system -o jsonpath='{.items[?(@.metadata.name=="console-lb")].status.loadBalancer.ingress[0].ip}'`;
+                let ip;
+                await mainMaster.exeCmd({
+                  close: () => {},
+                  stdout: (data: string) => {
+                    ip = data.toString();
+                  },
+                  stderr: () => {}
+                });
+                shell.openExternal(`https://${ip}/`);
+              }}
+              >
+              console로 이동
+              </a>
+            </span>
           </div>
           <div>
             <span

@@ -15,6 +15,7 @@ import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
 import IngressControllerInstaller from './ingressControllerInstaller';
 import * as Common from '../../common/common';
+import Node from '../Node';
 
 export default class HyperCloudWebhookInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `hypercloud-webhook-install`;
@@ -79,6 +80,10 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
     // Step 5. HyperCloud Audit Webhook Config 생성
     mainMaster.cmd = this._step5();
+    await mainMaster.exeCmd(callback);
+
+    // Webhook Config 다른 마스터들에게 복사
+    mainMaster.cmd = this._cpConfigtoMaster();
     await mainMaster.exeCmd(callback);
 
     // Step 6. HyperCloud Audit Webhook Config 적용
@@ -147,11 +152,27 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     `;
   }
 
+  private _cpConfigtoMaster() {
+    const { masterArr } = this.env.getNodesSortedByRole();
+    let copyScript='';
+    masterArr.map((master)=>{
+      copyScript += `
+      sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./06_audit-webhook-config ${master.user}@${master.ip}:/etc/kubernetes/pki/audit-webhook-config;
+      sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./07_audit-policy.yaml ${master.user}@${master.ip}:/etc/kubernetes/pki/audit-policy.yaml;
+      `;
+    });
+
+    return `
+    cd ~/${HyperCloudWebhookInstaller.INSTALL_HOME}/manifests;
+    ${copyScript}
+    `;
+  }
+
   private async _step6() {
-    const { mainMaster } = this.env.getNodesSortedByRole();
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
-    let apiServerYaml;
+    let apiServerYaml: any;
     await mainMaster.exeCmd({
       close: () => {},
       stdout: (data: string) => {
@@ -172,6 +193,31 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     await Common.waitApiServerUntilNomal(mainMaster);
+
+    // 다른 마스터에도 적용
+    await Promise.all(
+      masterArr.map(async (master: Node) => {
+        master.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+        await master.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            apiServerYaml = YAML.parse(data.toString());
+          },
+          stderr: () => {},
+        });
+        console.error('apiServerYaml', apiServerYaml);
+        apiServerYaml.spec.containers[0].command.push(`--audit-log-path=/var/log/kubernetes/apiserver/audit.log`)
+        apiServerYaml.spec.containers[0].command.push(`--audit-policy-file=/etc/kubernetes/pki/audit-policy.yaml`)
+        apiServerYaml.spec.containers[0].command.push(`--audit-webhook-config-file=/etc/kubernetes/pki/audit-webhook-config`)
+        apiServerYaml.spec.dnsPolicy = 'ClusterFirstWithHostNet';
+
+        console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+        master.cmd = `
+        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `
+        await master.exeCmd();
+      })
+    );
   }
 
   private _step7() {

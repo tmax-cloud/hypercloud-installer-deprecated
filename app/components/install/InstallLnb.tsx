@@ -10,6 +10,13 @@ import { MenuItem, Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import styles from './InstallLnb.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
@@ -24,11 +31,18 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
-      height: '100%'
+      height: '100%',
       // maxWidth: 360,
+      display: 'none'
     },
     nested: {
       paddingLeft: theme.spacing(4)
+    },
+    stepLabel_primary: {
+      cursor: 'pointer !important'
+    },
+    stepper_primary: {
+      backgroundColor: '#28384F'
     }
   })
 );
@@ -88,6 +102,36 @@ function InstallLnb(props: any) {
     return '';
   };
 
+  // stepper 관련
+  function getSteps() {
+    const result = requiredProduct.map(p => {
+      return p.NAME;
+    });
+    return result;
+  }
+
+  function getStepContent(step: number) {
+    switch (step) {
+      case 0:
+        return ``;
+      case 1:
+        return ``;
+      case 2:
+        return ``;
+      default:
+        return '';
+    }
+  }
+
+  const steps = getSteps();
+
+  const getcompleted = productName => {
+    if (nowEnv.isInstalled(productName)) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className={[styles.wrap].join(' ')}>
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
@@ -105,6 +149,44 @@ function InstallLnb(props: any) {
         </Link>
       </div>
       <div className={styles.lnb}>
+        <ListSubheader
+          component="div"
+          id="nested-list-subheader"
+          className="childUpDownCenter"
+          disableSticky
+          onClick={() => {
+            history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
+          }}
+        >
+          <span style={{ color: 'white' }}>
+            <a>제품 목록</a>
+          </span>
+        </ListSubheader>
+        <Stepper
+          // activeStep={activeStep}
+          orientation="vertical"
+          className={classes.stepper_primary}
+        >
+          {steps.map((label, index) => (
+            <Step
+              key={label}
+              active
+              completed={getcompleted(label)}
+              className={getcompleted(label) ? styles.primary : ''}
+              onClick={() => {
+                nowEnv = env.loadEnvByName(match.params.envName);
+                product.goProductInstallPage(label, nowEnv, history);
+              }}
+            >
+              <StepLabel className={classes.stepLabel_primary}>
+                {label}
+              </StepLabel>
+              <StepContent>
+                <Typography>{getStepContent(index)}</Typography>
+              </StepContent>
+            </Step>
+          ))}
+        </Stepper>
         <List
           component="nav"
           aria-labelledby="nested-list-subheader"
@@ -175,7 +257,8 @@ function InstallLnb(props: any) {
                       nowEnv = env.loadEnvByName(match.params.envName);
                       product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
-                    disabled={disabled}
+                    // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
+                    // disabled={disabled}
                   >
                     {/* <ListItemIcon>
                   <StarBorder />
@@ -233,7 +316,8 @@ function InstallLnb(props: any) {
                   onClick={() => {
                     product.goProductInstallPage(P.NAME, nowEnv, history);
                   }}
-                  disabled={!nowEnv.isAllRequiredProductInstall()}
+                  // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
+                  // disabled={!nowEnv.isAllRequiredProductInstall()}
                 >
                   {/* <ListItemIcon>
                   <StarBorder />

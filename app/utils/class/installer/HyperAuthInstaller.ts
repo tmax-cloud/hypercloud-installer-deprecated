@@ -15,6 +15,7 @@ import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperAuthFactory from '../script/ScriptHyperAuthFactory';
 import CentosHyperAuthScript from '../script/CentosHyperAuthScript';
 import * as Common from '../../common/common';
+import Node from '../Node';
 
 export default class HyperAuthInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `hyperauth-install`;
@@ -87,6 +88,10 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step2(mainMaster.os.type);
     await mainMaster.exeCmd(callback);
 
+    // 인증서 다른 마스터들에게 복사
+    mainMaster.cmd = this._cpSSLtoMaster();
+    await mainMaster.exeCmd(callback);
+
     // Step 3. HyperAuth Deployment 배포
     mainMaster.cmd = this._step3();
     await mainMaster.exeCmd(callback);
@@ -95,6 +100,19 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await this._step4();
 
     console.debug('###### Finish installing main Master... ######');
+  }
+
+  private _cpSSLtoMaster() {
+    const { masterArr } = this.env.getNodesSortedByRole();
+    let copyScript='';
+    masterArr.map((master)=>{
+      copyScript += `sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./hyperauth.crt ${master.user}@${master.ip}:/etc/kubernetes/pki/hyperauth.crt;`;
+    });
+
+    return `
+    cd ~/${HyperAuthInstaller.INSTALL_HOME};
+    ${copyScript}
+    `;
   }
 
   private _step1(): string {
@@ -128,7 +146,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private async _step4() {
-    const { mainMaster } = this.env.getNodesSortedByRole();
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
 
     // FIXME:
     // 일단 --oidc 부분 있으면 삭제
@@ -138,7 +156,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await this.rollbackApiServerYaml();
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
-    let apiServerYaml;
+    let apiServerYaml: any;
     await mainMaster.exeCmd({
       close: () => {},
       stdout: (data: string) => {
@@ -163,6 +181,35 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     await Common.waitApiServerUntilNomal(mainMaster);
+
+    // 다른 마스터에도 적용
+    await Promise.all(
+      masterArr.map(async (master: Node) => {
+        master.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+        await master.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            apiServerYaml = YAML.parse(data.toString());
+          },
+          stderr: () => {},
+        });
+        console.error('apiServerYaml', apiServerYaml);
+        apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`)
+        apiServerYaml.spec.containers[0].command.push(`--oidc-client-id=hypercloud4`)
+        apiServerYaml.spec.containers[0].command.push(`--oidc-username-claim=preferred_username`)
+        apiServerYaml.spec.containers[0].command.push(`--oidc-username-prefix=-`)
+        apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`)
+        apiServerYaml.spec.containers[0].command.push(`--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`)
+
+        console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+        master.cmd = `
+        export hyperCloudServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://$hyperCloudServiceIp/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `
+        await master.exeCmd();
+      })
+    );
   }
 
   private async rollbackApiServerYaml() {
