@@ -1,3 +1,17 @@
+# v4.1.2 (2020.10.26)
+### Features
+ - Node 추가 시, HostName, User 입력 받는 기능 추가 (IMS:242540)
+ - 설치화면에서 권장 설치 순서 보여주는 LNB Stepper로 변경 (IMS:242540)
+ - HyperCloud 설치 완료 화면에서, console로 이동하기 버튼 추가 (IMS:242540)
+ - Kubernetes 설치 시, Pod network 대역 입력 받는 기능 추가
+ 
+### Fixes
+ - Master 다중화에서 keepalive 설치 시, network interface 가져오는 스크립트 수정 (IMS: 242561)
+ - Master 다중화 설치 시, 각 노드 설정 누락되는 현상 수정 (IMS:242766)
+ - Nginx 설치 가이드 변경에 따른, 설치 스크립트 수정
+
+---
+
 # v4.1.1 (2020.10.15)
 ### Features
  - 지원 OS 추가
