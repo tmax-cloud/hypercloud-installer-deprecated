@@ -16,12 +16,15 @@ export default class AbstractCentosScript extends AbstractScript {
   installPackage() {
     return `
     # wget
-    yum install -y wget;
+    sudo yum install -y wget;
 
     # jq
-    curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq;
-    chmod a+x /usr/local/bin/jq;
-    jq -V;
+    sudo curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq;
+    sudo chmod a+x /usr/local/bin/jq;
+    sudo jq -V;
+
+    # sshpass
+    sudo yum install -y http://mirror.centos.org/centos/7/extras/x86_64/Packages/sshpass-1.06-2.el7.x86_64.rpm;
     `;
   }
 }

@@ -47,6 +47,11 @@
   padding: 0 !important;
 }
 
+.primary svg{
+  color: green !important;
+}
+
+
 /* @media (max-width: 600px) {
   .wrap {
     width: 100vw;

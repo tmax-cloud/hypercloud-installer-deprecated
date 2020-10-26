@@ -167,22 +167,24 @@ function InstallContentsMain(props: any) {
                     className={classes.paper}
                     onClick={() => {
                       // kubernetes 미설치시, 설치페이지 이동 불가
-                      if (!disabled) {
-                        product.goProductInstallPage(P.NAME, nowEnv, history);
-                      }
+                      // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
+                      // if (!disabled) {
+                      //   product.goProductInstallPage(P.NAME, nowEnv, history);
+                      // }
+                      product.goProductInstallPage(P.NAME, nowEnv, history);
                     }}
                     variant="outlined"
                   >
                     <div
                       // kubernetes 미설치시, disabled
-                      style={
-                        !disabled
-                          ? {}
-                          : {
-                              pointerEvents: 'none',
-                              opacity: '0.4'
-                            }
-                      }
+                      // style={
+                      //   !disabled
+                      //     ? {}
+                      //     : {
+                      //         pointerEvents: 'none',
+                      //         opacity: '0.4'
+                      //       }
+                      // }
                       className={[
                         '',
                         'childLeftRightCenter',
@@ -237,21 +239,23 @@ function InstallContentsMain(props: any) {
                   className={classes.paper}
                   onClick={() => {
                     // 필수 제품 모두 설치 된 경우에만 호환 제품 설치 페이지로 이동 가능
-                    if (nowEnv.isAllRequiredProductInstall()) {
-                      product.goProductInstallPage(P.NAME, nowEnv, history);
-                    }
+                    // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
+                    // if (nowEnv.isAllRequiredProductInstall()) {
+                    //   product.goProductInstallPage(P.NAME, nowEnv, history);
+                    // }
+                    product.goProductInstallPage(P.NAME, nowEnv, history);
                   }}
                   variant="outlined"
                 >
                   <div
-                    style={
-                      nowEnv.isAllRequiredProductInstall()
-                        ? {}
-                        : {
-                            pointerEvents: 'none',
-                            opacity: '0.4'
-                          }
-                    }
+                    // style={
+                    //   nowEnv.isAllRequiredProductInstall()
+                    //     ? {}
+                    //     : {
+                    //         pointerEvents: 'none',
+                    //         opacity: '0.4'
+                    //       }
+                    // }
                     className={[
                       '',
                       'childLeftRightCenter',
