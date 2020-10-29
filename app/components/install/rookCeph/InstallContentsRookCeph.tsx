@@ -30,6 +30,18 @@ function InstallContentsRookCeph(props: any) {
     version: RookCephInstaller.CEPH_VERSION
   });
 
+  const [option, setOption] = useState({
+    disk: {},
+    osdCpu: '',
+    osdMemory: '',
+    monCpu: '',
+    monMemory: '',
+    mgrCpu: '',
+    mgrMemory: '',
+    mdsCpu: '',
+    mdsMemory: ''
+  });
+
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(
   //   reducer,
   //   initialState
@@ -88,6 +100,7 @@ function InstallContentsRookCeph(props: any) {
               location={location}
               state={state}
               setState={setState}
+              setOption={setOption}
             />
           )}
         />
@@ -100,6 +113,7 @@ function InstallContentsRookCeph(props: any) {
               location={location}
               state={state}
               setState={setState}
+              option={option}
             />
           )}
         />

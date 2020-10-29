@@ -177,14 +177,14 @@ function InstallContentsMain(props: any) {
                   >
                     <div
                       // kubernetes 미설치시, disabled
-                      style={
-                        !disabled
-                          ? {}
-                          : {
-                              pointerEvents: 'none',
-                              opacity: '0.4'
-                            }
-                      }
+                      // style={
+                      //   !disabled
+                      //     ? {}
+                      //     : {
+                      //         pointerEvents: 'none',
+                      //         opacity: '0.4'
+                      //       }
+                      // }
                       className={[
                         '',
                         'childLeftRightCenter',

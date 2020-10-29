@@ -23,7 +23,7 @@ export async function waitApiServerUntilNomal(mainMaster: Node) {
       echo $?;
       `;
       count += 1;
-      if (count > 10) {
+      if (count > 30) {
         clearInterval(timerid);
         resolve();
       } else {

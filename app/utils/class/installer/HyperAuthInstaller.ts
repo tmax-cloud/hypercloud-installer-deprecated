@@ -153,7 +153,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     // hyperauth 삭제 할 때 --oidc부분을 삭제하면
     // api-server가 에러남
     // 그래서 설치 전에 해주는 것으로 임시로 변경해놓음
-    await this.rollbackApiServerYaml();
+    // await this.rollbackApiServerYaml();
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
     let apiServerYaml: any;
@@ -245,7 +245,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     // kube-apiserver.yaml 수정
-    // await this.rollbackApiServerYaml();
+    await this.rollbackApiServerYaml();
     console.debug('###### Finish remove main Master... ######');
   }
 
