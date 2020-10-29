@@ -43,6 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallContentsRookCeph2(props: any) {
+
+
   console.debug(InstallContentsRookCeph2.name, props);
   const { history, match, state, setState, setOption } = props;
 
