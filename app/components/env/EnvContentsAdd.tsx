@@ -270,17 +270,24 @@ function EnvContentsAdd(props: any) {
   const [hostName, setHostName] = useState('');
   const [hostNameError, setHostNameError] = useState('');
   const hasHostNameError = (target = hostName, setFunc = setHostNameError) => {
-    if (target.length === 0) {
-      setFunc('Host Name을 입력해주세요');
-      return true;
-    }
+    // if (target.length === 0) {
+    //   setFunc('Host Name을 입력해주세요');
+    //   return true;
+    // }
 
-    for (let i = 0; i < state.data.length; i += 1) {
-      if (state.data[i].hostName === target) {
-        setFunc('중복 된 Host Name이 존재합니다.');
-        return true;
-      }
-    }
+    // for (let i = 0; i < state.data.length; i += 1) {
+    //   if (state.data[i].hostName === target) {
+    //     setFunc('중복 된 Host Name이 존재합니다.');
+    //     return true;
+    //   }
+    // }
+
+    // if (target.length === 0) {
+    //   setHostName(p => {
+    //     return `Host-${state.data.length}`;
+    //   });
+    //   // return true;
+    // }
 
     setFunc('');
     return false;
@@ -582,7 +589,7 @@ function EnvContentsAdd(props: any) {
                         // hasIpError(e.target.value);
                       }}
                       onBlur={e => {
-                        hasHostNameError(e.target.value);
+                        // hasHostNameError(e.target.value);
                       }}
                       error={hostNameError.length !== 0}
                       helperText={hostNameError}
@@ -723,6 +730,9 @@ function EnvContentsAdd(props: any) {
                         setSelected([ip]);
                       }
 
+                      // hostName 미 입력시, 자동 설정
+                      const tempName = hostName || `Host-${state.data.length + 1}`;
+
                       setState(prevState => {
                         const data = [...prevState.data];
 
@@ -730,7 +740,7 @@ function EnvContentsAdd(props: any) {
                         data.splice(0, 0, {
                           ip,
                           port,
-                          hostName,
+                          hostName: tempName,
                           user,
                           password,
                           os
