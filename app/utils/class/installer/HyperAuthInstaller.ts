@@ -81,8 +81,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // 특정 pod가 뜨고 난 후 다음 작업 해야함
-    // 30초 대기
-    await new Promise(resolve => setTimeout(resolve, 30000));
+    // 1분 대기
+    await new Promise(resolve => setTimeout(resolve, 60000));
 
     // Step 2. SSL 인증서 생성
     mainMaster.cmd = this._step2(mainMaster.os.type);
@@ -153,7 +153,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     // hyperauth 삭제 할 때 --oidc부분을 삭제하면
     // api-server가 에러남
     // 그래서 설치 전에 해주는 것으로 임시로 변경해놓음
-    // await this.rollbackApiServerYaml();
+    await this.rollbackApiServerYaml();
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
     let apiServerYaml: any;
@@ -235,7 +235,9 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     `
     await mainMaster.exeCmd();
 
-    await Common.waitApiServerUntilNomal(mainMaster);
+    // oidc 부분 삭제하고 다시 넣어주기 때문에
+    // api 서버 정상동작 확인할 필요 없음
+    // await Common.waitApiServerUntilNomal(mainMaster);
   }
 
   private async _removeMainMaster() {
@@ -245,7 +247,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd();
 
     // kube-apiserver.yaml 수정
-    await this.rollbackApiServerYaml();
+    // await this.rollbackApiServerYaml();
     console.debug('###### Finish remove main Master... ######');
   }
 
@@ -253,8 +255,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     kubectl delete -f 2.hyperauth_deployment.yaml;
-    # kubectl delete secret hyperauth-https-secret -n hyperauth;
-    # rm -rf /etc/kubernetes/pki/hyperauth.crt;
+    kubectl delete secret hyperauth-https-secret -n hyperauth;
+    rm -rf /etc/kubernetes/pki/hyperauth.crt;
     kubectl delete -f 1.initialization.yaml;
     `;
   }
