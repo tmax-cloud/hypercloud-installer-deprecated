@@ -84,6 +84,8 @@ export default class KubernetesInstaller extends AbstractInstaller {
       version,
       callback
     )
+
+    await this._makeMasterCanSchedule();
     setProgress(100);
   }
 
@@ -425,7 +427,6 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up mainMaster;
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
-      ${this._makeMasterCanSchedule(mainMaster.hostName)}
       `;
   }
 
@@ -453,7 +454,6 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up master;
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
-      ${this._makeMasterCanSchedule(master.hostName)}
       `;
   }
 
@@ -481,8 +481,19 @@ export default class KubernetesInstaller extends AbstractInstaller {
       `;
   }
 
-  private _makeMasterCanSchedule(hostName: string): string {
-    return `kubectl taint node ${hostName} node-role.kubernetes.io/master:NoSchedule-;`;
+  private async _makeMasterCanSchedule() {
+    // return `kubectl taint node ${hostName} node-role.kubernetes.io/master:NoSchedule-;`;
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
+    const masterNodeArr = [...masterArr, mainMaster];
+    let script = '';
+    masterNodeArr.map((masterNode)=>{
+      script+=`
+      kubectl taint node ${masterNode.hostName} node-role.kubernetes.io/master:NoSchedule-;
+      `
+    });
+
+    mainMaster.cmd = script;
+    await mainMaster.exeCmd();
   }
 
   private _setHostName(hostName: string): string {

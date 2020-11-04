@@ -118,7 +118,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   private _step0() {
     let script = `
     cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
-    tar -xzf hypercloud-operator.tar.gz;
+    # tar -xzf hypercloud-operator.tar.gz;
 
     sed -i 's/{HPCD_VERSION}/'b${HyperCloudOperatorInstaller.HPCD_VERSION}'/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;

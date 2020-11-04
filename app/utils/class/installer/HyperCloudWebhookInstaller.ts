@@ -228,28 +228,35 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
   }
 
   public async rollbackApiServerYaml() {
-    const { mainMaster } = this.env.getNodesSortedByRole();
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
 
-    mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
-    let apiServerYaml;
-    await mainMaster.exeCmd({
-      close: () => {},
-      stdout: (data: string) => {
-        apiServerYaml = YAML.parse(data.toString());
-      },
-      stderr: () => {},
-    });
-    console.error('apiServerYaml', apiServerYaml);
-    apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
-      return cmd.indexOf("--audit") === -1;
-    })
-    delete apiServerYaml.spec.dnsPolicy;
+    const targetList = [...masterArr, mainMaster];
 
-    console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
-    mainMaster.cmd = `
-    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-    `
-    await mainMaster.exeCmd();
+
+    await Promise.all(
+      targetList.map(async (node)=>{
+        node.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+        let apiServerYaml;
+        await node.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            apiServerYaml = YAML.parse(data.toString());
+          },
+          stderr: () => {},
+        });
+        console.error('apiServerYaml', apiServerYaml);
+        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
+          return cmd.indexOf("--audit") === -1;
+        })
+        delete apiServerYaml.spec.dnsPolicy;
+
+        console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+        node.cmd = `
+        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `
+        await node.exeCmd();
+      })
+    )
   }
 
   private async _removeMainMaster() {

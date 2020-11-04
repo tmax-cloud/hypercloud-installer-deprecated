@@ -81,7 +81,11 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // 특정 pod가 뜨고 난 후 다음 작업 해야함
+<<<<<<< Updated upstream
     // 30초 대기
+=======
+    // 1분 대기
+>>>>>>> Stashed changes
     await new Promise(resolve => setTimeout(resolve, 30000));
 
     // Step 2. SSL 인증서 생성
@@ -148,12 +152,22 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   private async _step4() {
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
 
+    let hyperAuthServiceIp: any;
+    mainMaster.cmd = `kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7;`;
+    await mainMaster.exeCmd({
+      close: () => {},
+      stdout: (data: string) => {
+        hyperAuthServiceIp = data.toString().replace(/\r/g, "").replace(/\n/g, "");
+      },
+      stderr: () => {},
+    });
+
     // FIXME:
     // 일단 --oidc 부분 있으면 삭제
     // hyperauth 삭제 할 때 --oidc부분을 삭제하면
     // api-server가 에러남
     // 그래서 설치 전에 해주는 것으로 임시로 변경해놓음
-    await this.rollbackApiServerYaml();
+    await this.rollbackApiServerYaml([...masterArr, mainMaster]);
 
     mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
     let apiServerYaml: any;
@@ -164,7 +178,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
       },
       stderr: () => {},
     });
-    console.error('apiServerYaml', apiServerYaml);
+    // console.error('before apiServerYaml', apiServerYaml);
     apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`)
     apiServerYaml.spec.containers[0].command.push(`--oidc-client-id=hypercloud4`)
     apiServerYaml.spec.containers[0].command.push(`--oidc-username-claim=preferred_username`)
@@ -172,11 +186,12 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`)
     apiServerYaml.spec.containers[0].command.push(`--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`)
 
-    console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+    // console.error('after apiServerYaml', YAML.stringify(apiServerYaml));
     mainMaster.cmd = `
-    export hyperCloudServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    # export hyperAuthServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    # echo $hyperAuthServiceIp;
     echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-    sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://$hyperCloudServiceIp/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
+    sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://${hyperAuthServiceIp}/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
     `
     await mainMaster.exeCmd();
 
@@ -193,7 +208,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
           },
           stderr: () => {},
         });
-        console.error('apiServerYaml', apiServerYaml);
+        // console.error('before apiServerYaml', apiServerYaml);
         apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`)
         apiServerYaml.spec.containers[0].command.push(`--oidc-client-id=hypercloud4`)
         apiServerYaml.spec.containers[0].command.push(`--oidc-username-claim=preferred_username`)
@@ -201,51 +216,58 @@ export default class HyperAuthInstaller extends AbstractInstaller {
         apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`)
         apiServerYaml.spec.containers[0].command.push(`--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`)
 
-        console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
+        // console.error('after apiServerYaml', YAML.stringify(apiServerYaml));
         master.cmd = `
-        export hyperCloudServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+        # export hyperAuthServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+        # echo $hyperAuthServiceIp;
         echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-        sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://$hyperCloudServiceIp/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
+        sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://${hyperAuthServiceIp}/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
         `
         await master.exeCmd();
       })
     );
   }
 
-  private async rollbackApiServerYaml() {
-    const { mainMaster } = this.env.getNodesSortedByRole();
+  private async rollbackApiServerYaml(targetList:Node[]) {
+    // const { mainMaster } = this.env.getNodesSortedByRole();
 
-    mainMaster.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
-    let apiServerYaml;
-    await mainMaster.exeCmd({
-      close: () => {},
-      stdout: (data: string) => {
-        apiServerYaml = YAML.parse(data.toString());
-      },
-      stderr: () => {},
-    });
-    console.error('apiServerYaml', apiServerYaml);
-    apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
-      return cmd.indexOf("--oidc") === -1;
-    })
+    console.error(targetList);
 
-    console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
-    mainMaster.cmd = `
-    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-    `
-    await mainMaster.exeCmd();
+    await Promise.all(
+      targetList.map(async (node)=>{
+        node.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
+        let apiServerYaml;
+        await node.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            apiServerYaml = YAML.parse(data.toString());
+          },
+          stderr: () => {},
+        });
+        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
+          return cmd.indexOf("--oidc") === -1;
+        })
 
-    await Common.waitApiServerUntilNomal(mainMaster);
+        node.cmd = `
+        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `
+        await node.exeCmd();
+
+        // oidc 부분 삭제하고 다시 넣어주기 때문에
+        // api 서버 정상동작 확인할 필요 없음
+        // await Common.waitApiServerUntilNomal(node);
+      })
+    )
   }
 
   private async _removeMainMaster() {
     console.debug('@@@@@@ Start remove main Master... @@@@@@');
-    const { mainMaster } = this.env.getNodesSortedByRole();
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
 
-    // kube-apiserver.yaml 수정
-    // await this.rollbackApiServerYaml();
+    // FIXME: kube-apiserver.yaml 수정하면, api server 고장남
+    // await this.rollbackApiServerYaml([...masterArr, mainMaster]);
     console.debug('###### Finish remove main Master... ######');
   }
 
