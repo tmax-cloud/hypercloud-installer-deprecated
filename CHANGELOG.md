@@ -1,3 +1,13 @@
+# v4.1.3 (2020.11.05)
+### Features
+ - Node 추가 시, HostName 미입력 시 자동 생성 기능 추가 (IMS: 242540)
+ 
+### Fixes
+ - Master 다중화 설치 시, Master Join 후, Kube config 적용되도록 수정 (IMS: 242766)
+ - HyperAuth 설치 시, kube-apiserver.yaml에 oidc 연동 IP 들어가지 않던 문제 해결
+
+---
+
 # v4.1.2 (2020.10.26)
 ### Features
  - Node 추가 시, HostName, User 입력 받는 기능 추가 (IMS:242540)
