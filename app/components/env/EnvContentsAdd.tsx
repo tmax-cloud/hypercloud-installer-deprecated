@@ -112,13 +112,15 @@ function EnvContentsAdd(props: any) {
     // edit page에서는 해당 환경 데이터로 초기화 해줌
     if (envBeforeEdit) {
       return {
-        data: envBeforeEdit.nodeList
+        data: envBeforeEdit.nodeList,
+        count: envBeforeEdit.nodeList.length
       };
     }
 
     // add page에서는 초기에 추가되어 있는 노드 없음
     return {
-      data: []
+      data: [],
+      count: 0
     };
   });
 
@@ -289,6 +291,13 @@ function EnvContentsAdd(props: any) {
     //   // return true;
     // }
 
+    // if (target.length === 0) {
+    //   setHostName(p => {
+    //     return `Host-${state.data.length}`;
+    //   });
+    //   // return true;
+    // }
+
     setFunc('');
     return false;
   };
@@ -322,6 +331,16 @@ function EnvContentsAdd(props: any) {
     if (target.length === 0) {
       setFunc('노드를 추가해주세요.');
       return true;
+    }
+
+    const dict: any = {};
+    for (let i = 0; i < state.data.length; i += 1) {
+      const targetHostName = state.data[i].hostName;
+      if (targetHostName in dict) {
+        setFunc('중복 된 Host Name이 존재합니다.');
+        return true;
+      }
+      dict[targetHostName] = true;
     }
 
     setFunc('');
@@ -406,7 +425,7 @@ function EnvContentsAdd(props: any) {
           }
 
           setState(prevState => {
-            const data = [...prevState.data];
+            const { data } = prevState;
 
             for (let i = 0; i < data.length; i += 1) {
               if (data[i].ip === row.ip) {
@@ -731,10 +750,10 @@ function EnvContentsAdd(props: any) {
                       }
 
                       // hostName 미 입력시, 자동 설정
-                      const tempName = hostName || `Host-${state.data.length + 1}`;
+                      const tempName = hostName || `Host-${state.count + 1}`;
 
                       setState(prevState => {
-                        const data = [...prevState.data];
+                        const { data, count } = prevState;
 
                         // 0번째 index에 삽입
                         data.splice(0, 0, {
@@ -745,7 +764,7 @@ function EnvContentsAdd(props: any) {
                           password,
                           os
                         });
-                        return { ...prevState, data };
+                        return { ...prevState, data, count: count + 1 };
                       });
 
                       // 초기화
