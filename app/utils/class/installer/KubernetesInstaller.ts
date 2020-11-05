@@ -86,6 +86,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     )
 
     await this._makeMasterCanSchedule();
+    await this._makeMasterKubeConfig();
     setProgress(100);
   }
 
@@ -494,6 +495,18 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
     mainMaster.cmd = script;
     await mainMaster.exeCmd();
+  }
+
+  private async _makeMasterKubeConfig() {
+    const { masterArr } = this.env.getNodesSortedByRole();
+    masterArr.map(async (masterNode)=>{
+      masterNode.cmd = `
+      mkdir -p $HOME/.kube;
+      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config;
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config;
+      `;
+      await masterNode.exeCmd();
+    });
   }
 
   private _setHostName(hostName: string): string {
