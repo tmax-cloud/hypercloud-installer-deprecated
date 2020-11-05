@@ -81,12 +81,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // 특정 pod가 뜨고 난 후 다음 작업 해야함
-<<<<<<< Updated upstream
-    // 30초 대기
-=======
     // 1분 대기
->>>>>>> Stashed changes
-    await new Promise(resolve => setTimeout(resolve, 30000));
+    await new Promise(resolve => setTimeout(resolve, 60000));
 
     // Step 2. SSL 인증서 생성
     mainMaster.cmd = this._step2(mainMaster.os.type);
