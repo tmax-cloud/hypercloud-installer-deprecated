@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable no-console */
 import React, { useContext, useState } from 'react';
 import {
@@ -28,6 +29,7 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
+import * as Common from '../../../utils/common/common';
 import { AppContext } from '../../../containers/HomePage';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,8 +45,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function InstallContentsRookCeph2(props: any) {
-
-
   console.debug(InstallContentsRookCeph2.name, props);
   const { history, match, state, setState, setOption } = props;
 
@@ -68,9 +68,10 @@ function InstallContentsRookCeph2(props: any) {
       const targetHostName = hostName[i];
       temp[targetHostName] = [];
       for (let j = 0; j < possibleOsdDiskList[targetHostName].length; j += 1) {
-        const targetDiskName = possibleOsdDiskList[targetHostName][j];
+        const { disk, size } = possibleOsdDiskList[targetHostName][j];
         temp[targetHostName].push({
-          diskName: targetDiskName,
+          diskName: disk,
+          diskSize: size,
           checked: false
         });
       }
@@ -495,7 +496,7 @@ function InstallContentsRookCeph2(props: any) {
                                 }}
                               />
                             )}
-                            label={disk.diskName}
+                            label={`${disk.diskName} ${Common.ChangeByteToGigaByte(disk.diskSize)}GB`}
                           />
                         );
                       })

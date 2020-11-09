@@ -486,7 +486,7 @@ data:
   }
 
   public async getDiskListPossibleOsd() {
-    const hostNameDiskList={};
+    let hostNameDiskList={};
 
     // disk name 가져오기
     await Promise.all(
@@ -500,7 +500,7 @@ data:
             diskList = output.split('\n');
             // 개행으로 나누면, 마지막 공백들어옴 삭제
             diskList.pop();
-            hostNameDiskList[node.hostName]=diskList;
+            hostNameDiskList[node.hostName] = diskList;
           },
           stderr: () => {},
         });
@@ -511,7 +511,7 @@ data:
     await Promise.all(
       this.env.nodeList.map(async (node: Node) => {
         const diskList = hostNameDiskList[node.hostName];
-        const filteredDiskList: never[] = [];
+        const filteredDiskList: { disk: string; size: number; }[] = [];
         for (let i=0; i< diskList.length; i+=1) {
           const disk = diskList[i];
           let result: string[]=[];
@@ -521,7 +521,7 @@ data:
             stdout: (data: string) => {
               const output = data.toString();
               result = output.split(' ');
-              const temp={}
+              const temp: any = {};
               result.map((r)=>{
                 const s=r.split('=');
                 const key = s[0];
@@ -535,7 +535,7 @@ data:
               if (size>=10737418200) {
                 if (type==="disk" || type==="part") {
                   if (!mountpoint.trim()){
-                    filteredDiskList.push(disk);
+                    filteredDiskList.push({disk, size});
                   }
                 }
               }
@@ -547,19 +547,20 @@ data:
       })
     );
 
+    // disk 트리구조 맨 마지막 확인 (밑에 나누어진 파티션 없는지)
     await Promise.all(
       this.env.nodeList.map(async (node: Node) => {
         const diskList = hostNameDiskList[node.hostName];
-        const filteredDiskList: never[] = [];
+        const filteredDiskList: { disk: string; size: number; }[] = [];
         for (let i=0; i< diskList.length; i+=1) {
-          const disk = diskList[i];
+          const { disk, size } = diskList[i];
           node.cmd = `lsblk --noheadings --pairs /dev/${disk} | wc -l`
           await node.exeCmd({
             close: () => {},
             stdout: (data: string) => {
               const output = data.toString();
               if (output == 1) {
-                filteredDiskList.push(disk);
+                filteredDiskList.push(diskList[i]);
               }
             },
             stderr: () => {},
