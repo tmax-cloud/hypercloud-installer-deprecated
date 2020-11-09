@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -6,14 +6,24 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton
+  IconButton,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel
 } from '@material-ui/core';
 // import { KubeInstallContext } from './InstallContentsKubernetes';
 import CloseIcon from '@material-ui/icons/Close';
+import { type } from 'os';
 import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
+import { NETWORK_TYPE } from '../../../utils/class/Env';
 
 function InstallContentsPrometheus2(props: any) {
   console.debug(InstallContentsPrometheus2.name, props);
@@ -26,6 +36,39 @@ function InstallContentsPrometheus2(props: any) {
 
   // const kubeInstallContext = useContext(KubeInstallContext);
   // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
+
+  // whether to use PVC
+  const [isUsePvc, setIsUsePvc] = React.useState('true');
+  const handleChangeIsUsePvc = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsUsePvc((event.target as HTMLInputElement).value);
+  };
+
+  // service type
+  const [serviceType, setServiceType] = React.useState('NodePort');
+  const handleChangeServiceType = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setServiceType(event.target.value as string);
+  };
+
+  // port
+  const [port, setPort] = useState('');
+  const [portError, setPortError] = useState('');
+  const hasPortError = (target = port, setFunc = setPortError) => {
+    if (target.length === 0) {
+      setFunc('포트를 입력해주세요');
+      return true;
+    }
+
+    const portRegex = /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/;
+    if (!portRegex.test(target)) {
+      setFunc('0부터 65535 범위 내에서 입력해 주세요.');
+      return true;
+    }
+
+    setFunc('');
+    return false;
+  };
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -48,6 +91,109 @@ function InstallContentsPrometheus2(props: any) {
         </div>
       </div>
       <div
+        style={{
+          margin: '0px'
+        }}
+        className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+      >
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>
+            퍼시스턴츠 볼륨 클레임 (PVC)
+          </span>
+        </div>
+        <div>
+          <FormControl component="fieldset">
+            {/* <FormLabel component="legend">Gender</FormLabel> */}
+            <RadioGroup
+              aria-label="gender"
+              name="gender1"
+              value={isUsePvc}
+              onChange={handleChangeIsUsePvc}
+            >
+              <div className={['childLeftRightLeft'].join(' ')}>
+                <FormControlLabel
+                  value="true"
+                  control={<Radio />}
+                  label="사용함"
+                />
+                <FormControlLabel
+                  value="false"
+                  control={<Radio />}
+                  label="사용 안함"
+                />
+              </div>
+            </RadioGroup>
+          </FormControl>
+        </div>
+      </div>
+      <div className={['childLeftRightLeft'].join(' ')}>
+        <div className={[styles.titleBox].join(' ')} />
+        <div>
+          {isUsePvc === 'false' ? (
+            <span>
+              프로메테우스 파드가 재시작 될 경우, 현재 데이터는 저장되지
+              않습니다.
+            </span>
+          ) : (
+            ''
+          )}
+        </div>
+      </div>
+      <div className={[''].join(' ')}>
+        <div className={[styles.titleBox].join(' ')}>
+          <span className={['medium'].join(' ')}>서비스</span>
+        </div>
+        <div className={['childLeftRightLeft'].join(' ')}>
+          <div className={[styles.titleBox].join(' ')}>
+            <span className={['medium'].join(' ')}>유형</span>
+          </div>
+          <div>
+            <FormControl variant="outlined">
+              <InputLabel id="demo-simple-select-outlined-label">
+                Service Type
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={serviceType}
+                onChange={handleChangeServiceType}
+                label="Service Type"
+              >
+                <MenuItem value="NodePort">NodePort</MenuItem>
+                <MenuItem value="ClusterIP">ClusterIP</MenuItem>
+                <MenuItem value="LoadBalancer">LoadBalancer</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+        </div>
+        <div className={['childLeftRightLeft'].join(' ')}>
+          <div className={[styles.titleBox].join(' ')}>
+            <span className={['medium'].join(' ')}>포트</span>
+          </div>
+          <div>
+            <TextField
+              required
+              className={['short'].join(' ')}
+              id="outlined-required"
+              label="포트"
+              placeholder="0~65535"
+              variant="outlined"
+              size="small"
+              value={port}
+              onChange={e => {
+                setPort(e.target.value);
+                // hasPortError(e.target.value);
+              }}
+              onBlur={e => {
+                hasPortError(e.target.value);
+              }}
+              error={portError.length !== 0}
+              helperText={portError}
+            />
+          </div>
+        </div>
+      </div>
+      <div
         style={{ marginTop: '50px' }}
         className={['childLeftRightCenter'].join(' ')}
       >
@@ -57,10 +203,17 @@ function InstallContentsPrometheus2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   version: state.version,
-            //   type: state.type
-            // });
+            let hasError = false;
+            if (hasPortError()) hasError = true;
+            if (hasError) return;
+
+            setState({
+              version: state.version,
+              isUsePvc: isUsePvc === 'true',
+              serviceType,
+              port
+            });
+
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.PROMETHEUS.NAME}/step3`
             );
@@ -101,8 +254,8 @@ function InstallContentsPrometheus2(props: any) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <span className={['lightDark', 'small'].join(' ')}>
-                {CONST.PRODUCT.PROMETHEUS.NAME} 설정 화면에서 나가시겠습니까? 설정
-                내용은 저장되지 않습니다.
+                {CONST.PRODUCT.PROMETHEUS.NAME} 설정 화면에서 나가시겠습니까?
+                설정 내용은 저장되지 않습니다.
               </span>
             </DialogContentText>
           </DialogContent>
