@@ -1,0 +1,27 @@
+/*
+textfiled
+*/
+.long input {
+  width: 400px;
+  padding: 8px 0 8px 5px;
+}
+.long > div {
+  width: 400px;
+  border-radius: 0px;
+}
+.medium input {
+  width: 200px;
+  padding: 8px 0 8px 5px;
+}
+.medium > div {
+  width: 200px;
+  border-radius: 0px;
+}
+.short input {
+  width: 100px;
+  padding: 8px 0 8px 5px;
+}
+.short > div {
+  width: 100px;
+  border-radius: 0px;
+}

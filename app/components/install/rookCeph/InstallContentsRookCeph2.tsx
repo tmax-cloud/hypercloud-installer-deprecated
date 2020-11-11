@@ -80,6 +80,8 @@ function InstallContentsRookCeph2(props: any) {
     setOsdDiskList(temp);
   };
 
+  const [diskError, setDiskError] = useState(false);
+
   const selectedOsdDisk: any = {};
   const addSelectedOsdDisk = (hostName: string, diskName: string) => {
     console.error('addSelectedOsdDisk');
@@ -310,7 +312,7 @@ function InstallContentsRookCeph2(props: any) {
             <div>오브젝트 스토리지 데몬 (OSD)</div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>CPU</span>
+                <span className={['dark', 'medium'].join(' ')}> - CPU</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -336,7 +338,7 @@ function InstallContentsRookCeph2(props: any) {
             </div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>메모리</span>
+                <span className={['dark', 'medium'].join(' ')}> - 메모리</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -363,7 +365,7 @@ function InstallContentsRookCeph2(props: any) {
             <div>모니터 (MON)</div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>CPU</span>
+                <span className={['dark', 'medium'].join(' ')}> - CPU</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -389,7 +391,7 @@ function InstallContentsRookCeph2(props: any) {
             </div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>메모리</span>
+                <span className={['dark', 'medium'].join(' ')}> - 메모리</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -416,7 +418,7 @@ function InstallContentsRookCeph2(props: any) {
             <div>매니저 (MGR)</div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>CPU</span>
+                <span className={['dark', 'medium'].join(' ')}> - CPU</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -442,7 +444,7 @@ function InstallContentsRookCeph2(props: any) {
             </div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>메모리</span>
+                <span className={['dark', 'medium'].join(' ')}> - 메모리</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -469,7 +471,7 @@ function InstallContentsRookCeph2(props: any) {
             <div>메타데이터 서버 (MDS)</div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>CPU</span>
+                <span className={['dark', 'medium'].join(' ')}> - CPU</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -495,7 +497,7 @@ function InstallContentsRookCeph2(props: any) {
             </div>
             <div className={['childLeftRightLeft'].join(' ')}>
               <div className={styles.titleBox}>
-                <span className={['dark', 'medium'].join(' ')}>메모리</span>
+                <span className={['dark', 'medium'].join(' ')}> - 메모리</span>
                 <span style={{ color: 'red' }}>*</span>
               </div>
               <div>
@@ -551,7 +553,9 @@ function InstallContentsRookCeph2(props: any) {
                                 }}
                               />
                             )}
-                            label={`${disk.diskName} ${Common.ChangeByteToGigaByte(disk.diskSize)}GB`}
+                            label={`${
+                              disk.diskName
+                            } ${Common.ChangeByteToGigaByte(disk.diskSize)}GB`}
                           />
                         );
                       })
@@ -568,6 +572,7 @@ function InstallContentsRookCeph2(props: any) {
                 </div>
               );
             })}
+            {diskError ? <span>disk를 선택해주세요</span> : ''}
           </AccordionDetails>
         </Accordion>
       </>
@@ -590,6 +595,10 @@ function InstallContentsRookCeph2(props: any) {
             if (hasMgrMemoryError()) hasError = true;
             if (hasMdsCpuError()) hasError = true;
             if (hasMdsMemoryError()) hasError = true;
+            if (Object.keys(selectedOsdDisk).length === 0) {
+              setDiskError(true);
+              hasError = true;
+            }
             if (hasError) return;
 
             setOption((prev: any) => {

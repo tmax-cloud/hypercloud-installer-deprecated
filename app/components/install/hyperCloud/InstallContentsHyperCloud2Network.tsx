@@ -90,7 +90,7 @@ function InstallContentsHyperCloud2Network(props: any) {
       {isUseIngress === true ? (
         <div className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}>
           <div className={[styles.titleBox].join(' ')}>
-            <span className={['medium'].join(' ')}>인그레스 컨트롤러</span>
+            <span className={['medium'].join(' ')}> - 인그레스 컨트롤러</span>
           </div>
           <div>
             <FormControlLabel

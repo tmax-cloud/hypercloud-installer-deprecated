@@ -1,0 +1,45 @@
+/*
+div
+*/
+div.left {
+  float: left;
+}
+div.right {
+  float: right;
+}
+div.clear {
+  clear: both;
+}
+/* full size */
+div.fullHeight {
+  height: 100%;
+}
+div.fullWidth {
+  width: 100%;
+}
+/* child 상하 정렬 */
+div.childUpDownUP {
+  display: flex;
+  align-items: flex-start;
+}
+div.childUpDownCenter {
+  display: flex;
+  align-items: center;
+}
+div.childUpDownDown {
+  display: flex;
+  align-items: flex-end;
+}
+/* child 좌우 정렬 */
+div.childLeftRightLeft {
+  display: flex;
+  justify-content: flex-start;
+}
+div.childLeftRightCenter {
+  display: flex;
+  justify-content: center;
+}
+div.childLeftRightRight {
+  display: flex;
+  justify-content: flex-end;
+}

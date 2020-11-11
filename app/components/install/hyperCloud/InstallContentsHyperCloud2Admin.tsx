@@ -95,7 +95,7 @@ function InstallContentsHyperCloud2Admin(props: any) {
         style={{
           margin: '0px'
         }}
-        className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+        className={['childLeftRightLeft', 'childUpDownUp'].join(' ')}
       >
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>이메일</span>
@@ -131,9 +131,9 @@ function InstallContentsHyperCloud2Admin(props: any) {
       </div>
       <div
         style={{
-          margin: '0px'
+          marginBottom: '10px'
         }}
-        className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}
+        className={['childLeftRightLeft', 'childUpDownUp'].join(' ')}
       >
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>비밀번호</span>

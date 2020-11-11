@@ -143,9 +143,14 @@ function InstallContentsPrometheus2(props: any) {
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>서비스</span>
         </div>
-        <div className={['childLeftRightLeft'].join(' ')}>
+        <div
+          style={{
+            marginBottom: '10px'
+          }}
+          className={['childLeftRightLeft'].join(' ')}
+        >
           <div className={[styles.titleBox].join(' ')}>
-            <span className={['medium'].join(' ')}>유형</span>
+            <span className={['medium'].join(' ')}> - 유형</span>
           </div>
           <div>
             <FormControl variant="outlined">
@@ -168,7 +173,8 @@ function InstallContentsPrometheus2(props: any) {
         </div>
         <div className={['childLeftRightLeft'].join(' ')}>
           <div className={[styles.titleBox].join(' ')}>
-            <span className={['medium'].join(' ')}>포트</span>
+            <span className={['medium'].join(' ')}> - 포트</span>
+            <span style={{ color: 'red' }}>*</span>
           </div>
           <div>
             <TextField

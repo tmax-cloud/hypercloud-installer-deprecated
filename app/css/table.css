@@ -1,0 +1,13 @@
+/*
+table
+*/
+/* header */
+thead.primary {
+  background-color: #31475E;
+}
+thead.primary span{
+  color: white !important;
+}
+thead.primary svg{
+  color: white !important;
+}

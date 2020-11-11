@@ -1,0 +1,11 @@
+/*
+span
+*/
+/* child 왼쪽 정렬 */
+span.left{
+  text-align: left;
+}
+/* child 오른쪽 정렬 */
+span.right{
+  text-align: right;
+}
