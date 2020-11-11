@@ -64,7 +64,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
     });
     setProgress(60);
     await this._installMainMaster(state, callback);
-    // setProgress(100);
+    setProgress(100);
   }
 
   public async remove() {
