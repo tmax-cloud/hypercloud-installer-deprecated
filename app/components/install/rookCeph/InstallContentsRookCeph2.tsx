@@ -121,26 +121,37 @@ function InstallContentsRookCeph2(props: any) {
     return () => {};
   }, []);
 
-  const [osdCpu, setOsdCpu] = useState('1');
+  const OSD_CPU_MIN_VALUE = 2;
+  const [osdCpu, setOsdCpu] = useState(OSD_CPU_MIN_VALUE);
   const [osdCpuError, setOsdCpuError] = useState('');
   const hasOsdCpuError = (target = osdCpu, setFunc = setOsdCpuError) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (target < OSD_CPU_MIN_VALUE) {
+      setFunc(`최소값은  ${OSD_CPU_MIN_VALUE} 입니다.`);
       return true;
     }
 
     setFunc('');
     return false;
   };
-
-  const [osdMemory, setOsdMemory] = useState('2');
+  const OSD_MEMORY_MIN_VALUE = 2;
+  const [osdMemory, setOsdMemory] = useState(OSD_MEMORY_MIN_VALUE);
   const [osdMemoryError, setOsdMemoryError] = useState('');
   const hasOsdMemoryError = (
     target = osdMemory,
     setFunc = setOsdMemoryError
   ) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < OSD_MEMORY_MIN_VALUE) {
+      setFunc(`최소값은  ${OSD_MEMORY_MIN_VALUE} 입니다.`);
       return true;
     }
 
@@ -148,25 +159,37 @@ function InstallContentsRookCeph2(props: any) {
     return false;
   };
 
-  const [monCpu, setMonCpu] = useState('0.5');
+  const MON_CPU_MIN_VALUE = 1;
+  const [monCpu, setMonCpu] = useState(MON_CPU_MIN_VALUE);
   const [monCpuError, setMonCpuError] = useState('');
   const hasMonCpuError = (target = monCpu, setFunc = setMonCpuError) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MON_CPU_MIN_VALUE) {
+      setFunc(`최소값은  ${MON_CPU_MIN_VALUE} 입니다.`);
       return true;
     }
 
     setFunc('');
     return false;
   };
-  const [monMemory, setMonMemory] = useState('1');
+  const MON_MEMORY_MIN_VALUE = 2;
+  const [monMemory, setMonMemory] = useState(MON_MEMORY_MIN_VALUE);
   const [monMemoryError, setMonMemoryError] = useState('');
   const hasMonMemoryError = (
     target = monMemory,
     setFunc = setMonMemoryError
   ) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MON_MEMORY_MIN_VALUE) {
+      setFunc(`최소값은  ${MON_MEMORY_MIN_VALUE} 입니다.`);
       return true;
     }
 
@@ -174,25 +197,37 @@ function InstallContentsRookCeph2(props: any) {
     return false;
   };
 
-  const [mgrCpu, setMgrCpu] = useState('0.5');
+  const MGR_CPU_MIN_VALUE = 1;
+  const [mgrCpu, setMgrCpu] = useState(MGR_CPU_MIN_VALUE);
   const [mgrCpuError, setMgrCpuError] = useState('');
   const hasMgrCpuError = (target = mgrCpu, setFunc = setMgrCpuError) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MGR_CPU_MIN_VALUE) {
+      setFunc(`최소값은  ${MGR_CPU_MIN_VALUE} 입니다.`);
       return true;
     }
 
     setFunc('');
     return false;
   };
-  const [mgrMemory, setMgrMemory] = useState('1');
+  const MGR_MEMORY_MIN_VALUE = 1;
+  const [mgrMemory, setMgrMemory] = useState(MGR_MEMORY_MIN_VALUE);
   const [mgrMemoryError, setMgrMemoryError] = useState('');
   const hasMgrMemoryError = (
     target = mgrMemory,
     setFunc = setMgrMemoryError
   ) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MGR_MEMORY_MIN_VALUE) {
+      setFunc(`최소값은  ${MGR_MEMORY_MIN_VALUE} 입니다.`);
       return true;
     }
 
@@ -200,25 +235,37 @@ function InstallContentsRookCeph2(props: any) {
     return false;
   };
 
-  const [mdsCpu, setMdsCpu] = useState('2');
+  const MDS_CPU_MIN_VALUE = 4;
+  const [mdsCpu, setMdsCpu] = useState(MDS_CPU_MIN_VALUE);
   const [mdsCpuError, setMdsCpuError] = useState('');
   const hasMdsCpuError = (target = mdsCpu, setFunc = setMdsCpuError) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MDS_CPU_MIN_VALUE) {
+      setFunc(`최소값은  ${MDS_CPU_MIN_VALUE} 입니다.`);
       return true;
     }
 
     setFunc('');
     return false;
   };
-  const [mdsMemory, setMdsMemory] = useState('2');
+  const MDS_MEMORY_MIN_VALUE = 4;
+  const [mdsMemory, setMdsMemory] = useState(MDS_MEMORY_MIN_VALUE);
   const [mdsMemoryError, setMdsMemoryError] = useState('');
   const hasMdsMemoryError = (
     target = mdsMemory,
     setFunc = setMdsMemoryError
   ) => {
-    if (target.length === 0) {
+    if (!target) {
       setFunc('입력해주세요');
+      return true;
+    }
+
+    if (Number(target) < MDS_MEMORY_MIN_VALUE) {
+      setFunc(`최소값은  ${MDS_MEMORY_MIN_VALUE} 입니다.`);
       return true;
     }
 
@@ -269,6 +316,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -294,6 +342,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -320,6 +369,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -345,6 +395,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -371,6 +422,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -396,6 +448,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -422,6 +475,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
@@ -447,6 +501,7 @@ function InstallContentsRookCeph2(props: any) {
               <div>
                 <TextField
                   required
+                  type="number"
                   className={['short'].join(' ')}
                   id="outlined-required"
                   variant="outlined"
