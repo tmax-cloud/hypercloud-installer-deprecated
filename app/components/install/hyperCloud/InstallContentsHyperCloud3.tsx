@@ -95,6 +95,7 @@ function InstallContentsHyperCloud3(props: any) {
     try {
       // operator install
       await hyperCloudOperatorInstaller.install({
+        state,
         callback,
         setProgress
       });
@@ -112,6 +113,7 @@ function InstallContentsHyperCloud3(props: any) {
 
       // realm import
       await hyperAuthInstaller.realmImport({
+        state,
         callback,
         setProgress
       });

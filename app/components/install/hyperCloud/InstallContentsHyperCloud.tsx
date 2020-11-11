@@ -1,5 +1,5 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React, { useState } from 'react';
+import { Switch, Route } from 'react-router';
 import styles from '../InstallContents0.css';
 import InstallContentsHyperCloud1 from './InstallContentsHyperCloud1';
 import InstallContentsHyperCloud2 from './InstallContentsHyperCloud2';
@@ -7,10 +7,11 @@ import InstallContentsHyperCloud3 from './InstallContentsHyperCloud3';
 import InstallContentsHyperCloud4 from './InstallContentsHyperCloud4';
 import InstallContentsHyperCloudAlready from './InstallContentsHyperCloudAlready';
 import InstallKubePlease from '../InstallKubePlease';
-import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
+import InstallContentsHyperCloud2Network from './InstallContentsHyperCloud2Network';
+import InstallContentsHyperCloud2Admin from './InstallContentsHyperCloud2Admin';
 
 function InstallContentsHyperCloud(props: any) {
   console.debug(InstallContentsHyperCloud.name, props);
@@ -19,7 +20,12 @@ function InstallContentsHyperCloud(props: any) {
   const [state, setState] = useState({
     operator_version: HyperCloudOperatorInstaller.HPCD_VERSION,
     webhook_version: HyperCloudWebhookInstaller.WEBHOOK_VERSION,
-    console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
+    console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION,
+    isUseIngress: true,
+    sharedIngress: true,
+    systemIngress: true,
+    email: '',
+    password: ''
   });
 
   return (
@@ -33,6 +39,30 @@ function InstallContentsHyperCloud(props: any) {
           path={`${match.path}/step2`}
           render={() => (
             <InstallContentsHyperCloud2
+              history={history}
+              match={match}
+              location={location}
+              state={state}
+              setState={setState}
+            />
+          )}
+        />
+        <Route
+          path={`${match.path}/step2-network`}
+          render={() => (
+            <InstallContentsHyperCloud2Network
+              history={history}
+              match={match}
+              location={location}
+              state={state}
+              setState={setState}
+            />
+          )}
+        />
+        <Route
+          path={`${match.path}/step2-admin`}
+          render={() => (
+            <InstallContentsHyperCloud2Admin
               history={history}
               match={match}
               location={location}

@@ -14,6 +14,8 @@ import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
 import IngressControllerInstaller from './IngressControllerInstaller';
 import SecretWatcherInstaller from './SecretWatcherInstaller';
+import IngressControllerSharedInstaller from './IngressControllerSharedInstaller';
+import IngressControllerSystemInstaller from './IngressControllerSystemInstaller';
 
 export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `hypercloud-operator-install`;
@@ -38,23 +40,34 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { state: any, callback: any; setProgress: Function; }) {
+    const { state, callback, setProgress } = param;
 
     await this._preWorkInstall({
       callback
     });
 
-    // ingress controller 설치
-    const ingressControllerInstaller = IngressControllerInstaller.getInstance;
-    ingressControllerInstaller.env = this.env;
-    await ingressControllerInstaller.install({
-      callback,
-      setProgress
-    });
+    if (state.isUseIngress) {
+      if (state.sharedIngress){
+        const ingressControllerSharedInstaller = IngressControllerSharedInstaller.getInstance;
+        ingressControllerSharedInstaller.env = this.env;
+        await ingressControllerSharedInstaller.install({
+          callback,
+          setProgress
+        });
+      }
+      if(state.systemIngress){
+        const ingressControllerSystemInstaller = IngressControllerSystemInstaller.getInstance;
+        ingressControllerSystemInstaller.env = this.env;
+        await ingressControllerSystemInstaller.install({
+          callback,
+          setProgress
+        });
+      }
+    }
 
     // operator 설치
-    await this._installMainMaster(callback);
+    await this._installMainMaster(state, callback);
 
     // secret watcher 설치
     const secretWatcherInstaller = SecretWatcherInstaller.getInstance;
@@ -75,12 +88,16 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     await this._removeMainMaster();
 
     // ingress controller 삭제
-    const ingressControllerInstaller = IngressControllerInstaller.getInstance;
-    ingressControllerInstaller.env = this.env;
-    await ingressControllerInstaller.remove();
+    // FIXME: 현재 shared, system 둘 다 삭제함
+    const ingressControllerSystemInstaller = IngressControllerSystemInstaller.getInstance;
+    ingressControllerSystemInstaller.env = this.env;
+    await ingressControllerSystemInstaller.remove();
+    const ingressControllerSharedInstaller = IngressControllerSharedInstaller.getInstance;
+    ingressControllerSharedInstaller.env = this.env;
+    await ingressControllerSharedInstaller.remove();
   }
 
-  private async _installMainMaster(callback: any) {
+  private async _installMainMaster(state: any, callback: any) {
     console.debug('@@@@@@ Start installing hypercloud operator main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
 
@@ -109,7 +126,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // Step 6. 6.default-auth-object-init.yaml 실행
-    mainMaster.cmd = this._step6();
+    mainMaster.cmd = this._step6(state);
     await mainMaster.exeCmd(callback);
 
     console.debug('###### Finish installing hypercloud operator main Master... ######');
@@ -118,7 +135,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   private _step0() {
     let script = `
     cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
-    # tar -xzf hypercloud-operator.tar.gz;
+    tar -xzf hypercloud-operator.tar.gz;
 
     sed -i 's/{HPCD_VERSION}/'b${HyperCloudOperatorInstaller.HPCD_VERSION}'/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;
@@ -186,9 +203,14 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     `;
   }
 
-  private _step6() {
+  private _step6(state: any) {
+    // FIXME: targetEmail 값 변경 될 가능성 있음
+    const targetEmail = 'admin-tmax.co.kr';
+    const newEmail = state.email;
+
     return `
     cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
+    sed -i 's/${targetEmail}/${newEmail}/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/6.default-auth-object-init.yaml;
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/6.default-auth-object-init.yaml;
     `;
   }

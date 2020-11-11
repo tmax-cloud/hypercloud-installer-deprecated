@@ -14,13 +14,10 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 
 function InstallContentsHyperCloud2(props: any) {
   console.debug(InstallContentsHyperCloud2.name, props);
-  const { history, match, state, setState } = props;
+  const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -80,11 +77,11 @@ function InstallContentsHyperCloud2(props: any) {
             //   console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
             // });
             history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step3`
+              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2-network`
             );
           }}
         >
-          설치
+          다음
         </Button>
         <Button
           variant="contained"
