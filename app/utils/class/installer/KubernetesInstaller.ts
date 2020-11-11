@@ -72,12 +72,17 @@ export default class KubernetesInstaller extends AbstractInstaller {
     )
     setProgress(60);
 
+    await this._makeMasterCanSchedule();
+
     await this._installMaster(
       registry,
       version,
       callback
     )
     setProgress(80);
+
+
+
 
     await this._installWorker(
       registry,

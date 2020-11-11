@@ -86,6 +86,15 @@ export default class Env {
     };
   }
 
+  public getProductByName(name: string){
+    for (let i = 0; i < this.productList.length; i += 1) {
+      if (this.productList[i].name === name) {
+        return this.productList[i];
+      }
+    }
+    return null;
+  }
+
   public isAllRequiredProductInstall() {
     const requiredProduct = product.getRequiredProduct();
 

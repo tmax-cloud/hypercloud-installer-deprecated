@@ -280,8 +280,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     kubectl delete -f 2.hyperauth_deployment.yaml;
-    # kubectl delete secret hyperauth-https-secret -n hyperauth;
-    # rm -rf /etc/kubernetes/pki/hyperauth.crt;
+    kubectl delete secret hyperauth-https-secret -n hyperauth;
+    rm -rf /etc/kubernetes/pki/hyperauth.crt;
     kubectl delete -f 1.initialization.yaml;
     `;
   }
