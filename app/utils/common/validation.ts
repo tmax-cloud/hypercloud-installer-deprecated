@@ -10,3 +10,23 @@ export function checkEmailFormat(email: string): boolean {
   const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   return regex.test(email);
 }
+export function checkHaveUppercase(str: string): boolean {
+  if (str === str.toLocaleLowerCase()) {
+    return false;
+  }
+  return true;
+}
+export function checkHaveLowercase(str: string): boolean {
+  if (str === str.toLocaleUpperCase()) {
+    return false;
+  }
+  return true;
+}
+export function checkHaveNumber(str: string): boolean {
+  const regex = /[0-9]/;
+  return regex.test(str);
+}
+export function checkHaveSpecialCharacter(str: string): boolean {
+  const regex = /[~!@#$%^&*()_+|<>?:{}]/;
+  return regex.test(str);
+}

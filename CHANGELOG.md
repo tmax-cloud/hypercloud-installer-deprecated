@@ -1,3 +1,20 @@
+# v4.1.4 (2020.11.12)
+### Features
+ - Rook Ceph 설치 시, 입력 값 추가
+   - OSD, MON, MGR, MDS의 CPU, Memory 입력
+   - OSD 설치 할 Disk 입력 (IMS: 242409)
+ - Prometheus 설치 시, 입력 값 추가
+   - PVC 사용 여부 선택
+   - Service type, port 입력
+ - HyperCloud 설치 시, 입력 값 추가
+   - Ingress Controller 설치 옵션 선택
+   - admin계정 ID/PW 입력 (IMS: 243092) 
+ 
+### Fixes
+ - No changes
+
+---
+
 # v4.1.3 (2020.11.05)
 ### Features
  - Node 추가 시, HostName 미입력 시 자동 생성 기능 추가 (IMS: 242540)

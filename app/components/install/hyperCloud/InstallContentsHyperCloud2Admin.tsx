@@ -61,7 +61,30 @@ function InstallContentsHyperCloud2Admin(props: any) {
       return true;
     }
 
-    // TODO: 비밀번호 validation check
+    if (target.length < 9 || target.length > 20) {
+      setFunc('입력 가능한 비밀번호는 최소 9자, 최대 20자 입니다.');
+      return true;
+    }
+
+    if (!validation.checkHaveUppercase(target)) {
+      setFunc('대문자가 포함되어야 합니다.');
+      return true;
+    }
+
+    if (!validation.checkHaveLowercase(target)) {
+      setFunc('소문자가 포함되어야 합니다.');
+      return true;
+    }
+
+    if (!validation.checkHaveNumber(target)) {
+      setFunc('숫자가 포함되어야 합니다.');
+      return true;
+    }
+
+    if (!validation.checkHaveSpecialCharacter(target)) {
+      setFunc('특수문자가 포함되어야 합니다.');
+      return true;
+    }
 
     setFunc('');
     return false;

@@ -95,6 +95,8 @@ export default class RookCephInstaller extends AbstractInstaller {
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
+
+    // 설치 시, 선택했던 disk들 초기화 해주는 스크립트 생성
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         if (disk[node.hostName]) {
