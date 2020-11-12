@@ -1,0 +1,36 @@
+/*
+font
+*/
+/* size */
+.veryLarge {
+  font-size: 22px;
+}
+.large {
+  font-size: 20px;
+}
+.medium {
+  font-size: 16px;
+}
+.small {
+  font-size: 14px;
+}
+.verySmall {
+  font-size: 12px;
+}
+/* brightness */
+.dark {
+  color:#4F5257;
+}
+.lightDark {
+  color:#6A6A6A;
+}
+.indicator{
+  color: #0992AC
+}
+/* weight */
+.thick {
+  font-weight: bold;
+}
+.thin {
+  font-weight: lighter;
+}

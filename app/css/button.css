@@ -1,0 +1,67 @@
+/*
+button
+*/
+/* size */
+button.veryLarge {
+}
+button.large {
+}
+button.medium {
+}
+button.small {
+}
+button.verySmall {
+}
+/* color */
+button.primary {
+  background-color: #EC3854;
+  color:#FFFFFF;
+}
+button.primary:hover {
+  background-color: #D22D46;
+  color:#FFFFFF;
+}
+button.primary:active {
+  background-color:#BA2E44;
+  color:#FFFFFF;
+}
+/* button.primary {
+  background-color: #0992AC;
+  color:#FFFFFF;
+}
+button.primary:hover {
+  background-color: #067C92;
+  color:#FFFFFF;
+}
+button.primary:active {
+  background-color: #046A7D;
+  color:#FFFFFF;
+} */
+
+button.secondary {
+  background-color: #1E6CB9;
+  color:#FFFFFF;
+}
+button.secondary:hover {
+  background-color: #175B9E;
+  color:#FFFFFF;
+}
+button.secondary:active {
+  background-color: #0F4B86;
+  color:#FFFFFF;
+}
+/* button.secondary {
+  background-color: #FFFFFF;
+  color: #536882;
+  border: 1px solid #536882;
+}
+button.secondary:hover {
+  background-color: #E9F0F8;
+  color: #536882;
+  border: 1px solid #536882;
+}
+button.secondary:active {
+  background-color: #DDE8F7;
+  color: #536882;
+  border: 1px solid #536882;
+} */

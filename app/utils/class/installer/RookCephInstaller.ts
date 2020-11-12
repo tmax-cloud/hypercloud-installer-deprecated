@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable array-callback-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
@@ -24,8 +25,8 @@ export default class RookCephInstaller extends AbstractInstaller {
 
   public static readonly CEPH_VERSION=`14.2.9`;
 
-  public static readonly ROOK_VERSION=`1.3.6`;
-  // public static readonly ROOK_VERSION=`1.3.9`;
+  // public static readonly ROOK_VERSION=`1.3.6`;
+  public static readonly ROOK_VERSION=`1.3.9`;
 
   public static readonly CEPHCSI_VERSION=`2.1.2`;
 
@@ -53,16 +54,8 @@ export default class RookCephInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { isCdi: boolean; callback: any; setProgress: Function; }) {
-    const { isCdi, callback, setProgress } = param;
-
-    // 각 노드 디스크 초기화
-    await Promise.all(
-      this.env.nodeList.map((node: Node) => {
-        node.cmd = this._getRookCephRemoveConfigScript();
-        return node.exeCmd();
-      })
-    );
+  public async install(param: { isCdi: boolean; option: any, callback: any; setProgress: Function; }) {
+    const { isCdi, option, callback, setProgress } = param;
 
     setProgress(10);
     await this._preWorkInstall({
@@ -70,15 +63,15 @@ export default class RookCephInstaller extends AbstractInstaller {
       callback
     });
     setProgress(60);
-    await this._installMainMaster(isCdi, callback);
+    await this._installMainMaster(isCdi, option, callback);
     setProgress(100);
   }
 
-  public async remove() {
-    await this._removeMainMaster();
+  public async remove(disk: any) {
+    await this._removeMainMaster(disk);
   }
 
-  private async _installMainMaster(isCdi: boolean, callback: any) {
+  private async _installMainMaster(isCdi: boolean, option: any, callback: any) {
     console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getInstallScript({
@@ -86,7 +79,7 @@ export default class RookCephInstaller extends AbstractInstaller {
     });
     await mainMaster.exeCmd(callback);
 
-    await this._EditYamlScript();
+    await this._EditYamlScript(option);
 
     mainMaster.cmd = `
      cd ~/${RookCephInstaller.INSTALL_HOME};
@@ -97,14 +90,18 @@ export default class RookCephInstaller extends AbstractInstaller {
     console.debug('###### Finish installing main Master... ######');
   }
 
-  private async _removeMainMaster() {
+  private async _removeMainMaster(disk: any) {
     console.debug('@@@@@@ Start remove rook-ceph... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
+
+    // 설치 시, 선택했던 disk들 초기화 해주는 스크립트 생성
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        node.cmd = this._getRookCephRemoveConfigScript();
+        if (disk[node.hostName]) {
+          node.cmd = this._getRookCephRemoveConfigScript(disk[node.hostName]);
+        }
         return node.exeCmd();
       })
     );
@@ -208,25 +205,34 @@ export default class RookCephInstaller extends AbstractInstaller {
     console.debug('###### Finish installing gdisk... ######');
   }
 
-  private _getRookCephRemoveConfigScript(): string{
-    // TODO: disk 이름 받아오는 것으로 변경해야함
-    const diskName = 'sdb';
-    return `
-    sudo rm -rf /var/lib/rook;
-    sudo sgdisk --zap-all /dev/${diskName};
-    sudo ls /dev/mapper/ceph-* | sudo xargs -I% -- dmsetup remove %;
-    sudo rm -rf /dev/ceph-*;
-    sudo dd if=/dev/zero of="/dev/${diskName}" bs=1M count=100 oflag=direct,dsync;
-    sudo blkdiscard /dev/${diskName};
-    `;
+  private _getRookCephRemoveConfigScript(diskNameList: any): string{
+    let script = ``;
+    diskNameList.map((diskName: string)=>{
+      script+=`
+      sudo rm -rf /var/lib/rook;
+      sudo sgdisk --zap-all /dev/${diskName};
+      sudo ls /dev/mapper/ceph-* | sudo xargs -I% -- dmsetup remove %;
+      sudo rm -rf /dev/ceph-*;
+      sudo dd if=/dev/zero of="/dev/${diskName}" bs=1M count=100 oflag=direct,dsync;
+      sudo blkdiscard /dev/${diskName};
+      `
+    });
+    return script;
   }
 
-  private async _EditYamlScript() {
+  private async _EditYamlScript(option: any) {
     /**
      * 각 노드마다 OSD를 배포하도록 권장 (Taint 걸린 host 없는 걸 확인해야함)
       총 OSD 개수는 3개 이상으로 권장
       CephFS 및 RBD pool 설정 시 Replication 개수 3개 권장
      */
+    console.error('option', option);
+    let osdCount = 0;
+    Object.keys(option.disk).map((hostName)=>{
+      osdCount+=option.disk[hostName].length;
+    });
+    console.error('osdCount', osdCount);
+
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `cat ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`;
     let clusterYaml;
@@ -238,45 +244,59 @@ export default class RookCephInstaller extends AbstractInstaller {
       stderr: () => {},
     });
     // 리소스 최소값 설정
-    // clusterYaml.spec.resources = {
-    //   osd: {
-    //     limits:{
-    //       cpu:"1",
-    //       memory: "2048Mi"
-    //     },
-    //     requests:{
-    //       cpu:"1",
-    //       memory: "2048Mi"
-    //     }
-    //   },
-    //   mon: {
-    //     limits:{
-    //       cpu:"0.5",
-    //       memory: "1024Mi"
-    //     },
-    //     requests:{
-    //       cpu:"0.5",
-    //       memory: "1024Mi"
-    //     }
-    //   },
-    //   mgr: {
-    //     limits:{
-    //       cpu:"0.5",
-    //       memory: "512Mi"
-    //     },
-    //     requests:{
-    //       cpu:"0.5",
-    //       memory: "512Mi"
-    //     }
-    //   }
-    // };
-    clusterYaml.spec.storage.useAllNodes = true;
-    clusterYaml.spec.storage.useAllDevices = true;
+    clusterYaml.spec.resources = {
+      osd: {
+        limits:{
+          cpu: `${option.osdCpu}`,
+          memory: `${option.osdMemory}Gi`
+        },
+        requests:{
+          cpu: `${option.osdCpu}`,
+          memory: `${option.osdMemory}Gi`
+        }
+      },
+      mon: {
+        limits:{
+          cpu: `${option.monCpu}`,
+          memory: `${option.monMemory}Gi`
+        },
+        requests:{
+          cpu: `${option.monCpu}`,
+          memory: `${option.monMemory}Gi`
+        }
+      },
+      mgr: {
+        limits:{
+          cpu: `${option.mgrCpu}`,
+          memory: `${option.mgrMemory}Gi`
+        },
+        requests:{
+          cpu: `${option.mgrCpu}`,
+          memory: `${option.mgrMemory}Gi`
+        }
+      }
+    };
 
-    // TODO:
-    // 환경에 osd 설치가 가능한 디스크 개수 알아 내야 함
-    // 현재 임의 값으로 설정
-    const osdCnt = 1;
+    // 선택한 OSD 설치 할 디스크 없으면, 자동으로 OSD 설치 가능한 디스크 탐색 모드로 설정
+    if (osdCount === 0) {
+      clusterYaml.spec.storage.useAllNodes = true;
+      clusterYaml.spec.storage.useAllDevices = true;
+    } else {
+      const nodes = Object.keys(option.disk).map((hostName)=>{
+        return {
+          name: hostName,
+          devices: option.disk[hostName].map((diskName)=>{
+            return {
+              name: diskName
+            }
+          })
+        }
+      });
+      console.error(nodes);
+      clusterYaml.spec.storage.nodes = nodes;
+    }
+
+    const osdCnt = osdCount;
 
     mainMaster.cmd = '';
     if (osdCnt < 3) {
@@ -317,10 +337,10 @@ data:
 
     // 리소스 최소값 설정
     mainMaster.cmd += `
-    #sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    #sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    #sed -i 's/#    cpu: "4"/    cpu: "2"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    #sed -i 's/#    memory: "4096Mi"/    memory: "2048Mi"/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
     `;
     await mainMaster.exeCmd();
   }
@@ -465,5 +485,93 @@ data:
       sudo docker push \${REGISTRY}/k8scsi/csi-attacher:\${ATTACHER_VERSION};
       #rm -rf $ROOK_HOME;
       `;
+  }
+
+  public async getDiskListPossibleOsd() {
+    let hostNameDiskList={};
+
+    // disk name 가져오기
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        let diskList: string[]=[];
+        node.cmd = `lsblk --all --noheadings --list --output KNAME`
+        await node.exeCmd({
+          close: () => {},
+          stdout: (data: string) => {
+            const output = data.toString();
+            diskList = output.split('\n');
+            // 개행으로 나누면, 마지막 공백들어옴 삭제
+            diskList.pop();
+            hostNameDiskList[node.hostName] = diskList;
+          },
+          stderr: () => {},
+        });
+      })
+    );
+
+    // 10gb 이상 + disk/part 둘 중 하나 + mount 되어 있지 않은 것
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        const diskList = hostNameDiskList[node.hostName];
+        const filteredDiskList: { disk: string; size: number; }[] = [];
+        for (let i=0; i< diskList.length; i+=1) {
+          const disk = diskList[i];
+          let result: string[]=[];
+          node.cmd = `lsblk /dev/${disk} --bytes --nodeps --pairs --paths --output SIZE,TYPE,MOUNTPOINT`
+          await node.exeCmd({
+            close: () => {},
+            stdout: (data: string) => {
+              const output = data.toString();
+              result = output.split(' ');
+              const temp: any = {};
+              result.map((r)=>{
+                const s=r.split('=');
+                const key = s[0];
+                const value = s[1].replace(/"/gi,'');
+                temp[key]=value;
+              })
+              const size = temp.SIZE;
+              const type = temp.TYPE;
+              const mountpoint = temp.MOUNTPOINT;
+              console.log(size, type, mountpoint);
+              if (size>=10737418200) {
+                if (type==="disk" || type==="part") {
+                  if (!mountpoint.trim()){
+                    filteredDiskList.push({disk, size});
+                  }
+                }
+              }
+            },
+            stderr: () => {},
+          });
+        }
+        hostNameDiskList[node.hostName]=filteredDiskList;
+      })
+    );
+
+    // disk 트리구조 맨 마지막 확인 (밑에 나누어진 파티션 없는지)
+    await Promise.all(
+      this.env.nodeList.map(async (node: Node) => {
+        const diskList = hostNameDiskList[node.hostName];
+        const filteredDiskList: { disk: string; size: number; }[] = [];
+        for (let i=0; i< diskList.length; i+=1) {
+          const { disk, size } = diskList[i];
+          node.cmd = `lsblk --noheadings --pairs /dev/${disk} | wc -l`
+          await node.exeCmd({
+            close: () => {},
+            stdout: (data: string) => {
+              const output = data.toString();
+              if (output == 1) {
+                filteredDiskList.push(diskList[i]);
+              }
+            },
+            stderr: () => {},
+          });
+        }
+        hostNameDiskList[node.hostName]=filteredDiskList;
+      })
+    );
+
+    return hostNameDiskList;
   }
 }

@@ -79,6 +79,7 @@ function InstallContentsPrometheus3(props: any) {
 
     try {
       await prometheusInstaller.install({
+        state,
         callback,
         setProgress
       });

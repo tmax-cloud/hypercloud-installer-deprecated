@@ -21,7 +21,6 @@ import {
   Button,
   TextField,
   InputAdornment,
-  CircularProgress,
   IconButton,
   FormControl,
   RadioGroup,
@@ -30,12 +29,9 @@ import {
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { green } from '@material-ui/core/colors';
 import CloseIcon from '@material-ui/icons/Close';
-import * as Common from '../../utils/common/common';
-import * as Script from '../../utils/common/script';
 import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
 import * as ssh from '../../utils/common/ssh';
@@ -88,7 +84,6 @@ function EnvContentsAdd(props: any) {
 
   const { history, match } = props;
 
-  const classes = useStyles();
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

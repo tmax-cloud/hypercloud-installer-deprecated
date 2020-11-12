@@ -58,14 +58,23 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await this._removeMainMaster();
   }
 
-  public async realmImport(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async realmImport(param: { state: any, callback: any; setProgress: Function; }) {
+    const { state, callback, setProgress } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
+
+    // FIXME: targetEmail, targetPassword 값 변경 될 가능성 있음
+    const targetEmail = 'hc-admin@tmax.co.kr';
+    const targetPassword = 'Tmaxadmin1!';
+    const newEmail = state.email;
+    const newPassword = state.password;
+
     mainMaster.cmd = `
     export HYPERAUTH_SERVICE_IP=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     export HYPERCLOUD_CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     sed -i 's|\\r$||g' tmaxRealmImport.sh;
+    sed -i 's/${targetEmail}/${newEmail}/g' tmaxRealmImport.sh;
+    sed -i 's/${targetPassword}/${newPassword}/g' tmaxRealmImport.sh;
     chmod 755 tmaxRealmImport.sh;
     ./tmaxRealmImport.sh \${HYPERAUTH_SERVICE_IP} \${HYPERCLOUD_CONSOLE_IP};
     `
@@ -271,8 +280,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return `
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
     kubectl delete -f 2.hyperauth_deployment.yaml;
-    # kubectl delete secret hyperauth-https-secret -n hyperauth;
-    # rm -rf /etc/kubernetes/pki/hyperauth.crt;
+    kubectl delete secret hyperauth-https-secret -n hyperauth;
+    rm -rf /etc/kubernetes/pki/hyperauth.crt;
     kubectl delete -f 1.initialization.yaml;
     `;
   }

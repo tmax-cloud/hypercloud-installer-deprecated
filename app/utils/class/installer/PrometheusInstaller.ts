@@ -55,15 +55,15 @@ export default class PrometheusInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { state: any, callback: any; setProgress: Function; }) {
+    const { state, callback, setProgress } = param;
 
     setProgress(10);
     await this._preWorkInstall({
       callback
     });
     setProgress(60);
-    await this._installMainMaster(callback);
+    await this._installMainMaster(state, callback);
     setProgress(100);
   }
 
@@ -71,11 +71,12 @@ export default class PrometheusInstaller extends AbstractInstaller {
     await this._removeMainMaster();
   }
 
-  private async _installMainMaster(callback: any) {
+  private async _installMainMaster(state: any, callback: any) {
     console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getVersionEditScript();
     await mainMaster.exeCmd(callback);
+
 
     // Step 1. prometheus namespace 및 crd 생성
     mainMaster.cmd = this._step1();
@@ -84,6 +85,9 @@ export default class PrometheusInstaller extends AbstractInstaller {
     // setup/ yaml 적용 후, 특정 pod가 뜨고 난 후 다음 작업 해야함
     // 30초 대기
     await new Promise(resolve => setTimeout(resolve, 30000));
+
+    // apply state option
+    await this.applyStateOption(state, callback);
 
     // Step 2. Prometheus 모듈들에 대한 deploy 및 RBAC 생성
     mainMaster.cmd = this._step2();
@@ -108,6 +112,34 @@ export default class PrometheusInstaller extends AbstractInstaller {
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
     console.debug('###### Finish remove main Master... ######');
+  }
+
+  private async applyStateOption(state: any, callback: any) {
+    console.error(state);
+    const { mainMaster } = this.env.getNodesSortedByRole();
+
+    if (!state.isUsePvc) {
+      mainMaster.cmd = `cat ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-prometheus.yaml;`;
+      let clusterYaml;
+      await mainMaster.exeCmd({
+        close: () => {},
+        stdout: (data: string) => {
+          clusterYaml = YAML.parse(data.toString());
+        },
+        stderr: () => {},
+      });
+
+      delete clusterYaml.spec.storage;
+
+      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-prometheus.yaml;`;
+      await mainMaster.exeCmd();
+    }
+
+    mainMaster.cmd = `
+    sed -i 's/port: 9090/port: ${state.port}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-service.yaml;
+    sed -i 's/type: NodePort/type: ${state.serviceType}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-service.yaml
+    `;
+    await mainMaster.exeCmd();
   }
 
   private _getVersionEditScript(): string {
@@ -150,6 +182,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
   private _step2(): string {
     return `
     cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+
     kubectl create -f manifests/;
     kubectl get svc -n monitoring prometheus-k8s -o yaml | sed "s|type: NodePort|type: LoadBalancer|g" | kubectl replace -f -;
     kubectl get svc -n monitoring grafana -o yaml | sed "s|type: ClusterIP|type: LoadBalancer|g" | kubectl replace -f -;

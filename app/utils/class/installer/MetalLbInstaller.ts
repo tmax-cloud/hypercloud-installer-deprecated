@@ -94,6 +94,7 @@ export default class MetalLbInstaller extends AbstractInstaller {
       ipRangeText = ipRangeText.concat(`          - ${data[i]}\\n`);
     }
     console.error('ipRangeText', ipRangeText);
+    // FIXME: sed 값 변경 될 가능성 있음
     return `
     # interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
     # inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;

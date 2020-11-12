@@ -29,7 +29,10 @@ function InstallContentsPrometheus(props: any) {
   // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
-    version: PrometheusInstaller.PROMETHEUS_VERSION
+    version: PrometheusInstaller.PROMETHEUS_VERSION,
+    isUsePvc: 'true',
+    serviceType: '',
+    port: ''
   });
 
   // const [kubeInstallState, dispatchKubeInstall] = useReducer(

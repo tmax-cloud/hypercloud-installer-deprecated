@@ -46,7 +46,6 @@ function InstallContentsRookCephAlready(props: any) {
   console.debug(InstallContentsRookCephAlready.name, props);
   const { history, match } = props;
 
-
   const appContext = useContext(AppContext);
   const { dispatchAppState } = appContext;
 
@@ -76,11 +75,12 @@ function InstallContentsRookCephAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-
     const rookCephInstaller = RookCephInstaller.getInstance;
     rookCephInstaller.env = nowEnv;
 
-    await rookCephInstaller.remove();
+    await rookCephInstaller.remove(
+      rookCephInstaller.env.getProductByName(CONST.PRODUCT.ROOK_CEPH.NAME).disk
+    );
   };
 
   return (
