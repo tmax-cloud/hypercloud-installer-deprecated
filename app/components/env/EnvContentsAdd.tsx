@@ -2,7 +2,6 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable no-console */
 import React, { useState, useContext } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -30,7 +29,6 @@ import {
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { green } from '@material-ui/core/colors';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from './EnvContentsAdd.css';
 import * as env from '../../utils/common/env';
@@ -46,44 +44,10 @@ import Ubuntu from '../../utils/class/os/Ubuntu';
 import KubernetesInstaller from '../../utils/class/installer/KubernetesInstaller';
 import * as validation from '../../utils/common/validation';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    wrapper: {
-      margin: theme.spacing(1),
-      position: 'relative'
-    },
-    // buttonSuccess: {
-    //   backgroundColor: green[500],
-    //   '&:hover': {
-    //     backgroundColor: green[700]
-    //   }
-    // },
-    fabProgress: {
-      color: green[500],
-      position: 'absolute',
-      top: -6,
-      left: -6,
-      zIndex: 1
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -40,
-      marginLeft: -40
-    }
-  })
-);
-
 function EnvContentsAdd(props: any) {
   console.debug(EnvContentsAdd.name, props);
 
   const { history, match } = props;
-
 
   const appContext = useContext(AppContext);
   const { appState, dispatchAppState } = appContext;

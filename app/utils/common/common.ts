@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/prefer-default-export */
 
+import YAML from 'yaml';
 import Node from '../class/Node';
 
 /**
@@ -59,4 +60,49 @@ export async function waitApiServerUntilNomal(mainMaster: Node) {
       console.log(count);
     }, 5000);
   });
+}
+
+export async function getYamlObjectByYamlFilePath(
+  yamlFilePath: string,
+  mainMaster: Node
+) {
+  mainMaster.cmd = `cat ${yamlFilePath};`;
+  let yamlObject = null;
+  console.error('1');
+  await mainMaster.exeCmd({
+    close: () => {},
+    stdout: (data: string) => {
+      yamlObject = YAML.parse(data.toString());
+      console.error('2');
+    },
+    stderr: () => {}
+  });
+  console.error('3');
+  return yamlObject;
+}
+
+export async function setYamlObjectByYamlFilePath(
+  yamlFilePath: string,
+  mainMaster: Node,
+  yamlObject: any
+) {
+  mainMaster.cmd += `echo "${YAML.stringify(yamlObject)}" >> ${yamlFilePath};`;
+  await mainMaster.exeCmd();
+}
+
+export function getCopyCommandByFilePath(filePath: string) {
+  // 맨 앞에 \ 넣어주어야 강제 복사 가능
+  const lastIndexOfDot = filePath.lastIndexOf('.');
+  const copyFilePath = `${filePath.slice(0, lastIndexOfDot)}.copy.yaml`;
+  return `\\cp ${filePath} ${copyFilePath};`;
+}
+
+export function getDeleteDuplicationCommandByFilePath(filePath: string) {
+  // 맨 앞에 \ 넣어주어야 강제 복사 가능
+  const lastIndexOfSlash = filePath.lastIndexOf('/');
+  const tempFilePath = `${filePath.slice(0, lastIndexOfSlash)}/temp`;
+  return `
+  cat ${filePath} | sort | uniq > ${tempFilePath};
+  \\mv ${tempFilePath} ${filePath};
+  `;
 }

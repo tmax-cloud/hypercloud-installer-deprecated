@@ -6,24 +6,28 @@
   /* width: 25%; */
   /* height: calc(100vh - 60px); */
 }
-
 .selectBox {
   height: 35px;
+  margin-top: 19px;
 }
 .selectBox > div{
   width: 70%;
   color: white !important;
-  border-bottom: 1px solid white;
 }
-.selectBox > div::before{
+.selectBox > div::before, .selectBox > div::after{
   border-bottom: 0px !important
+}
+.selectBox > div > select{
+  background-color: #484C52 !important;
+  border-radius: 18.5px !important;
+  padding-left: 20px !important;
 }
 .selectBox svg{
   color: white;
 }
 .selectBox > a {
-  margin-top: 10px;
-  margin-left: 10px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 /* .listItemBox{
@@ -41,15 +45,21 @@
 
 .lnb {
   /* selectEnv 높이 만큼 빼준다. */
-  height: calc(100% - 35px);
+  height: calc(100% - 35px - 19px);
 }
 .lnb nav {
   padding: 0 !important;
 }
 
-.primary svg{
+.installed svg{
   color: green !important;
 }
+
+.clicked svg{
+  color:#ec3854 !important;
+}
+
+
 
 
 /* @media (max-width: 600px) {

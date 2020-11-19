@@ -101,8 +101,9 @@ export default class RookCephInstaller extends AbstractInstaller {
       this.env.nodeList.map((node: Node) => {
         if (disk[node.hostName]) {
           node.cmd = this._getRookCephRemoveConfigScript(disk[node.hostName]);
+          return node.exeCmd();
         }
-        return node.exeCmd();
+        return Promise.resolve();
       })
     );
     console.debug('###### Finish remove rook-ceph... ######');
@@ -244,38 +245,38 @@ export default class RookCephInstaller extends AbstractInstaller {
       stderr: () => {},
     });
     // 리소스 최소값 설정
-    clusterYaml.spec.resources = {
-      osd: {
-        limits:{
-          cpu: `${option.osdCpu}`,
-          memory: `${option.osdMemory}Gi`
-        },
-        requests:{
-          cpu: `${option.osdCpu}`,
-          memory: `${option.osdMemory}Gi`
-        }
-      },
-      mon: {
-        limits:{
-          cpu: `${option.monCpu}`,
-          memory: `${option.monMemory}Gi`
-        },
-        requests:{
-          cpu: `${option.monCpu}`,
-          memory: `${option.monMemory}Gi`
-        }
-      },
-      mgr: {
-        limits:{
-          cpu: `${option.mgrCpu}`,
-          memory: `${option.mgrMemory}Gi`
-        },
-        requests:{
-          cpu: `${option.mgrCpu}`,
-          memory: `${option.mgrMemory}Gi`
-        }
-      }
-    };
+    // clusterYaml.spec.resources = {
+    //   osd: {
+    //     limits:{
+    //       cpu: `${option.osdCpu}`,
+    //       memory: `${option.osdMemory}Gi`
+    //     },
+    //     requests:{
+    //       cpu: `${option.osdCpu}`,
+    //       memory: `${option.osdMemory}Gi`
+    //     }
+    //   },
+    //   mon: {
+    //     limits:{
+    //       cpu: `${option.monCpu}`,
+    //       memory: `${option.monMemory}Gi`
+    //     },
+    //     requests:{
+    //       cpu: `${option.monCpu}`,
+    //       memory: `${option.monMemory}Gi`
+    //     }
+    //   },
+    //   mgr: {
+    //     limits:{
+    //       cpu: `${option.mgrCpu}`,
+    //       memory: `${option.mgrMemory}Gi`
+    //     },
+    //     requests:{
+    //       cpu: `${option.mgrCpu}`,
+    //       memory: `${option.mgrMemory}Gi`
+    //     }
+    //   }
+    // };
 
     // 선택한 OSD 설치 할 디스크 없으면, 자동으로 OSD 설치 가능한 디스크 탐색 모드로 설정
     if (osdCount === 0) {
@@ -336,13 +337,13 @@ data:
     }
 
     // 리소스 최소값 설정
-    mainMaster.cmd += `
-    sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    `;
-    await mainMaster.exeCmd();
+    // mainMaster.cmd += `
+    // sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    // sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    // sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    // sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    // `;
+    // await mainMaster.exeCmd();
   }
 
   private _startNtp(): string {

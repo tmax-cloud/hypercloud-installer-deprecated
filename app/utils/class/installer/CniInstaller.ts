@@ -6,14 +6,12 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptCniFactory from '../script/ScriptCniFactory';
+import * as common from '../../common/common';
 import KubernetesInstaller from './KubernetesInstaller';
-import AbstractScript from '../script/AbstractScript';
+import Node from '../Node';
 
 export default class CniInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR=`cni-install`;
@@ -49,17 +47,17 @@ export default class CniInstaller extends AbstractInstaller {
       callback
     });
     setProgress(60);
-    await this._installMainMaster(type, version, callback);
+    await this._installMainMaster(callback);
     setProgress(100);
   }
 
   public async remove(param: { type: any; }) {
     const { type } = param;
 
-    await this._removeMainMaster(type);
+    await this._removeMainMaster();
   }
 
-  private async _installMainMaster(type: string, version: string, callback: any) {
+  private async _installMainMaster(callback: any) {
     console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     // const script = ScriptCniFactory.createScript(mainMaster.os.type)
@@ -70,32 +68,37 @@ export default class CniInstaller extends AbstractInstaller {
     console.debug('###### Finish installing main Master... ######');
   }
 
-  private async _removeMainMaster(type: string) {
+  private async _removeMainMaster() {
     console.debug('@@@@@@ Start remove main Master... @@@@@@');
-    const { mainMaster } = this.env.getNodesSortedByRole();
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
+    // FIXME: /etc/cni/ 삭제하면 재설치 시, 노드가 NotReady 상태에서 Ready로 안됨. 원인을 잘 모르겠음
+    // await Promise.all(
+    //   this.env.nodeList.map((node: Node) => {
+    //     node.cmd = CniInstaller.deleteCniConfigScript()
+    //     return node.exeCmd();
+    //   })
+    // );
     console.debug('###### Finish remove main Master... ######');
   }
 
   private _getInstallScript(): string {
     return `
-      cd ~/${CniInstaller.INSTALL_HOME};
-      sed -i 's/v3.13.4/'v${CniInstaller.CNI_VERSION}'/g' calico_${CniInstaller.CNI_VERSION}.yaml;
       . ~/${KubernetesInstaller.INSTALL_HOME}/k8s.config;
-      sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-
-      kubectl apply -f calico_${CniInstaller.CNI_VERSION}.yaml;
-      kubectl apply -f calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+      cd ~/${CniInstaller.INSTALL_HOME};
+      sed -i 's/v3.13.4/'v${CniInstaller.CNI_VERSION}'/g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+      sed -i 's|10.0.0.0/16|'$podSubnet'|g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+      kubectl apply -f calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+      kubectl apply -f calicoctl_${CniInstaller.CTL_VERSION}.copy.yaml;
       `;
   }
 
   private _getRemoveScript(): string {
     return `
     cd ~/${CniInstaller.INSTALL_HOME};
-    kubectl delete -f calico_${CniInstaller.CNI_VERSION}.yaml;
-    kubectl delete -f calicoctl_${CniInstaller.CTL_VERSION}.yaml;
-    ${CniInstaller.deleteCniConfigScript()}
+    kubectl delete -f calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    kubectl delete -f calicoctl_${CniInstaller.CTL_VERSION}.copy.yaml;
     `;
   }
 
@@ -105,10 +108,22 @@ export default class CniInstaller extends AbstractInstaller {
     `;
   }
 
+  private async _copyFile(callback: any) {
+    console.debug('@@@@@@ Start copy yaml file... @@@@@@');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = `
+    ${common.getCopyCommandByFilePath(`~/${CniInstaller.INSTALL_HOME}/calico_${CniInstaller.CNI_VERSION}.yaml`)}
+    ${common.getCopyCommandByFilePath(`~/${CniInstaller.INSTALL_HOME}/calicoctl_${CniInstaller.CTL_VERSION}.yaml`)}
+    `
+    await mainMaster.exeCmd(callback);
+    console.debug('###### Finish copy yaml file... ######');
+  }
+
   // protected abstract 구현
   protected async _preWorkInstall(param: { version: string; callback: any; }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
-    const { version, callback } = param;
+    const { callback } = param;
+    await this._copyFile(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
@@ -208,17 +223,17 @@ export default class CniInstaller extends AbstractInstaller {
     // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
     return `
     cd ~/${CniInstaller.INSTALL_HOME};
-    # sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    # sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    # sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    # sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    # sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+    # sed -i 's/calico\\/cni/'${this.env.registry}'\\/calico\\/cni/g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    # sed -i 's/calico\\/pod2daemon-flexvol/'${this.env.registry}'\\/calico\\/pod2daemon-flexvol/g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    # sed -i 's/calico\\/node/'${this.env.registry}'\\/calico\\/node/g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    # sed -i 's/calico\\/kube-controllers/'${this.env.registry}'\\/calico\\/kube-controllers/g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    # sed -i 's/calico\\/ctl/'${this.env.registry}'\\/calico\\/ctl/g' calicoctl_${CniInstaller.CTL_VERSION}.copy.yaml;
 
-    sed -i 's| calico/cni| '${this.env.registry}'/calico/cni|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    sed -i 's| calico/pod2daemon-flexvol| '${this.env.registry}'/calico/pod2daemon-flexvol|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    sed -i 's| calico/node| '${this.env.registry}'/calico/node|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    sed -i 's| calico/kube-controllers| '${this.env.registry}'/calico/kube-controllers|g' calico_${CniInstaller.CNI_VERSION}.yaml;
-    sed -i 's| calico/ctl| '${this.env.registry}'/calico/ctl|g' calicoctl_${CniInstaller.CTL_VERSION}.yaml;
+    sed -i 's| calico/cni| '${this.env.registry}'/calico/cni|g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    sed -i 's| calico/pod2daemon-flexvol| '${this.env.registry}'/calico/pod2daemon-flexvol|g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    sed -i 's| calico/node| '${this.env.registry}'/calico/node|g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    sed -i 's| calico/kube-controllers| '${this.env.registry}'/calico/kube-controllers|g' calico_${CniInstaller.CNI_VERSION}.copy.yaml;
+    sed -i 's| calico/ctl| '${this.env.registry}'/calico/ctl|g' calicoctl_${CniInstaller.CTL_VERSION}.copy.yaml;
     `;
   }
 }
