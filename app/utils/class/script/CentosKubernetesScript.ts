@@ -167,48 +167,4 @@ EOF
     #rm -rf ${destPath};
     `;
   }
-
-  // getInstallMainMasterScript(
-  //   mainMaster: Node,
-  //   registry: string,
-  //   version: string,
-  //   isMultiMaster: boolean
-  // ): string {
-  //   return script._getK8sMainMasterInstallScript(
-  //     mainMaster,
-  //     registry,
-  //     version,
-  //     isMultiMaster
-  //   );
-  // }
-
-  // getInstallMasterScript(
-  //   mainMaster: Node,
-  //   registry: string,
-  //   version: string,
-  //   master: Node,
-  //   priority: number
-  // ): string {
-  //   return script._getK8sMasterInstallScript(
-  //     mainMaster,
-  //     registry,
-  //     version,
-  //     master,
-  //     priority
-  //   );
-  // }
-
-  // getInstallWorkerScript(
-  //   mainMaster: Node,
-  //   registry: string,
-  //   version: string,
-  //   worker: Node
-  // ): string {
-  //   return script._getK8sWorkerInstallScript(
-  //     mainMaster,
-  //     registry,
-  //     version,
-  //     worker
-  //   );
-  // }
 }

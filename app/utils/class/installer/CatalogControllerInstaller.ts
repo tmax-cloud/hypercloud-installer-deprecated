@@ -82,14 +82,14 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
 
   private _step1() {
     return `
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
     kubectl apply -f crds/
     `;
   }
 
   private _step2() {
     return `
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
     kubectl create namespace catalog;
     kubectl apply -f serviceaccounts.yaml;
     kubectl apply -f rbac.yaml;
@@ -105,7 +105,7 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     }
 
     return `
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
     ${script}
     kubectl apply -f controller-manager-deployment.yaml;
     kubectl apply -f controller-manager-service.yaml;
@@ -131,7 +131,7 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     export key0=\`cat key0 | tr -d '\\n'\`;
     export cert=\`cat cert | tr -d '\\n'\`;
     export key=\`cat key | tr -d '\\n'\`;
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
     sed -i "s/{{ b64enc \\$ca.Cert }}/$key0/g" webhook-register.yaml;
     sed -i "s/{{ b64enc \\$cert.Cert }}/$cert/g" webhook-register.yaml;
     sed -i "s/{{ b64enc \\$cert.Key }}/$key/g" webhook-register.yaml;
@@ -152,7 +152,7 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   private _getRemoveScript(): string {
     // 설치의 역순
     return `
-    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install;
+    cd ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
     kubectl delete -f webhook-service.yaml;
     kubectl delete -f webhook-deployment.yaml;
     kubectl delete -f webhook-register.yaml;
@@ -182,10 +182,21 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   //   console.debug('###### Finish download yaml file from external... ######');
   // }
 
+  private async _copyFile(callback: any) {
+    console.debug('@@@@@@ Start copy yaml file... @@@@@@');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = `
+    \\cp -r ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
+    `
+    await mainMaster.exeCmd(callback);
+    console.debug('###### Finish copy yaml file... ######');
+  }
+
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
+    await this._copyFile(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       await this._downloadImageFile();

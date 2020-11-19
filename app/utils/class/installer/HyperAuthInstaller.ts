@@ -71,7 +71,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     mainMaster.cmd = `
     export HYPERAUTH_SERVICE_IP=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     export HYPERCLOUD_CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
     sed -i 's|\\r$||g' tmaxRealmImport.sh;
     sed -i 's/${targetEmail}/${newEmail}/g' tmaxRealmImport.sh;
     sed -i 's/${targetPassword}/${newPassword}/g' tmaxRealmImport.sh;
@@ -111,23 +111,10 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     console.debug('###### Finish installing main Master... ######');
   }
 
-  private _cpSSLtoMaster() {
-    const { masterArr } = this.env.getNodesSortedByRole();
-    let copyScript='';
-    masterArr.map((master)=>{
-      copyScript += `sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./hyperauth.crt ${master.user}@${master.ip}:/etc/kubernetes/pki/hyperauth.crt;`;
-    });
-
-    return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME};
-    ${copyScript}
-    `;
-  }
-
   private _step1(): string {
     // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
     return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
     sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
     sed -i 's/memory: "5Gi"/memory: "500Mi"/g' 1.initialization.yaml;
     kubectl apply -f 1.initialization.yaml;
@@ -144,10 +131,23 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     `;
   }
 
+  private _cpSSLtoMaster() {
+    const { masterArr } = this.env.getNodesSortedByRole();
+    let copyScript='';
+    masterArr.map((master)=>{
+      copyScript += `sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./hyperauth.crt ${master.user}@${master.ip}:/etc/kubernetes/pki/hyperauth.crt;`;
+    });
+
+    return `
+    cd ~/${HyperAuthInstaller.INSTALL_HOME};
+    ${copyScript}
+    `;
+  }
+
   private _step3(): string {
     // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
     return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
     sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 2.hyperauth_deployment.yaml;
     sed -i 's/cpu: "1"/cpu: "0.5"/g' 2.hyperauth_deployment.yaml;
     kubectl apply -f 2.hyperauth_deployment.yaml;
@@ -278,7 +278,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   private _getRemoveScript(): string {
     return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifest;
+    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
     kubectl delete -f 2.hyperauth_deployment.yaml;
     kubectl delete secret hyperauth-https-secret -n hyperauth;
     rm -rf /etc/kubernetes/pki/hyperauth.crt;
@@ -286,10 +286,21 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     `;
   }
 
+  private async _copyFile(callback: any) {
+    console.debug('@@@@@@ Start copy yaml file... @@@@@@');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = `
+    \\cp -r ~/${HyperAuthInstaller.INSTALL_HOME}/manifest ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
+    `
+    await mainMaster.exeCmd(callback);
+    console.debug('###### Finish copy yaml file... ######');
+  }
+
   // protected abstract 구현
   protected async _preWorkInstall(param?: any) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
+    await this._copyFile(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       await this._downloadImageFile();

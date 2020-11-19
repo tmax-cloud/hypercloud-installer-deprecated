@@ -13,6 +13,7 @@ import AbstractInstaller from './AbstractInstaller';
 import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import ScriptPrometheusFactory from '../script/ScriptPrometheusFactory';
+import * as common from '../../common/common';
 
 export default class PrometheusInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR=`prometheus-install`;
@@ -77,7 +78,6 @@ export default class PrometheusInstaller extends AbstractInstaller {
     mainMaster.cmd = this._getVersionEditScript();
     await mainMaster.exeCmd(callback);
 
-
     // Step 1. prometheus namespace 및 crd 생성
     mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
@@ -114,34 +114,6 @@ export default class PrometheusInstaller extends AbstractInstaller {
     console.debug('###### Finish remove main Master... ######');
   }
 
-  private async applyStateOption(state: any, callback: any) {
-    console.error(state);
-    const { mainMaster } = this.env.getNodesSortedByRole();
-
-    if (!state.isUsePvc) {
-      mainMaster.cmd = `cat ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-prometheus.yaml;`;
-      let clusterYaml;
-      await mainMaster.exeCmd({
-        close: () => {},
-        stdout: (data: string) => {
-          clusterYaml = YAML.parse(data.toString());
-        },
-        stderr: () => {},
-      });
-
-      delete clusterYaml.spec.storage;
-
-      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-prometheus.yaml;`;
-      await mainMaster.exeCmd();
-    }
-
-    mainMaster.cmd = `
-    sed -i 's/port: 9090/port: ${state.port}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-service.yaml;
-    sed -i 's/type: NodePort/type: ${state.serviceType}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/prometheus-service.yaml
-    `;
-    await mainMaster.exeCmd();
-  }
-
   private _getVersionEditScript(): string {
     return `
       export PROMETHEUS_VERSION=v${PrometheusInstaller.PROMETHEUS_VERSION};
@@ -155,7 +127,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
       export PROMETHEUS_ADAPTER_VERSION=v${PrometheusInstaller.PROMETHEUS_ADAPTER_VERSION};
       export ALERTMANAGER_VERSION=v${PrometheusInstaller.ALERTMANAGER_VERSION};
 
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/;
       sed -i 's/{ALERTMANAGER_VERSION}/'\${ALERTMANAGER_VERSION}'/g' alertmanager-alertmanager.yaml;
       sed -i 's/{GRAFANA_VERSION}/'\${GRAFANA_VERSION}'/g' grafana-deployment.yaml;
       sed -i 's/{KUBE_RBAC_PROXY_VERSION}/'\${KUBE_RBAC_PROXY_VERSION}'/g' kube-state-metrics-deployment.yaml;
@@ -165,7 +137,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
       sed -i 's/{PROMETHEUS_ADAPTER_VERSION}/'\${PROMETHEUS_ADAPTER_VERSION}'/g' prometheus-adapter-deployment.yaml;
       sed -i 's/{PROMETHEUS_VERSION}/'\${PROMETHEUS_VERSION}'/g' prometheus-prometheus.yaml;
 
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/setup/;
       sed -i 's/{PROMETHEUS_OPERATOR_VERSION}/'\${PROMETHEUS_OPERATOR_VERSION}'/g' prometheus-operator-deployment.yaml;
       sed -i 's/{CONFIGMAP_RELOADER_VERSION}/'\${CONFIGMAP_RELOADER_VERSION}'/g' prometheus-operator-deployment.yaml;
       sed -i 's/{CONFIGMAP_RELOAD_VERSION}/'\${CONFIGMAP_RELOAD_VERSION}'/g' prometheus-operator-deployment.yaml;
@@ -174,14 +146,42 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   private _step1(): string {
     return `
-      cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+      cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/;
       kubectl create -f setup/;
       `;
   }
 
+  private async applyStateOption(state: any, callback: any) {
+    console.error(state);
+    const { mainMaster } = this.env.getNodesSortedByRole();
+
+    if (!state.isUsePvc) {
+      mainMaster.cmd = `cat ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/prometheus-prometheus.yaml;`;
+      let clusterYaml;
+      await mainMaster.exeCmd({
+        close: () => {},
+        stdout: (data: string) => {
+          clusterYaml = YAML.parse(data.toString());
+        },
+        stderr: () => {},
+      });
+
+      delete clusterYaml.spec.storage;
+
+      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/prometheus-prometheus.yaml;`;
+      await mainMaster.exeCmd();
+    }
+
+    mainMaster.cmd = `
+    sed -i 's/port: 9090/port: ${state.port}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/prometheus-service.yaml;
+    sed -i 's/type: NodePort/type: ${state.serviceType}/g' ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/prometheus-service.yaml
+    `;
+    await mainMaster.exeCmd();
+  }
+
   private _step2(): string {
     return `
-    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/;
 
     kubectl create -f manifests/;
     kubectl get svc -n monitoring prometheus-k8s -o yaml | sed "s|type: NodePort|type: LoadBalancer|g" | kubectl replace -f -;
@@ -191,7 +191,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   private _step3(): string {
     return `
-    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/;
     kubectl create -f kube-controller-manager-prometheus-discovery.yaml;
     kubectl create -f kube-scheduler-prometheus-discovery.yaml;
     `;
@@ -281,7 +281,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   private _getRemoveScript(): string {
     return `
-    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/;
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/;
     kubectl delete -f kube-scheduler-prometheus-discovery.yaml;
     kubectl delete -f kube-controller-manager-prometheus-discovery.yaml;
     kubectl delete -f manifests/;
@@ -289,10 +289,21 @@ export default class PrometheusInstaller extends AbstractInstaller {
     `;
   }
 
+  private async _copyFile(callback: any) {
+    console.debug('@@@@@@ Start copy yaml file... @@@@@@');
+    const { mainMaster } = this.env.getNodesSortedByRole();
+    mainMaster.cmd = `
+    \\cp -r ~/${PrometheusInstaller.INSTALL_HOME}/yaml ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy;
+    `
+    await mainMaster.exeCmd(callback);
+    console.debug('###### Finish copy yaml file... ######');
+  }
+
   // protected abstract 구현
   protected async _preWorkInstall(param: { callback: any; }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
+    await this._copyFile(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       await this._downloadImageFile();
@@ -409,7 +420,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
   private _getImagePathEditScript(): string {
     // git guide에 내용 보기 쉽게 변경해놓음 (공백 유지해야함)
     return `
-    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/manifests/;
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/;
     sed -i "s| quay.io/prometheus/alertmanager| ${this.env.registry}/prometheus/alertmanager|g" alertmanager-alertmanager.yaml;
     sed -i "s| grafana/grafana| ${this.env.registry}/grafana|g" grafana-deployment.yaml;
     sed -i "s| quay.io/coreos/kube-rbac-proxy| ${this.env.registry}/coreos/kube-rbac-proxy|g" kube-state-metrics-deployment.yaml;
@@ -419,7 +430,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
     sed -i "s| quay.io/coreos/k8s-prometheus-adapter-amd64| ${this.env.registry}/coreos/k8s-prometheus-adapter-amd64|g" prometheus-adapter-deployment.yaml;
     sed -i "s| quay.io/prometheus/prometheus| ${this.env.registry}/prometheus/prometheus|g" prometheus-prometheus.yaml;
 
-    cd ~/${PrometheusInstaller.INSTALL_HOME}/yaml/setup/;
+    cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/setup/;
     sed -i "s| quay.io/coreos/configmap-reload| ${this.env.registry}/coreos/configmap-reload|g" prometheus-operator-deployment.yaml
     sed -i "s| quay.io/coreos/prometheus-config-reloader| ${this.env.registry}/coreos/prometheus-config-reloader|g" prometheus-operator-deployment.yaml
     sed -i "s| quay.io/coreos/prometheus-operator| ${this.env.registry}/coreos/prometheus-operator|g" prometheus-operator-deployment.yaml

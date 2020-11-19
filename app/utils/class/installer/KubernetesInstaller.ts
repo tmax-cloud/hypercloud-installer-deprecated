@@ -15,6 +15,7 @@ import * as ssh from '../../common/ssh';
 import * as git from '../../common/git';
 import CONST from '../../constants/constant';
 import ScriptKubernetesFactory from '../script/ScriptKubernetesFactory';
+import * as common from '../../common/common';
 
 export default class KubernetesInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR=`k8s-install`;
@@ -427,6 +428,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up mainMaster;
+      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
@@ -454,6 +456,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up master;
+      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
@@ -478,6 +481,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up worker;
+      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }

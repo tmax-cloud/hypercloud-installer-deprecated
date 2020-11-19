@@ -1,12 +1,12 @@
 /* eslint-disable import/no-cycle */
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import { MenuItem, Select, Tooltip } from '@material-ui/core';
+import { Select, Tooltip } from '@material-ui/core';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -14,9 +14,8 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import { History, Location } from 'history';
+import * as router from 'react-router';
 import styles from './InstallLnb.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
 import CONST from '../../utils/constants/constant';
@@ -25,7 +24,6 @@ import routes from '../../utils/constants/routes.json';
 // import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
 import * as product from '../../utils/common/product';
-import { InstallContext } from '../../containers/InstallPage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,10 +45,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallLnb(props: any) {
-  console.debug(InstallLnb.name, props);
+type Props = {
+  history: History;
+  match: router.match;
+  location: Location;
+  clicked: string;
+  setClicked: Function;
+};
 
-  const { history, match, location } = props;
+function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
+  console.debug(InstallLnb.name);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -61,6 +65,8 @@ function InstallLnb(props: any) {
   const optionalProduct = product.getOptionalProduct();
 
   const classes = useStyles();
+
+  // const [clicked, setClicked] = React.useState('');
 
   const [open] = React.useState(true);
   const handleClick = () => {
@@ -110,18 +116,6 @@ function InstallLnb(props: any) {
     return result;
   }
 
-  function getStepContent(step: number) {
-    switch (step) {
-      case 0:
-        return ``;
-      case 1:
-        return ``;
-      case 2:
-        return ``;
-      default:
-        return '';
-    }
-  }
 
   const steps = getSteps();
 
@@ -132,6 +126,18 @@ function InstallLnb(props: any) {
     return false;
   };
 
+  const getClassName = label => {
+    if (getcompleted(label)) {
+      if (clicked === label) {
+        return styles.clicked;
+      }
+      return styles.installed;
+    }
+
+    if (clicked === label) {
+      return styles.clicked;
+    }
+  };
   return (
     <div className={[styles.wrap].join(' ')}>
       <div className={[styles.selectBox, 'childLeftRightCenter'].join(' ')}>
@@ -156,6 +162,7 @@ function InstallLnb(props: any) {
           disableSticky
           onClick={() => {
             history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
+            setClicked('');
           }}
         >
           <span style={{ color: 'white' }}>
@@ -167,22 +174,23 @@ function InstallLnb(props: any) {
           orientation="vertical"
           className={classes.stepper_primary}
         >
-          {steps.map((label, index) => (
+          {steps.map((label) => (
             <Step
               key={label}
               active
               completed={getcompleted(label)}
-              className={getcompleted(label) ? styles.primary : ''}
+              className={getClassName(label)}
               onClick={() => {
                 nowEnv = env.loadEnvByName(match.params.envName);
                 product.goProductInstallPage(label, nowEnv, history);
+                setClicked(label);
               }}
             >
               <StepLabel className={classes.stepLabel_primary}>
                 {label}
               </StepLabel>
               <StepContent>
-                <Typography>{getStepContent(index)}</Typography>
+                {/* <Typography>{getStepContent(index)}</Typography> */}
               </StepContent>
             </Step>
           ))}

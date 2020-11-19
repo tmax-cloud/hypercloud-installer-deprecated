@@ -1,8 +1,10 @@
 /* eslint-disable import/no-cycle */
-import React, { useContext } from 'react';
-import { Grid, Paper, Tooltip } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
+import { Grid, Paper, TextField, Tooltip } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { History, Location } from 'history';
+import * as router from 'react-router';
 import styles from './InstallContentsMain.css';
 import CONST from '../../utils/constants/constant';
 import { AppContext } from '../../containers/HomePage';
@@ -36,17 +38,41 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function InstallContentsMain(props: any) {
-  console.debug(InstallContentsMain.name, props);
-  const { history, location, match } = props;
+type Props = {
+  history: History;
+  match: router.match;
+  location: Location;
+  setClicked: Function;
+};
+
+function InstallContentsMain({ history, location, match, setClicked }: Props) {
+  console.debug(InstallContentsMain.name);
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const requiredProduct = product.getRequiredProduct();
-  const optionalProduct = product.getOptionalProduct();
+  const [searchText, setSearchText] = useState('');
+
+  let requiredProduct = product.getRequiredProduct();
+  let optionalProduct = product.getOptionalProduct();
+
+  if (searchText) {
+    searchText.toLocaleLowerCase();
+    requiredProduct = requiredProduct.filter(P => {
+      if (P.NAME.toLocaleLowerCase().indexOf(searchText) !== -1) {
+        return true;
+      }
+      return false;
+    });
+    optionalProduct = optionalProduct.filter(P => {
+      if (P.NAME.toLocaleLowerCase().indexOf(searchText) !== -1) {
+        return true;
+      }
+      return false;
+    });
+  }
 
   const classes = useStyles();
 
@@ -124,8 +150,8 @@ function InstallContentsMain(props: any) {
           ].join(' ')}
         >
           <span>
-            HyperCloud Installer는 {CONST.PRODUCT.KUBERNETES.NAME} 및 다양한 호환 제품 설치를
-            제공합니다.
+            HyperCloud Installer는 {CONST.PRODUCT.KUBERNETES.NAME} 및 다양한
+            호환 제품 설치를 제공합니다.
           </span>
         </div>
         <div
@@ -139,6 +165,27 @@ function InstallContentsMain(props: any) {
           <br />
           <span>설치할 제품을 선택해 주세요.</span>
         </div>
+      </div>
+      <div className="childLeftRightRight">
+        <TextField
+          required
+          className={['medium'].join(' ')}
+          id="outlined-required"
+          label="검색"
+          placeholder="제품명"
+          variant="outlined"
+          size="small"
+          value={searchText}
+          onChange={e => {
+            setSearchText(e.target.value);
+            // hasIpError(e.target.value);
+          }}
+          onBlur={e => {
+            // hasUserError(e.target.value);
+          }}
+          // error={userError.length !== 0}
+          // helperText={userError}
+        />
       </div>
       <div>
         <Grid item xs={12}>
@@ -172,6 +219,7 @@ function InstallContentsMain(props: any) {
                       //   product.goProductInstallPage(P.NAME, nowEnv, history);
                       // }
                       product.goProductInstallPage(P.NAME, nowEnv, history);
+                      setClicked(P.NAME);
                     }}
                     variant="outlined"
                   >
@@ -244,6 +292,7 @@ function InstallContentsMain(props: any) {
                     //   product.goProductInstallPage(P.NAME, nowEnv, history);
                     // }
                     product.goProductInstallPage(P.NAME, nowEnv, history);
+                    setClicked(P.NAME);
                   }}
                   variant="outlined"
                 >
@@ -259,7 +308,7 @@ function InstallContentsMain(props: any) {
                     className={[
                       '',
                       'childLeftRightCenter',
-                      styles.productBox
+                      styles['productBox--second']
                     ].join(' ')}
                   >
                     <div className={[styles.productBoxContents].join(' ')}>

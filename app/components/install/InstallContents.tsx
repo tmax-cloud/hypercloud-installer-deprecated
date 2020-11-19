@@ -17,7 +17,7 @@ import InstallContentsTekton from './Tekton/InstallContentsTekton';
 
 function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
-  const { history, location, match } = props;
+  const { history, location, match, setClicked } = props;
 
   // const appContext = useContext(AppContext);
   // const { appState, dispatchAppState } = appContext;
@@ -30,7 +30,17 @@ function InstallContents(props: any) {
         match={match}
       />
       <Switch>
-        <Route path={`${match.path}/main`} component={InstallContentsMain} />
+        <Route
+          path={`${match.path}/main`}
+          render={() => (
+            <InstallContentsMain
+              history={history}
+              match={match}
+              location={location}
+              setClicked={setClicked}
+            />
+          )}
+        />
         <Route
           path={`${match.path}/${CONST.PRODUCT.KUBERNETES.NAME}`}
           component={InstallContentsKubernetes}

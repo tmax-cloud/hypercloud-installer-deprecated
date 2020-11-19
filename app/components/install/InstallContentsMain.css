@@ -21,7 +21,17 @@
 }
 .productBox:hover {
   cursor: pointer;
+  border: 1px solid #ec3854;
 }
+.productBox--second {
+  height: 100%;
+  width: 100%;
+}
+.productBox--second:hover {
+  cursor: pointer;
+  border: 1px solid #1e6cb9;
+}
+
 .productBoxContents {
   padding: 5px 20px;
   width: 100%;
