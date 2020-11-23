@@ -56,6 +56,7 @@ function InstallContentsRookCeph2(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
+  // disk 후보군을 보여주는 state
   const [osdDiskList, setOsdDiskList] = React.useState({});
   const getDiskListPossibleOsd = async () => {
     const rookCephInstaller = RookCephInstaller.getInstance;
@@ -80,26 +81,27 @@ function InstallContentsRookCeph2(props: any) {
     setOsdDiskList(temp);
   };
 
+  // 선택된 disk를 나타내는 state
   const [diskError, setDiskError] = useState(false);
-
-  const selectedOsdDisk: any = {};
+  const [selectedOsdDisk, setSelectedOsdDisk] = useState({});
   const addSelectedOsdDisk = (hostName: string, diskName: string) => {
-    console.error('addSelectedOsdDisk');
+    console.debug(selectedOsdDisk);
     if (hostName in selectedOsdDisk) {
       selectedOsdDisk[hostName].push(diskName);
     } else {
       selectedOsdDisk[hostName] = [diskName];
     }
-    console.error(selectedOsdDisk);
+    setSelectedOsdDisk(selectedOsdDisk);
+    setDiskError(false);
   };
   const deleteSelectedOsdDisk = (hostName: string, diskName: string) => {
-    console.error('deleteSelectedOsdDisk');
+    console.debug(selectedOsdDisk);
     const idx = selectedOsdDisk[hostName].indexOf(diskName);
     if (idx > -1) selectedOsdDisk[hostName].splice(idx, 1);
     if (selectedOsdDisk[hostName].length === 0) {
       delete selectedOsdDisk[hostName];
+      setSelectedOsdDisk(selectedOsdDisk);
     }
-    console.error(selectedOsdDisk);
   };
 
   React.useEffect(() => {
@@ -600,7 +602,18 @@ function InstallContentsRookCeph2(props: any) {
               hasError = true;
             }
             if (hasError) return;
-
+            console.debug({
+              disk: selectedOsdDisk,
+              osdCpu,
+              osdMemory,
+              monCpu,
+              monMemory,
+              mgrCpu,
+              mgrMemory,
+              mdsCpu,
+              mdsMemory
+            });
+            return;
             setOption((prev: any) => {
               return {
                 ...prev,
