@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -55,9 +54,6 @@ type Props = {
 
 function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
   console.debug(InstallLnb.name);
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
 
   let nowEnv = env.loadEnvByName(match.params.envName);
 

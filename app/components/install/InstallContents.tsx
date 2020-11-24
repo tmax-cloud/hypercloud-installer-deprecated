@@ -1,5 +1,4 @@
-/* eslint-disable import/no-cycle */
-import React, { useContext } from 'react';
+import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import styles from './InstallContents.css';
 import InstallContentsMain from './InstallContentsMain';
@@ -19,9 +18,6 @@ function InstallContents(props: any) {
   console.debug(InstallContents.name, props);
   const { history, location, match, setClicked } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   return (
     <div className={[styles.wrap].join(' ')}>
       <InstallContentsHeader
@@ -36,7 +32,6 @@ function InstallContents(props: any) {
             <InstallContentsMain
               history={history}
               match={match}
-              location={location}
               setClicked={setClicked}
             />
           )}

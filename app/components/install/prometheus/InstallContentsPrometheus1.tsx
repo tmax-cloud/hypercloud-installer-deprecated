@@ -11,9 +11,6 @@ function InstallContentsPrometheus1(props: any) {
   console.debug(InstallContentsPrometheus1.name, props);
   const { history, match } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   const defaultProps = {
@@ -30,7 +27,11 @@ function InstallContentsPrometheus1(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={["childUpDownCenter", "childLeftRightCenter", styles.circle].join(' ')}
+              className={[
+                'childUpDownCenter',
+                'childLeftRightCenter',
+                styles.circle
+              ].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -74,18 +75,6 @@ function InstallContentsPrometheus1(props: any) {
             </Button>
           </div>
         </div>
-        {/* <button
-          type="button"
-          onClick={() => {
-            abc();
-          }}
-        >
-          test
-        </button>
-        <span>{cnt}</span>
-        <textarea value={stdout} disabled />
-        <textarea value={stderr} disabled />
-        <LinearProgressWithLabel value={progress} /> */}
       </div>
     </div>
   );

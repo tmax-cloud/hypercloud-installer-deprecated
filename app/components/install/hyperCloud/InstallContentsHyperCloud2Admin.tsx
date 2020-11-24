@@ -7,10 +7,6 @@ import {
   DialogContentText,
   DialogActions,
   IconButton,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
   TextField
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';

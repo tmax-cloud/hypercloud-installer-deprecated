@@ -1,28 +1,21 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
 import Env, { NETWORK_TYPE } from '../Env';
 import * as common from '../../common/common';
 import KubernetesInstaller from './KubernetesInstaller';
-import Node from '../Node';
 
 export default class CniInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR=`cni-install`;
+  public static readonly IMAGE_DIR = `cni-install`;
 
-  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/CNI`;
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/CNI`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}`;
 
-  public static readonly CNI_VERSION=`3.13.4`;
+  public static readonly CNI_VERSION = `3.13.4`;
 
-  public static readonly CTL_VERSION=`3.15.0`;
+  public static readonly CTL_VERSION = `3.15.0`;
 
   // singleton
   private static instance: CniInstaller;
@@ -38,8 +31,13 @@ export default class CniInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { type: string; version: string; callback: any; setProgress: Function; }) {
-    const { type, version, callback, setProgress } = param;
+  public async install(param: {
+    type: string;
+    version: string;
+    callback: any;
+    setProgress: Function;
+  }) {
+    const { version, callback, setProgress } = param;
 
     setProgress(10);
     await this._preWorkInstall({
@@ -51,9 +49,7 @@ export default class CniInstaller extends AbstractInstaller {
     setProgress(100);
   }
 
-  public async remove(param: { type: any; }) {
-    const { type } = param;
-
+  public async remove(param: { type: any }) {
     await this._removeMainMaster();
   }
 
@@ -70,7 +66,7 @@ export default class CniInstaller extends AbstractInstaller {
 
   private async _removeMainMaster() {
     console.debug('@@@@@@ Start remove main Master... @@@@@@');
-    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
+    const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
     // FIXME: /etc/cni/ 삭제하면 재설치 시, 노드가 NotReady 상태에서 Ready로 안됨. 원인을 잘 모르겠음
@@ -112,15 +108,19 @@ export default class CniInstaller extends AbstractInstaller {
     console.debug('@@@@@@ Start copy yaml file... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
-    ${common.getCopyCommandByFilePath(`~/${CniInstaller.INSTALL_HOME}/calico_${CniInstaller.CNI_VERSION}.yaml`)}
-    ${common.getCopyCommandByFilePath(`~/${CniInstaller.INSTALL_HOME}/calicoctl_${CniInstaller.CTL_VERSION}.yaml`)}
-    `
+    ${common.getCopyCommandByFilePath(
+      `~/${CniInstaller.INSTALL_HOME}/calico_${CniInstaller.CNI_VERSION}.yaml`
+    )}
+    ${common.getCopyCommandByFilePath(
+      `~/${CniInstaller.INSTALL_HOME}/calicoctl_${CniInstaller.CTL_VERSION}.yaml`
+    )}
+    `;
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish copy yaml file... ######');
   }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { version: string; callback: any; }) {
+  protected async _preWorkInstall(param: { version: string; callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     await this._copyFile(callback);
@@ -152,26 +152,38 @@ export default class CniInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${CniInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${CniInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
-
+/* eslint-disable no-underscore-dangle */
 import { AbstractOs, OS_TYPE } from './os/AbstractOs';
 import * as ssh from '../common/ssh';
 import CentOS from './os/CentOS';
 import Ubuntu from './os/Ubuntu';
 
-/* eslint-disable no-underscore-dangle */
 export enum ROLE {
   MAIN_MASTER = 100,
   MASTER = 0,

@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
   Button,
@@ -8,16 +6,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton,
-  CircularProgress,
-  makeStyles,
-  Theme,
-  createStyles
+  IconButton
 } from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
-import { AppContext } from '../../../containers/HomePage';
+import { AppContext } from '../../../containers/AppContext';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/Kubernetes_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
@@ -26,39 +20,16 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import KubernetesInstaller from '../../../utils/class/installer/KubernetesInstaller';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    // buttonSuccess: {
-    //   backgroundColor: green[500],
-    //   '&:hover': {
-    //     backgroundColor: green[700]
-    //   }
-    // },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -40,
-      marginLeft: -40
-    }
-  })
-);
-
 function InstallContentsKubernetesAlready(props: any) {
   console.debug(InstallContentsKubernetesAlready.name, props);
-  const { history, location, match } = props;
-
-  const classes = useStyles();
+  const { history, match } = props;
 
   const appContext = useContext(AppContext);
-  const { appState, dispatchAppState } = appContext;
+  const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.KUBERNETES;
-
-  // loading bar
-  // const [loading, setLoading] = React.useState(false);
 
   const getVersion = () => {
     // nowEnv 있을 경우만 실행
@@ -97,13 +68,6 @@ function InstallContentsKubernetesAlready(props: any) {
 
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      {/* {loading && (
-        <CircularProgress
-          color="secondary"
-          size={40}
-          className={classes.buttonProgress}
-        />
-      )} */}
       <div>
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
@@ -237,18 +201,6 @@ function InstallContentsKubernetesAlready(props: any) {
             </Dialog>
           </div>
         </div>
-        {/* <button
-          type="button"
-          onClick={() => {
-            abc();
-          }}
-        >
-          test
-        </button>
-        <span>{cnt}</span>
-        <textarea value={stdout} disabled />
-        <textarea value={stderr} disabled />
-        <LinearProgressWithLabel value={progress} /> */}
       </div>
     </div>
   );

@@ -1,8 +1,3 @@
-/* eslint-disable eqeqeq */
-/* eslint-disable no-console */
-/* eslint-disable no-param-reassign */
-/* eslint-disable import/prefer-default-export */
-
 import YAML from 'yaml';
 import Node from '../class/Node';
 

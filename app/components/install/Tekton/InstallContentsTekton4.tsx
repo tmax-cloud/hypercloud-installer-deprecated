@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 import styles from '../InstallContents4.css';
-import CONST from '../../../utils/constants/constant';
 import * as env from '../../../utils/common/env';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
@@ -12,16 +11,6 @@ function InstallContentsTekton4(props: any) {
   const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  // nowEnv.deleteProductByName(CONST.PRODUCT.TEKTON.NAME);
-  // nowEnv.addProduct({
-  //   name: CONST.PRODUCT.TEKTON.NAME,
-  //   operator_version: state.operator_version,
-  //   webhook_version: state.webhook_version,
-  //   console_version: state.console_version
-  // });
-  // // json 파일 저장
-  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -38,6 +27,7 @@ function InstallContentsTekton4(props: any) {
         </div>
       );
     }
+    return <></>;
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>

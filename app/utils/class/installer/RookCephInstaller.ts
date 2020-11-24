@@ -1,44 +1,35 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import Node from '../Node';
 import ScriptRookCephFactory from '../script/ScriptRookCephFactory';
 
 export default class RookCephInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR=`rook-install`;
+  public static readonly IMAGE_DIR = `rook-install`;
 
-  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/rook-ceph`;
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/rook-ceph`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}`;
 
-  public static readonly CEPH_VERSION=`14.2.9`;
+  public static readonly CEPH_VERSION = `14.2.9`;
 
   // public static readonly ROOK_VERSION=`1.3.6`;
-  public static readonly ROOK_VERSION=`1.3.9`;
+  public static readonly ROOK_VERSION = `1.3.9`;
 
-  public static readonly CEPHCSI_VERSION=`2.1.2`;
+  public static readonly CEPHCSI_VERSION = `2.1.2`;
 
-  public static readonly NODE_DRIVER_VERSION=`1.2.0`;
+  public static readonly NODE_DRIVER_VERSION = `1.2.0`;
 
-  public static readonly RESIZER_VERSION=`0.4.0`;
+  public static readonly RESIZER_VERSION = `0.4.0`;
 
-  public static readonly PROVISIONER_VERSION=`1.4.0`;
+  public static readonly PROVISIONER_VERSION = `1.4.0`;
 
-  public static readonly SNAPSHOTTER_VERSION=`1.2.2`;
+  public static readonly SNAPSHOTTER_VERSION = `1.2.2`;
 
-  public static readonly ATTACHER_VERSION=`2.1.0`;
+  public static readonly ATTACHER_VERSION = `2.1.0`;
 
   // singleton
   private static instance: RookCephInstaller;
@@ -54,7 +45,12 @@ export default class RookCephInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { isCdi: boolean; option: any, callback: any; setProgress: Function; }) {
+  public async install(param: {
+    isCdi: boolean;
+    option: any;
+    callback: any;
+    setProgress: Function;
+  }) {
     const { isCdi, option, callback, setProgress } = param;
 
     setProgress(10);
@@ -159,24 +155,26 @@ export default class RookCephInstaller extends AbstractInstaller {
 
   private async _setNtp(callback: any) {
     console.debug('@@@@@@ Start setting ntp... @@@@@@');
-    const { mainMaster, masterArr, workerArr } = this.env.getNodesSortedByRole();
+    const {
+      mainMaster,
+      masterArr,
+      workerArr
+    } = this.env.getNodesSortedByRole();
 
     // 기존 서버 목록 주석 처리
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // main master를 ntp 서버로
       // main master를 제외한 노드를 ntp client로 설정하기 위함
-      let script = ScriptRookCephFactory.createScript(mainMaster.os.type)
+      let script = ScriptRookCephFactory.createScript(mainMaster.os.type);
       mainMaster.cmd = script.installNtp();
-      mainMaster.cmd += this._setNtpServer(mainMaster.os.type);
+      mainMaster.cmd += this._setNtpServer();
       await mainMaster.exeCmd(callback);
       workerArr.concat(masterArr);
       await Promise.all(
         workerArr.map(worker => {
-          script = ScriptRookCephFactory.createScript(worker.os.type)
+          script = ScriptRookCephFactory.createScript(worker.os.type);
           worker.cmd = script.installNtp();
-          worker.cmd += this._setNtpClient(
-            mainMaster.ip,
-          );
+          worker.cmd += this._setNtpClient(mainMaster.ip);
           return worker.exeCmd(callback);
         })
       );
@@ -184,7 +182,7 @@ export default class RookCephInstaller extends AbstractInstaller {
       // 한국 공용 타임서버 목록 설정
       await Promise.all(
         this.env.nodeList.map((node: Node) => {
-          const script = ScriptRookCephFactory.createScript(node.os.type)
+          const script = ScriptRookCephFactory.createScript(node.os.type);
           node.cmd = script.installNtp();
           node.cmd += this._setPublicNtp();
           return node.exeCmd(callback);
@@ -198,7 +196,7 @@ export default class RookCephInstaller extends AbstractInstaller {
     console.debug('@@@@@@ Start installing gdisk... @@@@@@');
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
-        const script = ScriptRookCephFactory.createScript(node.os.type)
+        const script = ScriptRookCephFactory.createScript(node.os.type);
         node.cmd = script.installGdisk();
         return node.exeCmd(callback);
       })
@@ -206,17 +204,17 @@ export default class RookCephInstaller extends AbstractInstaller {
     console.debug('###### Finish installing gdisk... ######');
   }
 
-  private _getRookCephRemoveConfigScript(diskNameList: any): string{
+  private _getRookCephRemoveConfigScript(diskNameList: any): string {
     let script = ``;
-    diskNameList.map((diskName: string)=>{
-      script+=`
+    diskNameList.map((diskName: string) => {
+      script += `
       sudo rm -rf /var/lib/rook;
       sudo sgdisk --zap-all /dev/${diskName};
       sudo ls /dev/mapper/ceph-* | sudo xargs -I% -- dmsetup remove %;
       sudo rm -rf /dev/ceph-*;
       sudo dd if=/dev/zero of="/dev/${diskName}" bs=1M count=100 oflag=direct,dsync;
       sudo blkdiscard /dev/${diskName};
-      `
+      `;
     });
     return script;
   }
@@ -229,8 +227,8 @@ export default class RookCephInstaller extends AbstractInstaller {
      */
     console.error('option', option);
     let osdCount = 0;
-    Object.keys(option.disk).map((hostName)=>{
-      osdCount+=option.disk[hostName].length;
+    Object.keys(option.disk).map(hostName => {
+      osdCount += option.disk[hostName].length;
     });
     console.error('osdCount', osdCount);
 
@@ -242,7 +240,7 @@ export default class RookCephInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         clusterYaml = YAML.parse(data.toString());
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     // 리소스 최소값 설정
     // clusterYaml.spec.resources = {
@@ -283,15 +281,15 @@ export default class RookCephInstaller extends AbstractInstaller {
       clusterYaml.spec.storage.useAllNodes = true;
       clusterYaml.spec.storage.useAllDevices = true;
     } else {
-      const nodes = Object.keys(option.disk).map((hostName)=>{
+      const nodes = Object.keys(option.disk).map(hostName => {
         return {
           name: hostName,
-          devices: option.disk[hostName].map((diskName)=>{
+          devices: option.disk[hostName].map(diskName => {
             return {
               name: diskName
-            }
+            };
           })
-        }
+        };
       });
       console.error(nodes);
       clusterYaml.spec.storage.nodes = nodes;
@@ -313,10 +311,14 @@ data:
     [global]
     osd_pool_default_size = 1
 ---" > ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`;
-      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" >> ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`
+      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" >> ~/${
+        RookCephInstaller.INSTALL_HOME
+      }/install/rook/cluster.yaml;`;
     } else {
       // osd 3개 이상 보장
-      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${RookCephInstaller.INSTALL_HOME}/install/rook/cluster.yaml;`
+      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${
+        RookCephInstaller.INSTALL_HOME
+      }/install/rook/cluster.yaml;`;
     }
 
     await mainMaster.exeCmd();
@@ -361,7 +363,7 @@ data:
     `;
   }
 
-  private _setNtpServer(osType:  string): string {
+  private _setNtpServer(): string {
     return `
     interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
     inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
@@ -380,9 +382,9 @@ data:
   }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { isCdi?: boolean; callback: any; }) {
+  protected async _preWorkInstall(param: { isCdi?: boolean; callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
-    const { isCdi, callback } = param;
+    const { callback } = param;
     await this._setNtp(callback);
     await this._installGdisk(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
@@ -406,25 +408,37 @@ data:
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${RookCephInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${RookCephInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {
@@ -489,13 +503,13 @@ data:
   }
 
   public async getDiskListPossibleOsd() {
-    let hostNameDiskList={};
+    const hostNameDiskList = {};
 
     // disk name 가져오기
     await Promise.all(
       this.env.nodeList.map(async (node: Node) => {
-        let diskList: string[]=[];
-        node.cmd = `lsblk --all --noheadings --list --output KNAME`
+        let diskList: string[] = [];
+        node.cmd = `lsblk --all --noheadings --list --output KNAME`;
         await node.exeCmd({
           close: () => {},
           stdout: (data: string) => {
@@ -505,7 +519,7 @@ data:
             diskList.pop();
             hostNameDiskList[node.hostName] = diskList;
           },
-          stderr: () => {},
+          stderr: () => {}
         });
       })
     );
@@ -514,39 +528,39 @@ data:
     await Promise.all(
       this.env.nodeList.map(async (node: Node) => {
         const diskList = hostNameDiskList[node.hostName];
-        const filteredDiskList: { disk: string; size: number; }[] = [];
-        for (let i=0; i< diskList.length; i+=1) {
+        const filteredDiskList: { disk: string; size: number }[] = [];
+        for (let i = 0; i < diskList.length; i += 1) {
           const disk = diskList[i];
-          let result: string[]=[];
-          node.cmd = `lsblk /dev/${disk} --bytes --nodeps --pairs --paths --output SIZE,TYPE,MOUNTPOINT`
+          let result: string[] = [];
+          node.cmd = `lsblk /dev/${disk} --bytes --nodeps --pairs --paths --output SIZE,TYPE,MOUNTPOINT`;
           await node.exeCmd({
             close: () => {},
             stdout: (data: string) => {
               const output = data.toString();
               result = output.split(' ');
               const temp: any = {};
-              result.map((r)=>{
-                const s=r.split('=');
+              result.map(r => {
+                const s = r.split('=');
                 const key = s[0];
-                const value = s[1].replace(/"/gi,'');
-                temp[key]=value;
-              })
+                const value = s[1].replace(/"/gi, '');
+                temp[key] = value;
+              });
               const size = temp.SIZE;
               const type = temp.TYPE;
               const mountpoint = temp.MOUNTPOINT;
               console.log(size, type, mountpoint);
-              if (size>=10737418200) {
-                if (type==="disk" || type==="part") {
-                  if (!mountpoint.trim()){
-                    filteredDiskList.push({disk, size});
+              if (size >= 10737418200) {
+                if (type === 'disk' || type === 'part') {
+                  if (!mountpoint.trim()) {
+                    filteredDiskList.push({ disk, size });
                   }
                 }
               }
             },
-            stderr: () => {},
+            stderr: () => {}
           });
         }
-        hostNameDiskList[node.hostName]=filteredDiskList;
+        hostNameDiskList[node.hostName] = filteredDiskList;
       })
     );
 
@@ -554,10 +568,10 @@ data:
     await Promise.all(
       this.env.nodeList.map(async (node: Node) => {
         const diskList = hostNameDiskList[node.hostName];
-        const filteredDiskList: { disk: string; size: number; }[] = [];
-        for (let i=0; i< diskList.length; i+=1) {
-          const { disk, size } = diskList[i];
-          node.cmd = `lsblk --noheadings --pairs /dev/${disk} | wc -l`
+        const filteredDiskList: { disk: string; size: number }[] = [];
+        for (let i = 0; i < diskList.length; i += 1) {
+          const { disk } = diskList[i];
+          node.cmd = `lsblk --noheadings --pairs /dev/${disk} | wc -l`;
           await node.exeCmd({
             close: () => {},
             stdout: (data: string) => {
@@ -566,10 +580,10 @@ data:
                 filteredDiskList.push(diskList[i]);
               }
             },
-            stderr: () => {},
+            stderr: () => {}
           });
         }
-        hostNameDiskList[node.hostName]=filteredDiskList;
+        hostNameDiskList[node.hostName] = filteredDiskList;
       })
     );
 

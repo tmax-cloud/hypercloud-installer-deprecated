@@ -1,46 +1,36 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptPrometheusFactory from '../script/ScriptPrometheusFactory';
-import * as common from '../../common/common';
 
 export default class PrometheusInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR=`prometheus-install`;
+  public static readonly IMAGE_DIR = `prometheus-install`;
 
-  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/Prometheus`;
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/Prometheus`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}`;
 
-  public static readonly PROMETHEUS_VERSION=`2.11.0`;
+  public static readonly PROMETHEUS_VERSION = `2.11.0`;
 
-  public static readonly PROMETHEUS_OPERATOR_VERSION=`0.34.0`;
+  public static readonly PROMETHEUS_OPERATOR_VERSION = `0.34.0`;
 
-  public static readonly NODE_EXPORTER_VERSION=`0.18.1`;
+  public static readonly NODE_EXPORTER_VERSION = `0.18.1`;
 
-  public static readonly GRAFANA_VERSION=`6.4.3`;
+  public static readonly GRAFANA_VERSION = `6.4.3`;
 
-  public static readonly KUBE_STATE_METRICS_VERSION=`1.8.0`;
+  public static readonly KUBE_STATE_METRICS_VERSION = `1.8.0`;
 
-  public static readonly CONFIGMAP_RELOADER_VERSION=`0.34.0`;
+  public static readonly CONFIGMAP_RELOADER_VERSION = `0.34.0`;
 
-  public static readonly CONFIGMAP_RELOAD_VERSION=`0.0.1`;
+  public static readonly CONFIGMAP_RELOAD_VERSION = `0.0.1`;
 
-  public static readonly KUBE_RBAC_PROXY_VERSION=`0.4.1`;
+  public static readonly KUBE_RBAC_PROXY_VERSION = `0.4.1`;
 
-  public static readonly PROMETHEUS_ADAPTER_VERSION=`0.5.0`;
+  public static readonly PROMETHEUS_ADAPTER_VERSION = `0.5.0`;
 
-  public static readonly ALERTMANAGER_VERSION=`0.20.0`;
+  public static readonly ALERTMANAGER_VERSION = `0.20.0`;
 
   // singleton
   private static instance: PrometheusInstaller;
@@ -56,7 +46,11 @@ export default class PrometheusInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { state: any, callback: any; setProgress: Function; }) {
+  public async install(param: {
+    state: any;
+    callback: any;
+    setProgress: Function;
+  }) {
     const { state, callback, setProgress } = param;
 
     setProgress(10);
@@ -87,7 +81,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
     await new Promise(resolve => setTimeout(resolve, 30000));
 
     // apply state option
-    await this.applyStateOption(state, callback);
+    await this.applyStateOption(state);
 
     // Step 2. Prometheus 모듈들에 대한 deploy 및 RBAC 생성
     mainMaster.cmd = this._step2();
@@ -151,7 +145,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
       `;
   }
 
-  private async applyStateOption(state: any, callback: any) {
+  private async applyStateOption(state: any) {
     console.error(state);
     const { mainMaster } = this.env.getNodesSortedByRole();
 
@@ -163,12 +157,14 @@ export default class PrometheusInstaller extends AbstractInstaller {
         stdout: (data: string) => {
           clusterYaml = YAML.parse(data.toString());
         },
-        stderr: () => {},
+        stderr: () => {}
       });
 
       delete clusterYaml.spec.storage;
 
-      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/manifests/prometheus-prometheus.yaml;`;
+      mainMaster.cmd += `echo "${YAML.stringify(clusterYaml)}" > ~/${
+        PrometheusInstaller.INSTALL_HOME
+      }/yamlCopy/manifests/prometheus-prometheus.yaml;`;
       await mainMaster.exeCmd();
     }
 
@@ -184,7 +180,7 @@ export default class PrometheusInstaller extends AbstractInstaller {
     cd ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy/;
 
     kubectl create -f manifests/;
-    kubectl get svc -n monitoring prometheus-k8s -o yaml | sed "s|type: NodePort|type: LoadBalancer|g" | kubectl replace -f -;
+    # kubectl get svc -n monitoring prometheus-k8s -o yaml | sed "s|type: NodePort|type: LoadBalancer|g" | kubectl replace -f -;
     kubectl get svc -n monitoring grafana -o yaml | sed "s|type: ClusterIP|type: LoadBalancer|g" | kubectl replace -f -;
     `;
   }
@@ -207,13 +203,13 @@ export default class PrometheusInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         podNameStr = data.toString();
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     const podNameList = podNameStr.split(' ');
     const schedulerNameList: string[] = [];
     const controllerNameList: string[] = [];
 
-    podNameList.map((podName: string)=>{
+    podNameList.map((podName: string) => {
       if (podName.startsWith('kube-scheduler')) {
         schedulerNameList.push(podName);
       } else if (podName.startsWith('kube-controller-manager')) {
@@ -221,12 +217,12 @@ export default class PrometheusInstaller extends AbstractInstaller {
       }
     });
     mainMaster.cmd = '';
-    schedulerNameList.map((podName)=>{
-      mainMaster.cmd += `kubectl get pod -n kube-system ${podName} -o yaml | sed "s|labels:|labels:\\n    k8s-app: kube-scheduler|g" | kubectl replace -f -;`
-    })
-    controllerNameList.map((podName)=>{
-      mainMaster.cmd += `kubectl get pod -n kube-system ${podName} -o yaml | sed "s|labels:|labels:\\n    k8s-app: kube-controller-manager|g" | kubectl replace -f -;`
-    })
+    schedulerNameList.map(podName => {
+      mainMaster.cmd += `kubectl get pod -n kube-system ${podName} -o yaml | sed "s|labels:|labels:\\n    k8s-app: kube-scheduler|g" | kubectl replace -f -;`;
+    });
+    controllerNameList.map(podName => {
+      mainMaster.cmd += `kubectl get pod -n kube-system ${podName} -o yaml | sed "s|labels:|labels:\\n    k8s-app: kube-controller-manager|g" | kubectl replace -f -;`;
+    });
 
     await mainMaster.exeCmd();
   }
@@ -242,15 +238,19 @@ export default class PrometheusInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         controllerYaml = YAML.parse(data.toString());
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     console.error(controllerYaml);
-    for (let i = 0; i< controllerYaml.spec.endpoints.length; i += 1) {
+    for (let i = 0; i < controllerYaml.spec.endpoints.length; i += 1) {
       delete controllerYaml.spec.endpoints[i].metricRelabelings;
     }
     mainMaster.cmd = `
-    echo "${YAML.stringify(controllerYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/controller.yaml;
-    sed -i "s|${controllerYaml.metadata.resourceVersion}|\\"${controllerYaml.metadata.resourceVersion}\\"|g" ~/${PrometheusInstaller.INSTALL_HOME}/controller.yaml;
+    echo "${YAML.stringify(controllerYaml)}" > ~/${
+      PrometheusInstaller.INSTALL_HOME
+    }/controller.yaml;
+    sed -i "s|${controllerYaml.metadata.resourceVersion}|\\"${
+      controllerYaml.metadata.resourceVersion
+    }\\"|g" ~/${PrometheusInstaller.INSTALL_HOME}/controller.yaml;
     kubectl replace -f ~/${PrometheusInstaller.INSTALL_HOME}/controller.yaml;
     #rm -rf ~/${PrometheusInstaller.INSTALL_HOME}/controller.yaml;
     `;
@@ -264,15 +264,19 @@ export default class PrometheusInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         schedulerYaml = YAML.parse(data.toString());
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     console.error(schedulerYaml);
-    for (let i = 0; i< schedulerYaml.spec.endpoints.length; i += 1) {
+    for (let i = 0; i < schedulerYaml.spec.endpoints.length; i += 1) {
       delete schedulerYaml.spec.endpoints[i].metricRelabelings;
     }
     mainMaster.cmd = `
-    echo "${YAML.stringify(schedulerYaml)}" > ~/${PrometheusInstaller.INSTALL_HOME}/scheduler.yaml;
-    sed -i "s|${schedulerYaml.metadata.resourceVersion}|\\"${schedulerYaml.metadata.resourceVersion}\\"|g" ~/${PrometheusInstaller.INSTALL_HOME}/scheduler.yaml;
+    echo "${YAML.stringify(schedulerYaml)}" > ~/${
+      PrometheusInstaller.INSTALL_HOME
+    }/scheduler.yaml;
+    sed -i "s|${schedulerYaml.metadata.resourceVersion}|\\"${
+      schedulerYaml.metadata.resourceVersion
+    }\\"|g" ~/${PrometheusInstaller.INSTALL_HOME}/scheduler.yaml;
     kubectl replace -f ~/${PrometheusInstaller.INSTALL_HOME}/scheduler.yaml;
     #rm -rf ~/${PrometheusInstaller.INSTALL_HOME}/scheduler.yaml;
     `;
@@ -294,13 +298,13 @@ export default class PrometheusInstaller extends AbstractInstaller {
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     \\cp -r ~/${PrometheusInstaller.INSTALL_HOME}/yaml ~/${PrometheusInstaller.INSTALL_HOME}/yamlCopy;
-    `
+    `;
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish copy yaml file... ######');
   }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { callback: any; }) {
+  protected async _preWorkInstall(param: { callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     await this._copyFile(callback);
@@ -324,26 +328,42 @@ export default class PrometheusInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${PrometheusInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${PrometheusInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${PrometheusInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

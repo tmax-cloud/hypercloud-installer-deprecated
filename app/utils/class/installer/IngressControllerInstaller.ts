@@ -1,34 +1,23 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptCniFactory from '../script/ScriptCniFactory';
-import KubernetesInstaller from './KubernetesInstaller';
-import AbstractScript from '../script/AbstractScript';
 
 export default class IngressControllerInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR=`install-ingress-nginx`;
+  public static readonly IMAGE_DIR = `install-ingress-nginx`;
 
-  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/IngressNginx`;
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/IngressNginx`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}`;
 
-  public static readonly INGRESS_NGINX_NAME=`ingress-nginx-shared`;
+  public static readonly INGRESS_NGINX_NAME = `ingress-nginx-shared`;
 
-  public static readonly INGRESS_CLASS=`nginx-shd`;
+  public static readonly INGRESS_CLASS = `nginx-shd`;
 
-  public static readonly NGINX_INGRESS_VERSION=`0.33.0`;
+  public static readonly NGINX_INGRESS_VERSION = `0.33.0`;
 
-  public static readonly KUBE_WEBHOOK_CERTGEN_VERSION=`1.2.2`;
+  public static readonly KUBE_WEBHOOK_CERTGEN_VERSION = `1.2.2`;
 
   // singleton
   private static instance: IngressControllerInstaller;
@@ -44,8 +33,8 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { callback: any; setProgress: Function }) {
+    const { callback } = param;
 
     await this._preWorkInstall({
       callback
@@ -58,7 +47,9 @@ export default class IngressControllerInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing nginx ingress controller main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing nginx ingress controller main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step0. deploy yaml 수정
@@ -68,7 +59,9 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     // Step 1. Nginx Ingress Controller 배포
     mainMaster.cmd = this._step1();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish installing nginx ingress controller main Master... ######');
+    console.debug(
+      '###### Finish installing nginx ingress controller main Master... ######'
+    );
   }
 
   private _step0() {
@@ -124,13 +117,16 @@ export default class IngressControllerInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.debug('@@@@@@ Start remove nginx ingress controller main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start remove nginx ingress controller main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.debug('###### Finish remove nginx ingress controller main Master... ######');
+    console.debug(
+      '###### Finish remove nginx ingress controller main Master... ######'
+    );
   }
-
 
   private _getRemoveScript(): string {
     return `
@@ -158,7 +154,7 @@ export default class IngressControllerInstaller extends AbstractInstaller {
   // }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { callback: any; }) {
+  protected async _preWorkInstall(param: { callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
@@ -190,25 +186,41 @@ export default class IngressControllerInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${IngressControllerInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${IngressControllerInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${IngressControllerInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {
@@ -250,6 +262,6 @@ export default class IngressControllerInstaller extends AbstractInstaller {
     export NGINX_INGRESS_VERSION=${IngressControllerInstaller.NGINX_INGRESS_VERSION};
     export KUBE_WEBHOOK_CERTGEN_VERSION=v${IngressControllerInstaller.KUBE_WEBHOOK_CERTGEN_VERSION};
     export REGISTRY=${this.env.registry};
-    `
+    `;
   }
 }

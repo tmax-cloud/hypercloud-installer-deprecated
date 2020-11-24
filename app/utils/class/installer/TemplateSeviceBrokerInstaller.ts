@@ -1,27 +1,17 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './ingressControllerInstaller';
 
 export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `template-service-broker-install`;
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/TemplateServiceBroker`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TemplateSeviceBrokerInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${TemplateSeviceBrokerInstaller.IMAGE_DIR}`;
 
-  public static readonly VERSION=`4.0.0.5`;
+  public static readonly VERSION = `4.0.0.5`;
 
   // singleton
   private static instance: TemplateSeviceBrokerInstaller;
@@ -37,8 +27,8 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { callback: any; setProgress: Function }) {
+    const { callback } = param;
 
     await this._preWorkInstall({
       callback
@@ -52,7 +42,9 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing template service broker main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing template service broker main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. TemplateServiceBroker Namespace 및 ServiceAccount 생성
@@ -75,7 +67,9 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step5();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing template service broker main Master... ######');
+    console.debug(
+      '###### Finish installing template service broker main Master... ######'
+    );
   }
 
   private _step1() {
@@ -101,9 +95,9 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
   }
 
   private _step3() {
-    let script=``;
+    let script = ``;
     if (this.env.registry) {
-      script+=`
+      script += `
       sed -i 's| tmaxcloudck| '${this.env.registry}'|g' tsb_deployment.yaml;
       `;
     }
@@ -122,7 +116,6 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
   }
 
   private _step5() {
-
     return `
     cd ~/${TemplateSeviceBrokerInstaller.INSTALL_HOME}/yaml_install;
     export SERVICE_BROKER_EXTERNAL_IP=\`kubectl get svc -n tsb-ns -o jsonpath='{.items[?(@.metadata.name=="template-service-broker-service")].status.loadBalancer.ingress[0].ip}'\`;
@@ -195,25 +188,41 @@ export default class TemplateSeviceBrokerInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${TemplateSeviceBrokerInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${TemplateSeviceBrokerInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${TemplateSeviceBrokerInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

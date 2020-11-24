@@ -18,24 +18,16 @@ import {
 } from '@material-ui/core';
 // import { KubeInstallContext } from './InstallContentsKubernetes';
 import CloseIcon from '@material-ui/icons/Close';
-import { type } from 'os';
 import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
-import { NETWORK_TYPE } from '../../../utils/class/Env';
 
 function InstallContentsPrometheus2(props: any) {
   console.debug(InstallContentsPrometheus2.name, props);
   const { history, match, state, setState } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
 
   // whether to use PVC
   const [isUsePvc, setIsUsePvc] = React.useState('true');

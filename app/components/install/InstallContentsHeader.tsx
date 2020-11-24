@@ -1,18 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styles from './InstallContentsHeader.css';
-// import { InstallPageContext } from '../../containers/InstallPage';
-import CONST from '../../utils/constants/constant';
-import { AppContext } from '../../containers/HomePage';
-import routes from '../../utils/constants/routes.json';
 
 function InstallContentsHeader(props: any) {
   console.debug(InstallContentsHeader.name, props);
-  // const installPageContext = useContext(InstallPageContext);
-  // const { installPageState } = installPageContext;
-  const { history, location, match } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
+  const { location } = props;
 
   const getComponent = () => {
     let component;

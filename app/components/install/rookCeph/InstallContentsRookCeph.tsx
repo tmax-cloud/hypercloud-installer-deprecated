@@ -9,22 +9,9 @@ import InstallContentsRookCephAlready from './InstallContentsRookCephAlready';
 import InstallKubePlease from '../InstallKubePlease';
 import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
 
-// const initialState = {
-//   version: '1.17.3',
-//   registry: '',
-//   page: 1
-// };
-// export const KubeInstallContext = React.createContext(initialState);
-// const reducer = (state, action) => {
-//   return { ...state, ...action };
-// };
-
 function InstallContentsRookCeph(props: any) {
   console.debug(InstallContentsRookCeph.name, props);
   const { history, location, match } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
 
   const [state, setState] = useState({
     version: RookCephInstaller.CEPH_VERSION
@@ -42,50 +29,8 @@ function InstallContentsRookCeph(props: any) {
     mdsMemory: ''
   });
 
-  // const [kubeInstallState, dispatchKubeInstall] = useReducer(
-  //   reducer,
-  //   initialState
-  // );
-
-  // const getComponent = () => {
-  //   let component;
-
-  //   // 설치 여부 판단
-  //   let isInstalled = false;
-  //   for (let i = 0; i < appState.nowEnv.productList.length; i += 1) {
-  //     const target = appState.nowEnv.productList[i];
-  //     if (target.name === CONST.PRODUCT.KUBERNETES.NAME) {
-  //       isInstalled = true;
-  //       break;
-  //     }
-  //   }
-
-  //   if (!isInstalled) {
-  //     if (kubeInstallState.page === 1) {
-  //       component = <InstallContentsRookCeph1 />;
-  //     } else if (kubeInstallState.page === 2) {
-  //       component = <InstallContentsRookCeph2 />;
-  //     } else if (kubeInstallState.page === 3) {
-  //       component = <InstallContentsRookCeph3 />;
-  //     } else if (kubeInstallState.page === 4) {
-  //       component = <InstallContentsRookCeph4 history={history} />;
-  //     }
-  //   } else {
-  //     component = <InstallContentsRookCephAlready />;
-  //   }
-
-  //   return component;
-  // };
-
   return (
-    // <KubeInstallContext.Provider
-    //   value={{
-    //     kubeInstallState,
-    //     dispatchKubeInstall
-    //   }}
-    // >
     <div className={['childUpDownCenter', styles.wrap].join(' ')}>
-      {/* {getComponent()} */}
       <Switch>
         <Route
           path={`${match.path}/step1`}
@@ -139,7 +84,6 @@ function InstallContentsRookCeph(props: any) {
         />
       </Switch>
     </div>
-    // </KubeInstallContext.Provider>
   );
 }
 

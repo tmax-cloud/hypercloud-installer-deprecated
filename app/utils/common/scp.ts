@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable global-require */
 import Node from '../class/Node';
 
 export function sendFile(node: Node, srcPath: string, destPath: string) {

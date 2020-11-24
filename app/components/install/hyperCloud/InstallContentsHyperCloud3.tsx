@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -19,7 +18,6 @@ import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperClou
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
-import * as Common from '../../../utils/common/common';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsHyperCloud3(props: any) {
@@ -165,22 +163,6 @@ function InstallContentsHyperCloud3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"

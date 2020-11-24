@@ -1,19 +1,10 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import ScriptHyperAuthFactory from '../script/ScriptHyperAuthFactory';
-import CentosHyperAuthScript from '../script/CentosHyperAuthScript';
 import * as Common from '../../common/common';
 import Node from '../Node';
 
@@ -22,11 +13,11 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/HyperAuth`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}`;
 
-  public static readonly POSTGRES_VERSION=`9.6.2-alpine`;
+  public static readonly POSTGRES_VERSION = `9.6.2-alpine`;
 
-  public static readonly HYPERAUTH_VERSION=`1.0.5.6`;
+  public static readonly HYPERAUTH_VERSION = `1.0.5.6`;
 
   // singleton
   private static instance: HyperAuthInstaller;
@@ -42,7 +33,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
+  public async install(param: { callback: any; setProgress: Function }) {
     const { callback, setProgress } = param;
 
     setProgress(10);
@@ -58,8 +49,12 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await this._removeMainMaster();
   }
 
-  public async realmImport(param: { state: any, callback: any; setProgress: Function; }) {
-    const { state, callback, setProgress } = param;
+  public async realmImport(param: {
+    state: any;
+    callback: any;
+    setProgress: Function;
+  }) {
+    const { state, callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // FIXME: targetEmail, targetPassword 값 변경 될 가능성 있음
@@ -77,7 +72,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     sed -i 's/${targetPassword}/${newPassword}/g' tmaxRealmImport.sh;
     chmod 755 tmaxRealmImport.sh;
     ./tmaxRealmImport.sh \${HYPERAUTH_SERVICE_IP} \${HYPERCLOUD_CONSOLE_IP};
-    `
+    `;
     await mainMaster.exeCmd(callback);
   }
 
@@ -133,8 +128,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   private _cpSSLtoMaster() {
     const { masterArr } = this.env.getNodesSortedByRole();
-    let copyScript='';
-    masterArr.map((master)=>{
+    let copyScript = '';
+    masterArr.map(master => {
       copyScript += `sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./hyperauth.crt ${master.user}@${master.ip}:/etc/kubernetes/pki/hyperauth.crt;`;
     });
 
@@ -162,9 +157,12 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd({
       close: () => {},
       stdout: (data: string) => {
-        hyperAuthServiceIp = data.toString().replace(/\r/g, "").replace(/\n/g, "");
+        hyperAuthServiceIp = data
+          .toString()
+          .replace(/\r/g, '')
+          .replace(/\n/g, '');
       },
-      stderr: () => {},
+      stderr: () => {}
     });
 
     // FIXME:
@@ -181,23 +179,31 @@ export default class HyperAuthInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         apiServerYaml = YAML.parse(data.toString());
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     // console.error('before apiServerYaml', apiServerYaml);
-    apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`)
-    apiServerYaml.spec.containers[0].command.push(`--oidc-client-id=hypercloud4`)
-    apiServerYaml.spec.containers[0].command.push(`--oidc-username-claim=preferred_username`)
-    apiServerYaml.spec.containers[0].command.push(`--oidc-username-prefix=-`)
-    apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`)
-    apiServerYaml.spec.containers[0].command.push(`--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`)
+    apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`);
+    apiServerYaml.spec.containers[0].command.push(
+      `--oidc-client-id=hypercloud4`
+    );
+    apiServerYaml.spec.containers[0].command.push(
+      `--oidc-username-claim=preferred_username`
+    );
+    apiServerYaml.spec.containers[0].command.push(`--oidc-username-prefix=-`);
+    apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`);
+    apiServerYaml.spec.containers[0].command.push(
+      `--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`
+    );
 
     // console.error('after apiServerYaml', YAML.stringify(apiServerYaml));
     mainMaster.cmd = `
     # export hyperAuthServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     # echo $hyperAuthServiceIp;
-    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+    echo "${YAML.stringify(
+      apiServerYaml
+    )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
     sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://${hyperAuthServiceIp}/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
-    `
+    `;
     await mainMaster.exeCmd();
 
     await Common.waitApiServerUntilNomal(mainMaster);
@@ -211,35 +217,47 @@ export default class HyperAuthInstaller extends AbstractInstaller {
           stdout: (data: string) => {
             apiServerYaml = YAML.parse(data.toString());
           },
-          stderr: () => {},
+          stderr: () => {}
         });
         // console.error('before apiServerYaml', apiServerYaml);
-        apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`)
-        apiServerYaml.spec.containers[0].command.push(`--oidc-client-id=hypercloud4`)
-        apiServerYaml.spec.containers[0].command.push(`--oidc-username-claim=preferred_username`)
-        apiServerYaml.spec.containers[0].command.push(`--oidc-username-prefix=-`)
-        apiServerYaml.spec.containers[0].command.push(`--oidc-groups-claim=group`)
-        apiServerYaml.spec.containers[0].command.push(`--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`)
+        apiServerYaml.spec.containers[0].command.push(`%%--oidc-issuer-url%%`);
+        apiServerYaml.spec.containers[0].command.push(
+          `--oidc-client-id=hypercloud4`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--oidc-username-claim=preferred_username`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--oidc-username-prefix=-`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--oidc-groups-claim=group`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--oidc-ca-file=/etc/kubernetes/pki/hyperauth.crt`
+        );
 
         // console.error('after apiServerYaml', YAML.stringify(apiServerYaml));
         master.cmd = `
         # export hyperAuthServiceIp=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
         # echo $hyperAuthServiceIp;
-        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        echo "${YAML.stringify(
+          apiServerYaml
+        )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
         sudo sed -i "s|%%--oidc-issuer-url%%|--oidc-issuer-url=https://${hyperAuthServiceIp}/auth/realms/tmax|g" /etc/kubernetes/manifests/kube-apiserver.yaml;
-        `
+        `;
         await master.exeCmd();
       })
     );
   }
 
-  private async rollbackApiServerYaml(targetList:Node[]) {
+  private async rollbackApiServerYaml(targetList: Node[]) {
     // const { mainMaster } = this.env.getNodesSortedByRole();
 
     console.error(targetList);
 
     await Promise.all(
-      targetList.map(async (node)=>{
+      targetList.map(async node => {
         node.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
         let apiServerYaml;
         await node.exeCmd({
@@ -247,27 +265,31 @@ export default class HyperAuthInstaller extends AbstractInstaller {
           stdout: (data: string) => {
             apiServerYaml = YAML.parse(data.toString());
           },
-          stderr: () => {},
+          stderr: () => {}
         });
-        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
-          return cmd.indexOf("--oidc") === -1;
-        })
+        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter(
+          (cmd: string | string[]) => {
+            return cmd.indexOf('--oidc') === -1;
+          }
+        );
 
         node.cmd = `
-        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-        `
+        echo "${YAML.stringify(
+          apiServerYaml
+        )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `;
         await node.exeCmd();
 
         // oidc 부분 삭제하고 다시 넣어주기 때문에
         // api 서버 정상동작 확인할 필요 없음
         // await Common.waitApiServerUntilNomal(node);
       })
-    )
+    );
   }
 
   private async _removeMainMaster() {
     console.debug('@@@@@@ Start remove main Master... @@@@@@');
-    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
+    const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
 
@@ -291,7 +313,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     \\cp -r ~/${HyperAuthInstaller.INSTALL_HOME}/manifest ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
-    `
+    `;
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish copy yaml file... ######');
   }
@@ -320,25 +342,41 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperAuthInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${HyperAuthInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${HyperAuthInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {
@@ -373,5 +411,4 @@ export default class HyperAuthInstaller extends AbstractInstaller {
       #rm -rf $HYPERAUTH_HOME;
       `;
   }
-
 }

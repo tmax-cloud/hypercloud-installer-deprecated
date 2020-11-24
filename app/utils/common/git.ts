@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable global-require */
 import simpleGit, { SimpleGit } from 'simple-git';
 
 export async function clone(repoPath: string, localPath: string, option: any) {

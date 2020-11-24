@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 /**
  * @description 랜덤 문자열 생성 함수
  */

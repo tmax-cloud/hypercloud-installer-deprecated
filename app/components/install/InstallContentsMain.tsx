@@ -1,14 +1,11 @@
-/* eslint-disable import/no-cycle */
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Grid, Paper, TextField, Tooltip } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { History, Location } from 'history';
+import { History } from 'history';
 import * as router from 'react-router';
 import styles from './InstallContentsMain.css';
 import CONST from '../../utils/constants/constant';
-import { AppContext } from '../../containers/HomePage';
-import routes from '../../utils/constants/routes.json';
 import * as env from '../../utils/common/env';
 import * as product from '../../utils/common/product';
 import CloudImage from '../../../resources/assets/ic_logo_hypercloud_blue.svg';
@@ -23,33 +20,29 @@ import TektonImage from '../../../resources/assets/Tekton_logo.png';
 // import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
-    root: {
-      flexGrow: 1
-    },
+    // root: {
+    //   flexGrow: 1
+    // },
     paper: {
       height: 220,
       width: 220
-    },
-    control: {
-      padding: theme.spacing(2)
     }
+    // control: {
+    //   padding: theme.spacing(2)
+    // }
   })
 );
 
 type Props = {
   history: History;
   match: router.match;
-  location: Location;
   setClicked: Function;
 };
 
-function InstallContentsMain({ history, location, match, setClicked }: Props) {
+function InstallContentsMain({ history, match, setClicked }: Props) {
   console.debug(InstallContentsMain.name);
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -76,21 +69,6 @@ function InstallContentsMain({ history, location, match, setClicked }: Props) {
 
   const classes = useStyles();
 
-  // const goProductInstallPage = (name: string) => {
-  //   console.debug('goProductInstallPage');
-  //   if (name === CONST.PRODUCT.KUBERNETES.NAME) {
-  //     if (env.isInstalled(name, nowEnv)) {
-  //       history.push(
-  //         `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/already`
-  //       );
-  //     } else {
-  //       history.push(
-  //       `${routes.INSTALL.HOME}/${nowEnv.name}/kubernetes/step1`
-  //       );
-  //     }
-  //   }
-  // };
-
   const getInstalledImage = (productName: string) => {
     if (nowEnv.isInstalled(productName)) {
       return (
@@ -104,7 +82,6 @@ function InstallContentsMain({ history, location, match, setClicked }: Props) {
   };
 
   const getInstalledLogo = (productName: string) => {
-    const path = `../resources/assets/${productName}_logo.png`;
     let image = null;
     if (productName === CONST.PRODUCT.KUBERNETES.NAME) {
       image = KubernetesImage;
@@ -180,7 +157,7 @@ function InstallContentsMain({ history, location, match, setClicked }: Props) {
             setSearchText(e.target.value);
             // hasIpError(e.target.value);
           }}
-          onBlur={e => {
+          onBlur={() => {
             // hasUserError(e.target.value);
           }}
           // error={userError.length !== 0}
@@ -193,10 +170,8 @@ function InstallContentsMain({ history, location, match, setClicked }: Props) {
             {requiredProduct.map((P, index) => {
               // Kubernetes 이외 제품은
               // Kubernetes 가 설치되어야만 설치 가능
-              let disabled = false;
               if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
                 if (!nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)) {
-                  disabled = true;
                 }
               }
               return (

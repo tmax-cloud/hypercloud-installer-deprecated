@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -8,7 +7,6 @@ import {
   DialogContentText,
   DialogActions
 } from '@material-ui/core';
-// import { InstallPageContext } from '../../containers/InstallPage';
 import styles from '../InstallContents3.css';
 import ProgressBar from '../../ProgressBar';
 import routes from '../../../utils/constants/routes.json';
@@ -20,9 +18,6 @@ const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsMetalLb3(props: any) {
   console.debug(InstallContentsMetalLb3.name, props);
   const { history, match, state } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -112,22 +107,6 @@ function InstallContentsMetalLb3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"

@@ -1,6 +1,3 @@
-/* eslint-disable new-cap */
-/* eslint-disable global-require */
-/* eslint-disable no-console */
 import Node from '../class/Node';
 
 interface SendCb {

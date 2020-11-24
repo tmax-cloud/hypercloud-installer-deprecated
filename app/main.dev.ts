@@ -60,11 +60,13 @@ const createWindow = async () => {
     frame: false,
     // backgroundColor: '#363A41',
     show: false,
+    // 초기 크기
     width: 1024,
     height: 768,
+    // 최소 크기
     minWidth: 1024,
     minHeight: 768,
-    icon: path.join(__dirname, './resource/assets/test.png'),
+    // icon: path.join(__dirname, './resource/assets/test.png'),
     // webPreferences:
     //   process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
     //     ? {

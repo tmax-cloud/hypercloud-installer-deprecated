@@ -1,12 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-console */
-/* eslint-disable global-require */
 import { remote } from 'electron';
-import { rootPath } from 'electron-root-path';
 import path from 'path';
-import { ROLE } from '../class/Node';
 import Env from '../class/Env';
-import * as product from './product';
 
 /**
  * 파일 작업은 모두 sync로 수행

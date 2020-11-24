@@ -9,10 +9,7 @@ import CONST from '../../../utils/constants/constant';
 
 function InstallContentsKubernetes1(props: any) {
   console.debug(InstallContentsKubernetes1.name, props);
-  const { history, location, match } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
+  const { history, match } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -70,9 +67,6 @@ function InstallContentsKubernetes1(props: any) {
               className={['primary'].join(' ')}
               size="large"
               onClick={() => {
-                // dispatchKubeInstall({
-                //   page: 2
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step2`
                 );
@@ -82,18 +76,6 @@ function InstallContentsKubernetes1(props: any) {
             </Button>
           </div>
         </div>
-        {/* <button
-          type="button"
-          onClick={() => {
-            abc();
-          }}
-        >
-          test
-        </button>
-        <span>{cnt}</span>
-        <textarea value={stdout} disabled />
-        <textarea value={stderr} disabled />
-        <LinearProgressWithLabel value={progress} /> */}
       </div>
     </div>
   );

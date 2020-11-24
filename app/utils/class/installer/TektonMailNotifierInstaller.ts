@@ -1,28 +1,18 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './ingressControllerInstaller';
 
 export default class TektonMailNotifierInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `mail-install`;
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/${TektonMailNotifierInstaller.IMAGE_DIR}`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${TektonMailNotifierInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${TektonMailNotifierInstaller.IMAGE_DIR}`;
 
   // TODO: version 처리 안됨
-  public static readonly VERSION=`0.0.4`;
+  public static readonly VERSION = `0.0.4`;
 
   // singleton
   private static instance: TektonMailNotifierInstaller;
@@ -38,8 +28,8 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { callback: any; setProgress: Function }) {
+    const { callback } = param;
 
     await this._preWorkInstall({
       callback
@@ -53,7 +43,9 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing mail-notifier main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing mail-notifier main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. SMTP 서버 설정
@@ -64,7 +56,9 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step2();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing mail-notifier main Master... ######');
+    console.debug(
+      '###### Finish installing mail-notifier main Master... ######'
+    );
   }
 
   private _step1() {
@@ -186,26 +180,42 @@ export default class TektonMailNotifierInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${TektonMailNotifierInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${TektonMailNotifierInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${TektonMailNotifierInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

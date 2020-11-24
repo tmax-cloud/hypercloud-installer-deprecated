@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
-/* eslint-disable no-underscore-dangle */
-
 import Env from './Env';
 
 export default class Data {
