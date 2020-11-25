@@ -1,8 +1,11 @@
-import { useContext } from 'react';
 import CONST from '../constants/constant';
-import * as env from './env';
 import routes from '../constants/routes.json';
 
+/**
+ * @description constant 파일에서 필수 제품만 필터링 해서 리턴해주는 함수
+ *
+ * @return 필수 제품의 key(이름)를 배열로 리턴
+ */
 export function getRequiredProduct() {
   const result: any[] = [];
 
@@ -15,6 +18,11 @@ export function getRequiredProduct() {
   return result;
 }
 
+/**
+ * @description constant 파일에서 호환 제품만 필터링 해서 리턴해주는 함수
+ *
+ * @return 호환 제품의 key(이름)를 배열로 리턴
+ */
 export function getOptionalProduct() {
   const result: any[] = [];
 
@@ -27,7 +35,11 @@ export function getOptionalProduct() {
   return result;
 }
 
+/**
+ * @description 각 제품 설치 페이지로 이동해주는 함수
+ */
 export function goProductInstallPage(productName: string, nowEnv, history) {
+  // 이미 설치 되어 있는 경우
   if (nowEnv.isInstalled(productName)) {
     history.push(
       `${routes.INSTALL.HOME}/${nowEnv.name}/${productName}/already`

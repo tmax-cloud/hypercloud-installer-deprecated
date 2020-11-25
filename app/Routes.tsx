@@ -8,7 +8,6 @@ export default function Routes() {
   return (
     <App>
       <Switch>
-        {/* <Route path={routes.COUNTER} component={CounterPage} /> */}
         <Route path={routes.HOME} component={HomePage} />
       </Switch>
     </App>

@@ -66,6 +66,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     mainMaster.cmd = `
     export HYPERAUTH_SERVICE_IP=\`kubectl describe service hyperauth -n hyperauth | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
     export HYPERCLOUD_CONSOLE_IP=\`kubectl describe service console-lb -n console-system | grep 'LoadBalancer Ingress' | cut -d ' ' -f7\`;
+    # \\cp ~/${HyperAuthInstaller.INSTALL_HOME}/manifest/tmaxRealmImport.sh ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy/tmaxRealmImport.sh;
     cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
     sed -i 's|\\r$||g' tmaxRealmImport.sh;
     sed -i 's/${targetEmail}/${newEmail}/g' tmaxRealmImport.sh;

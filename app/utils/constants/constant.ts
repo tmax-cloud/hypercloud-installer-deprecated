@@ -1,3 +1,4 @@
+// 상수들 저장 객체
 const CONST = {
   GIT_REPO: 'https://github.com/tmax-cloud/hypercloud-install-guide.git',
   GIT_BRANCH: '4.1',

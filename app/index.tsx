@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   new Titlebar({
     // backgroundColor: Color.fromHex('#fff'),
     icon: MasterImage,
-    menu: null,
+    menu: null
   });
   render(
     <AppContainer>

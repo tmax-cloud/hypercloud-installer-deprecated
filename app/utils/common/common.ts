@@ -3,6 +3,8 @@ import Node from '../class/Node';
 
 /**
  * @description 랜덤 문자열 생성 함수
+ *
+ * @return 랜덤 문자열
  */
 export function getRandomString() {
   return Math.random()
@@ -11,10 +13,12 @@ export function getRandomString() {
 }
 
 /**
+ * @description byte -> gigabyte 변경 함수
  *
- * @param
+ * @param byte
+ *
+ * @return gigabyte
  */
-
 export function ChangeByteToGigaByte(byte: number) {
   let gigaByte = byte / (1024 * 1024 * 1024);
 
@@ -28,16 +32,25 @@ export function ChangeByteToGigaByte(byte: number) {
   return gigaByte;
 }
 
+/**
+ * @description api server 정상 응답 확인 함수
+ *
+ * @param mainMaster main master Node 객체
+ *
+ * @return
+ */
 export async function waitApiServerUntilNomal(mainMaster: Node) {
   return new Promise(resolve => {
     let count = 0;
     const timerid = setInterval(async () => {
+      // kubectl get node를 api server의 health check command로 사용
       mainMaster.cmd = `
       kubectl get node;
       echo $?;
       `;
       count += 1;
       if (count > 30) {
+        // 30번 이상 요청 시 timeout
         clearInterval(timerid);
         resolve();
       } else {
@@ -53,10 +66,19 @@ export async function waitApiServerUntilNomal(mainMaster: Node) {
         });
       }
       console.log(count);
+      // 5초마다
     }, 5000);
   });
 }
 
+/**
+ * @description main master의 yaml파일을 읽어 yaml객체로 리턴해주는 함수
+ *
+ * @param yamlFilePath yaml file path
+ * @param mainMaster main master Node 객체
+ *
+ * @return yaml 객체
+ */
 export async function getYamlObjectByYamlFilePath(
   yamlFilePath: string,
   mainMaster: Node
@@ -76,6 +98,15 @@ export async function getYamlObjectByYamlFilePath(
   return yamlObject;
 }
 
+/**
+ * @description yaml object를 main master의 yaml file에 쓰는 함수
+ *
+ * @param yamlFilePath yaml file path
+ * @param mainMaster main master Node 객체
+ * @param yamlObject yaml object
+ *
+ * @return yaml 객체
+ */
 export async function setYamlObjectByYamlFilePath(
   yamlFilePath: string,
   mainMaster: Node,
@@ -85,6 +116,13 @@ export async function setYamlObjectByYamlFilePath(
   await mainMaster.exeCmd();
 }
 
+/**
+ * @description yaml 파일 복사
+ *
+ * @param filePath 복사 할 yaml 파일
+ *
+ * @return yaml 파일 복사 command
+ */
 export function getCopyCommandByFilePath(filePath: string) {
   // 맨 앞에 \ 넣어주어야 강제 복사 가능
   const lastIndexOfDot = filePath.lastIndexOf('.');
@@ -92,6 +130,13 @@ export function getCopyCommandByFilePath(filePath: string) {
   return `\\cp ${filePath} ${copyFilePath};`;
 }
 
+/**
+ * @description yaml 파일 이동
+ *
+ * @param filePath 이동 할 yaml 파일
+ *
+ * @return yaml 파일 이동 command
+ */
 export function getDeleteDuplicationCommandByFilePath(filePath: string) {
   // 맨 앞에 \ 넣어주어야 강제 복사 가능
   const lastIndexOfSlash = filePath.lastIndexOf('/');

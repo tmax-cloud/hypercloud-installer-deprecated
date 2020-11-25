@@ -62,56 +62,19 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
 
   const classes = useStyles();
 
-  // const [clicked, setClicked] = React.useState('');
-
-  const [open] = React.useState(true);
-  const handleClick = () => {
-    // setOpen(!open);
-  };
-
   const handleChange = e => {
     history.push(`${routes.INSTALL.HOME}/${e.target.value}`);
   };
 
-  const getItem = (productName: string, disabled: boolean) => {
-    // Kubernetes가 설치 되지 않으면 disabled === true
-    if (disabled) {
-      return (
-        <div className={['childLeftRightLeft', 'childUpDownCenter'].join(' ')}>
-          <div>
-            <ListItemText primary={productName} />
-          </div>
-          {/* <Tooltip
-            title="Kubernetes를 설치하셔야 설치할 수 있습니다."
-            placement="right"
-          >
-            <HelpOutlineIcon fontSize="small" />
-          </Tooltip> */}
-          <div />
-        </div>
-      );
-    }
-    return <ListItemText primary={productName} />;
-  };
-
-  // 설치 여부 이미지 표시 해주는 함수
-  const getInstalledImage = (productName: string) => {
-    if (nowEnv.isInstalled(productName)) {
-      return (
-        <img src={InstalledImage} alt="Logo" style={{ marginRight: '5px' }} />
-      );
-    }
-    return '';
-  };
-
-  // stepper 관련
+  /**
+   * stepper 관련 함수들
+   */
   function getSteps() {
     const result = requiredProduct.map(p => {
       return p.NAME;
     });
     return result;
   }
-
 
   const steps = getSteps();
 
@@ -140,7 +103,7 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
         <Select native value={nowEnv.name} onChange={handleChange}>
           {env.loadEnvList().map((e: any) => {
             return (
-              <option style={{ color: 'black' }} key={e.name} value={e.name}>
+              <option key={e.name} value={e.name}>
                 {e.name}
               </option>
             );
@@ -191,148 +154,6 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
             </Step>
           ))}
         </Stepper>
-        <List
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-          subheader={(
-            <ListSubheader
-              component="div"
-              id="nested-list-subheader"
-              className="childUpDownCenter"
-              disableSticky
-              onClick={() => {
-                history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
-              }}
-            >
-              <span style={{ color: 'white' }}>
-                <a>제품 목록</a>
-              </span>
-            </ListSubheader>
-          )}
-          className={classes.root}
-        >
-          <ListItem>
-            {/* <ListItemIcon>
-              <DraftsIcon />
-            </ListItemIcon> */}
-            {nowEnv.isAllRequiredProductInstall() ? (
-              <ListItemText primary="필수 제품" />
-            ) : (
-              <div
-                className={['childLeftRightLeft', 'childUpDownCenter'].join(
-                  ' '
-                )}
-              >
-                <div>
-                  <ListItemText primary="필수 제품" />
-                </div>
-                <Tooltip
-                  title="쿠버네티스 제품을 설치해야 그 외 모듈을 설치할 수 있습니다."
-                  placement="right"
-                >
-                  <HelpOutlineIcon fontSize="small" />
-                </Tooltip>
-                <div />
-              </div>
-            )}
-          </ListItem>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {requiredProduct.map(P => {
-                // Kubernetes 이외 제품은
-                // Kubernetes 가 설치되어야만 설치 가능
-                let disabled = false;
-                if (P.NAME !== CONST.PRODUCT.KUBERNETES.NAME) {
-                  if (!nowEnv.isInstalled(CONST.PRODUCT.KUBERNETES.NAME)) {
-                    disabled = true;
-                  }
-                }
-                return (
-                  <ListItem
-                    key={P.NAME}
-                    button
-                    className={
-                      location.pathname.split('/')[3]?.toLowerCase() ===
-                      P.NAME.toLowerCase()
-                        ? [classes.nested, styles.seletecItemBox].join(' ')
-                        : [classes.nested, styles.listItemBox].join(' ')
-                    }
-                    onClick={() => {
-                      nowEnv = env.loadEnvByName(match.params.envName);
-                      product.goProductInstallPage(P.NAME, nowEnv, history);
-                    }}
-                    // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
-                    // disabled={disabled}
-                  >
-                    {/* <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon> */}
-                    {/* <CheckCircleIcon /> */}
-                    {getInstalledImage(P.NAME)}
-                    {getItem(P.NAME, disabled)}
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Collapse>
-          <ListItem
-            // button
-            onClick={handleClick}
-          >
-            {/* <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon> */}
-            {nowEnv.isAllRequiredProductInstall() ? (
-              <ListItemText primary="호환 제품" />
-            ) : (
-              <div
-                className={['childLeftRightLeft', 'childUpDownCenter'].join(
-                  ' '
-                )}
-              >
-                <div>
-                  <ListItemText primary="호환 제품" />
-                </div>
-                <Tooltip
-                  title="필수제품을 설치하셔야 호환제품을 설치할 수 있습니다."
-                  placement="right"
-                >
-                  <HelpOutlineIcon fontSize="small" />
-                </Tooltip>
-                <div />
-              </div>
-            )}
-
-            {/* {open ? <ExpandLess /> : <ExpandMore />} */}
-          </ListItem>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {optionalProduct.map(P => (
-                <ListItem
-                  key={P.NAME}
-                  button
-                  className={
-                    location.pathname.split('/')[3]?.toLowerCase() ===
-                    P.NAME.toLowerCase()
-                      ? [classes.nested, styles.seletecItemBox].join(' ')
-                      : [classes.nested, styles.listItemBox].join(' ')
-                  }
-                  onClick={() => {
-                    product.goProductInstallPage(P.NAME, nowEnv, history);
-                  }}
-                  // XXX:disabled 상태 없이 진행 (수동으로 환경에 직접 설치 시, 인스톨러에서 설치 여부 판단 어려움)
-                  // disabled={!nowEnv.isAllRequiredProductInstall()}
-                >
-                  {/* <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon> */}
-                  {getInstalledImage(P.NAME)}
-                  <ListItemText primary={P.NAME} />
-                </ListItem>
-              ))}
-            </List>
-          </Collapse>
-        </List>
       </div>
     </div>
   );

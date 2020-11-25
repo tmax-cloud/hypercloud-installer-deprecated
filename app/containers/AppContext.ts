@@ -1,5 +1,6 @@
 import React from 'react';
 
+// app 전체에서 사용 될, context
 export const AppContext = React.createContext({});
 
 export const initialState = {
