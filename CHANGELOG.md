@@ -1,3 +1,14 @@
+# v4.1.6 (2020.11.26)
+### Features
+ - No changes
+ 
+### Fixes
+ - hypercloud 재설치 경우, admin user 로그인 안되는 현상 수정 (IMS: 245904)
+ - rook-ceph 설치 화면에서, cpu,memory 설정 시, 선택한 disk 초기화 되는 현상 수정
+ - Tekton CI/CI Template version 수정 (4.1.4.6 -> 1.1.5)
+
+---
+
 # v4.1.5 (2020.11.19)
 ### Features
  - Install Page 검색 기능 추가
