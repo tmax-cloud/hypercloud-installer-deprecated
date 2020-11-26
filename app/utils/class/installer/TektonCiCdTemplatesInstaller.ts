@@ -11,7 +11,7 @@ export default class TektonCiCdTemplatesInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${TektonCiCdTemplatesInstaller.IMAGE_DIR}`;
 
-  public static readonly VERSION = `4.1.4.6`;
+  public static readonly VERSION = `1.1.5`;
 
   // singleton
   private static instance: TektonCiCdTemplatesInstaller;
