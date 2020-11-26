@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
   Button,
@@ -7,15 +6,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton,
-  makeStyles,
-  Theme,
-  createStyles
-} from '@material-ui/core';
+  IconButton} from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
-import { AppContext } from '../../../containers/HomePage';
+import { AppContext } from '../../../containers/AppContext';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/HyperCloud Operator_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
@@ -24,28 +19,9 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    // buttonSuccess: {
-    //   backgroundColor: green[500],
-    //   '&:hover': {
-    //     backgroundColor: green[700]
-    //   }
-    // },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -40,
-      marginLeft: -40
-    }
-  })
-);
-
 function InstallContentsHyperAuthAlready(props: any) {
   console.debug(InstallContentsHyperAuthAlready.name, props);
   const { history, match } = props;
-
 
   const appContext = useContext(AppContext);
   const { dispatchAppState } = appContext;
@@ -53,9 +29,6 @@ function InstallContentsHyperAuthAlready(props: any) {
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.HYPERAUTH;
-
-  // loading bar
-  // const [loading, setLoading] = React.useState(false);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -76,7 +49,6 @@ function InstallContentsHyperAuthAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.HYPERAUTH.NAME);
 
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
@@ -121,14 +93,6 @@ function InstallContentsHyperAuthAlready(props: any) {
             </MuiBox>
           </div>
           <div>
-            {/* <div>
-              <span className={['medium', 'thick'].join(' ')}>타입</span>
-            </div>
-            <div>
-              <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).type}
-              </span>
-            </div> */}
           </div>
           <div>
             <div>

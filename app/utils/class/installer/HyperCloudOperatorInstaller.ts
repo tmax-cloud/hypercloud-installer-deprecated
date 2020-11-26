@@ -1,18 +1,8 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './IngressControllerInstaller';
 import SecretWatcherInstaller from './SecretWatcherInstaller';
 import IngressControllerSharedInstaller from './IngressControllerSharedInstaller';
 import IngressControllerSystemInstaller from './IngressControllerSystemInstaller';
@@ -22,9 +12,9 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
 
-  public static readonly HPCD_VERSION=`4.1.1.0`;
+  public static readonly HPCD_VERSION = `4.1.1.0`;
 
   // singleton
   private static instance: HyperCloudOperatorInstaller;
@@ -40,7 +30,11 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { state: any, callback: any; setProgress: Function; }) {
+  public async install(param: {
+    state: any;
+    callback: any;
+    setProgress: Function;
+  }) {
     const { state, callback, setProgress } = param;
 
     await this._preWorkInstall({
@@ -48,16 +42,18 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     });
 
     if (state.isUseIngress) {
-      if (state.sharedIngress){
-        const ingressControllerSharedInstaller = IngressControllerSharedInstaller.getInstance;
+      if (state.sharedIngress) {
+        const ingressControllerSharedInstaller =
+          IngressControllerSharedInstaller.getInstance;
         ingressControllerSharedInstaller.env = this.env;
         await ingressControllerSharedInstaller.install({
           callback,
           setProgress
         });
       }
-      if(state.systemIngress){
-        const ingressControllerSystemInstaller = IngressControllerSystemInstaller.getInstance;
+      if (state.systemIngress) {
+        const ingressControllerSystemInstaller =
+          IngressControllerSystemInstaller.getInstance;
         ingressControllerSystemInstaller.env = this.env;
         await ingressControllerSystemInstaller.install({
           callback,
@@ -89,16 +85,20 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
     // ingress controller 삭제
     // FIXME: 현재 shared, system 둘 다 삭제함
-    const ingressControllerSystemInstaller = IngressControllerSystemInstaller.getInstance;
+    const ingressControllerSystemInstaller =
+      IngressControllerSystemInstaller.getInstance;
     ingressControllerSystemInstaller.env = this.env;
     await ingressControllerSystemInstaller.remove();
-    const ingressControllerSharedInstaller = IngressControllerSharedInstaller.getInstance;
+    const ingressControllerSharedInstaller =
+      IngressControllerSharedInstaller.getInstance;
     ingressControllerSharedInstaller.env = this.env;
     await ingressControllerSharedInstaller.remove();
   }
 
   private async _installMainMaster(state: any, callback: any) {
-    console.debug('@@@@@@ Start installing hypercloud operator main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing hypercloud operator main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 0. install yaml 수정
@@ -129,7 +129,9 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step6(state);
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing hypercloud operator main Master... ######');
+    console.debug(
+      '###### Finish installing hypercloud operator main Master... ######'
+    );
   }
 
   private _step0() {
@@ -216,11 +218,15 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   }
 
   private async _removeMainMaster() {
-    console.debug('@@@@@@ Start remove hypercloud operator main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start remove hypercloud operator main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getRemoveScript();
     await mainMaster.exeCmd();
-    console.debug('###### Finish remove hypercloud operator main Master... ######');
+    console.debug(
+      '###### Finish remove hypercloud operator main Master... ######'
+    );
   }
 
   private _getRemoveScript(): string {
@@ -292,25 +298,41 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${HyperCloudOperatorInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${HyperCloudOperatorInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

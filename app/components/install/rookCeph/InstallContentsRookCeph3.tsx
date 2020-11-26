@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -20,9 +19,6 @@ const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsRookCeph3(props: any) {
   console.debug(InstallContentsRookCeph3.name, props);
   const { history, match, state, option } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -114,22 +110,6 @@ function InstallContentsRookCeph3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"
@@ -172,9 +152,6 @@ function InstallContentsRookCeph3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step1`
                 );

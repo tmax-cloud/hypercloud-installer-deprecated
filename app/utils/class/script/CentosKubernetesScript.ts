@@ -1,14 +1,13 @@
 /* eslint-disable class-methods-use-this */
-/* eslint-disable prettier/prettier */
 import Node, { ROLE } from '../Node';
 import AbstractCentosScript from './AbstractCentosScript';
 import { InterfaceKubernetesInstall } from './InterfaceKubernetesInstall';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
 import CniInstaller from '../installer/CniInstaller';
 import KubernetesInstaller from '../installer/KubernetesInstaller';
 
-export default class CentosKubernetesScript extends AbstractCentosScript implements InterfaceKubernetesInstall {
+export default class CentosKubernetesScript extends AbstractCentosScript
+  implements InterfaceKubernetesInstall {
   setKubernetesRepo(): string {
     return `
     cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -78,7 +77,9 @@ EOF`;
     const deleteHostName = `sudo sed -i /\`hostname\`/d /etc/hosts`;
     return `
       cd ~/${KubernetesInstaller.INSTALL_HOME};
-      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${
+        Env.INSTALL_ROOT
+      }/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' k8s.config;
       sed -i 's|\\r$||g' install.sh;
@@ -142,7 +143,9 @@ EOF`;
     sudo systemctl status docker;
     chmod 755 run-registry.sh;
     sed -i 's|\\r$||g' run-registry.sh;
-    sudo ./run-registry.sh ~/${KubernetesInstaller.IMAGE_REGISTRY_INSTALL_HOME} ${registry};
+    sudo ./run-registry.sh ~/${
+      KubernetesInstaller.IMAGE_REGISTRY_INSTALL_HOME
+    } ${registry};
     `;
   }
 

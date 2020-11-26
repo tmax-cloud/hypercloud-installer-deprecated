@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   Button,
-  Select,
-  FormControl,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -19,33 +17,9 @@ import * as env from '../../../utils/common/env';
 
 function InstallContentsCni2(props: any) {
   console.debug(InstallContentsCni2.name, props);
-  const { history, match, state, setState } = props;
-
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
+  const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
-
-  // const [version, setVersion] = React.useState(state.version);
-  const handleChangeVersion = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setState((prevState: any) => {
-      return { ...prevState, version: event.target.value as string };
-    });
-    // setVersion(event.target.value as string);
-  };
-
-  // const [type, setType] = React.useState(state.type);
-  const handleChangeType = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setState((prevState: any) => {
-      return { ...prevState, type: event.target.value as string };
-    });
-    // setType(event.target.value as string);
-  };
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -72,25 +46,6 @@ function InstallContentsCni2(props: any) {
           <span className={['medium'].join(' ')}>Version</span>
         </div>
         <div>
-          {/* <FormControl variant="outlined" className={styles.select}>
-            <Select
-              native
-              value={state.version}
-              onChange={handleChangeVersion}
-              inputProps={{
-                name: 'age',
-                id: 'age-native-simple'
-              }}
-            >
-              {CONST.PRODUCT.CNI.SUPPORTED_VERSION.map(v => {
-                return (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                );
-              })}
-            </Select>
-          </FormControl> */}
           <span className={['medium', 'lightDark'].join(' ')}>
             {state.version}
           </span>
@@ -106,10 +61,6 @@ function InstallContentsCni2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   version: state.version,
-            //   type: state.type
-            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CNI.NAME}/step3`
             );

@@ -1,5 +1,5 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React, { useState } from 'react';
+import { Switch, Route } from 'react-router';
 import styles from '../InstallContents0.css';
 import InstallContentsCatalogController1 from './InstallContentsCatalogController1';
 import InstallContentsCatalogController2 from './InstallContentsCatalogController2';
@@ -7,10 +7,6 @@ import InstallContentsCatalogController3 from './InstallContentsCatalogControlle
 import InstallContentsCatalogController4 from './InstallContentsCatalogController4';
 import InstallContentsCatalogControllerAlready from './InstallContentsCatalogControllerAlready';
 import InstallKubePlease from '../InstallKubePlease';
-import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
 function InstallContentsCatalogController(props: any) {

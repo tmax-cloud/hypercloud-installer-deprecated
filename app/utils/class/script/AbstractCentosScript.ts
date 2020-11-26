@@ -1,5 +1,5 @@
-import Env from '../Env';
 /* eslint-disable class-methods-use-this */
+import Env from '../Env';
 import AbstractScript from './AbstractScript';
 
 export default class AbstractCentosScript extends AbstractScript {

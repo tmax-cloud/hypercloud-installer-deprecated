@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
   Button,
@@ -7,47 +6,24 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton,
-  makeStyles,
-  Theme,
-  createStyles
+  IconButton
 } from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
-import { AppContext } from '../../../containers/HomePage';
+import { AppContext } from '../../../containers/AppContext';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/Tekton_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
 import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import TektonApprovalInstaller from '../../../utils/class/installer/TektonApprovalInstaller';
 import TektonCiCdTemplatesInstaller from '../../../utils/class/installer/TektonCiCdTemplatesInstaller';
 import TektonMailNotifierInstaller from '../../../utils/class/installer/TektonMailNotifierInstaller';
 import TektonPipelineInstaller from '../../../utils/class/installer/TektonPipelineInstaller';
 import TektonTriggerInstaller from '../../../utils/class/installer/TektonTriggerInstaller';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    // buttonSuccess: {
-    //   backgroundColor: green[500],
-    //   '&:hover': {
-    //     backgroundColor: green[700]
-    //   }
-    // },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -40,
-      marginLeft: -40
-    }
-  })
-);
 
 function InstallContentsTektonAlready(props: any) {
   console.debug(InstallContentsTektonAlready.name, props);
@@ -59,9 +35,6 @@ function InstallContentsTektonAlready(props: any) {
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.TEKTON;
-
-  // loading bar
-  // const [loading, setLoading] = React.useState(false);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -81,8 +54,6 @@ function InstallContentsTektonAlready(props: any) {
 
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
-
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.TEKTON.NAME);
 
     const tektonPipelineInstaller = TektonPipelineInstaller.getInstance;
     const tektonTriggerInstaller = TektonTriggerInstaller.getInstance;

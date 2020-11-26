@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useContext } from 'react';
 import {
   Button,
@@ -7,15 +6,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton,
-  makeStyles,
-  Theme,
-  createStyles
-} from '@material-ui/core';
+  IconButton} from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';
-import { AppContext } from '../../../containers/HomePage';
+import { AppContext } from '../../../containers/AppContext';
 import CONST from '../../../utils/constants/constant';
 import productImage from '../../../../resources/assets/cni_logo.png';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
@@ -24,28 +19,9 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import CniInstaller from '../../../utils/class/installer/CniInstaller';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    // buttonSuccess: {
-    //   backgroundColor: green[500],
-    //   '&:hover': {
-    //     backgroundColor: green[700]
-    //   }
-    // },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -40,
-      marginLeft: -40
-    }
-  })
-);
-
 function InstallContentsCniAlready(props: any) {
   console.debug(InstallContentsCniAlready.name, props);
   const { history, match } = props;
-
 
   const appContext = useContext(AppContext);
   const { dispatchAppState } = appContext;
@@ -53,9 +29,6 @@ function InstallContentsCniAlready(props: any) {
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   const nowProduct = CONST.PRODUCT.CNI;
-
-  // loading bar
-  // const [loading, setLoading] = React.useState(false);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -76,7 +49,7 @@ function InstallContentsCniAlready(props: any) {
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
 
-    const { version, type } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
+    const { type } = nowEnv.isInstalled(CONST.PRODUCT.CNI.NAME);
 
     const cniInstaller = CniInstaller.getInstance;
     cniInstaller.env = nowEnv;
@@ -88,13 +61,6 @@ function InstallContentsCniAlready(props: any) {
 
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      {/* {loading && (
-        <CircularProgress
-          color="secondary"
-          size={40}
-          className={classes.buttonProgress}
-        />
-      )} */}
       <div>
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
@@ -235,18 +201,6 @@ function InstallContentsCniAlready(props: any) {
             </Dialog>
           </div>
         </div>
-        {/* <button
-          type="button"
-          onClick={() => {
-            abc();
-          }}
-        >
-          test
-        </button>
-        <span>{cnt}</span>
-        <textarea value={stdout} disabled />
-        <textarea value={stderr} disabled />
-        <LinearProgressWithLabel value={progress} /> */}
       </div>
     </div>
   );

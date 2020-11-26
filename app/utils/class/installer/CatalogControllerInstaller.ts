@@ -1,27 +1,17 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './ingressControllerInstaller';
 
 export default class CatalogControllerInstaller extends AbstractInstaller {
   public static readonly IMAGE_DIR = `catalog-controller-install`;
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/CatalogController`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${CatalogControllerInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${CatalogControllerInstaller.IMAGE_DIR}`;
 
-  public static readonly VERSION=`0.3.0`;
+  public static readonly VERSION = `0.3.0`;
 
   // singleton
   private static instance: CatalogControllerInstaller;
@@ -37,7 +27,7 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
+  public async install(param: { callback: any; setProgress: Function }) {
     const { callback, setProgress } = param;
 
     setProgress(10);
@@ -54,7 +44,9 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   }
 
   private async _installMainMaster(callback: any) {
-    console.debug('@@@@@@ Start installing catalog controller main Master... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing catalog controller main Master... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
 
     // Step 1. 설치에 필요한 crd 생성
@@ -77,7 +69,9 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     mainMaster.cmd = this._step5();
     await mainMaster.exeCmd(callback);
 
-    console.debug('###### Finish installing catalog controller main Master... ######');
+    console.debug(
+      '###### Finish installing catalog controller main Master... ######'
+    );
   }
 
   private _step1() {
@@ -97,9 +91,9 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
   }
 
   private _step3() {
-    let script=``;
+    let script = ``;
     if (this.env.registry) {
-      script+=`
+      script += `
       sed -i 's| quay.io| '${this.env.registry}'/quay.io|g' *.yaml;
       `;
     }
@@ -187,7 +181,7 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
     \\cp -r ~/${CatalogControllerInstaller.INSTALL_HOME}/yaml_install ~/${CatalogControllerInstaller.INSTALL_HOME}/yamlCopy;
-    `
+    `;
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish copy yaml file... ######');
   }
@@ -219,25 +213,41 @@ export default class CatalogControllerInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${CatalogControllerInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${CatalogControllerInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${CatalogControllerInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Button,
-  Select,
   FormControl,
   Dialog,
   DialogTitle,
@@ -24,18 +23,9 @@ import * as validation from '../../../utils/common/validation';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
-  const { history, location, match, state, setState } = props;
+  const { history, match, state, setState } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  const handleChangeVersion = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setState({
-      version: event.target.value as string
-    });
-    // setVersion(event.target.value as string);
-  };
 
   const [registryType, setRegistryType] = React.useState(() => {
     if (nowEnv.networkType === NETWORK_TYPE.INTERNAL) {
@@ -44,6 +34,7 @@ function InstallContentsKubernetes2(props: any) {
     if (nowEnv.networkType === NETWORK_TYPE.EXTERNAL) {
       return 'public';
     }
+    return null;
   });
   const handleChangeRegistryType = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -123,7 +114,6 @@ function InstallContentsKubernetes2(props: any) {
             disabled
             // disabled={nowEnv.networkType === NETWORK_TYPE.INTERNAL}
           >
-            {/* <FormLabel component="legend">Gender</FormLabel> */}
             <RadioGroup
               aria-label="gender"
               name="gender1"

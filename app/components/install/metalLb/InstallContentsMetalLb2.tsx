@@ -16,7 +16,6 @@ import {
   TableCell,
   TableBody
 } from '@material-ui/core';
-// import { KubeInstallContext } from './InstallContentsKubernetes';
 import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
@@ -30,15 +29,8 @@ function InstallContentsMetalLb2(props: any) {
   console.debug(InstallContentsMetalLb2.name, props);
   const { history, match, state, setState } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
-
-  // const [version, setVersion] = React.useState(state.version);
   const [startIp, setStartIp] = useState('');
   const [startIpError, setStartIpError] = useState('');
 
@@ -50,13 +42,6 @@ function InstallContentsMetalLb2(props: any) {
       setFunc('IP를 입력해주세요');
       return true;
     }
-
-    // for (let i = 0; i < state.data.length; i += 1) {
-    //   if (state.data[i].ip === target) {
-    //     setFunc('중복 된 IP가 존재합니다.');
-    //     return true;
-    //   }
-    // }
 
     if (!validation.checkIpFormat(target)) {
       setFunc('IP 형식을 확인해 주세요.');
@@ -80,14 +65,14 @@ function InstallContentsMetalLb2(props: any) {
     setEndIp('');
   };
 
-  const getRemoveButton = row => {
+  const getRemoveButton = (row: any) => {
     return (
       <IconButton
         aria-label="delete"
         onClick={e => {
           // 마스터 노드 seleted 변경 안되게 하기 위해 이벤트 전파 막음
           e.stopPropagation();
-          setState(prevState => {
+          setState((prevState: any) => {
             const data = [...prevState.data];
 
             for (let i = 0; i < data.length; i += 1) {
@@ -196,7 +181,7 @@ function InstallContentsMetalLb2(props: any) {
               if (hasIpError(endIp, setEndIpError)) hasError = true;
               if (hasError) return;
 
-              setState(prevState => {
+              setState((prevState: any) => {
                 const data = [...prevState.data];
                 console.log(startIp, endIp);
                 // 0번째 index에 삽입
@@ -259,10 +244,6 @@ function InstallContentsMetalLb2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   version: state.version,
-            //   type: state.type
-            // });
             if (state.data.length < 1) {
               // TODO: error msg
               return;

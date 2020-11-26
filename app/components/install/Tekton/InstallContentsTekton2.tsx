@@ -14,13 +14,10 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 
 function InstallContentsTekton2(props: any) {
   console.debug(InstallContentsTekton2.name, props);
-  const { history, match, state, setState } = props;
+  const { history, match, state } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -94,11 +91,6 @@ function InstallContentsTekton2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   operator_version: HyperCloudOperatorInstaller.HPCD_VERSION,
-            //   webhook_version: HyperCloudWebhookInstaller.WEBHOOK_VERSION,
-            //   console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
-            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.TEKTON.NAME}/step3`
             );

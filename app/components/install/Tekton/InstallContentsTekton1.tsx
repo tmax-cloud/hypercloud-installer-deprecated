@@ -1,5 +1,5 @@
 import MuiBox from '@material-ui/core/Box';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Button } from '@material-ui/core';
 import styles from '../InstallContents1.css';
 import routes from '../../../utils/constants/routes.json';
@@ -9,7 +9,7 @@ import CONST from '../../../utils/constants/constant';
 
 function InstallContentsTekton1(props: any) {
   console.debug(InstallContentsTekton1.name, props);
-  const { history, location, match } = props;
+  const { history, match } = props;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -27,7 +27,11 @@ function InstallContentsTekton1(props: any) {
         <div className={styles.contents}>
           <div className="childLeftRightCenter">
             <MuiBox
-              className={["childUpDownCenter", "childLeftRightCenter",styles.circle].join(' ')}
+              className={[
+                'childUpDownCenter',
+                'childLeftRightCenter',
+                styles.circle
+              ].join(' ')}
               borderRadius="50%"
               {...defaultProps}
             >
@@ -59,9 +63,6 @@ function InstallContentsTekton1(props: any) {
               className={['primary'].join(' ')}
               size="large"
               onClick={() => {
-                // dispatchKubeInstall({
-                //   page: 2
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.TEKTON.NAME}/step2`
                 );
@@ -71,18 +72,6 @@ function InstallContentsTekton1(props: any) {
             </Button>
           </div>
         </div>
-        {/* <button
-          type="button"
-          onClick={() => {
-            abc();
-          }}
-        >
-          test
-        </button>
-        <span>{cnt}</span>
-        <textarea value={stdout} disabled />
-        <textarea value={stderr} disabled />
-        <LinearProgressWithLabel value={progress} /> */}
       </div>
     </div>
   );

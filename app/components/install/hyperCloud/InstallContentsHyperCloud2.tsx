@@ -71,11 +71,6 @@ function InstallContentsHyperCloud2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   operator_version: HyperCloudOperatorInstaller.HPCD_VERSION,
-            //   webhook_version: HyperCloudWebhookInstaller.WEBHOOK_VERSION,
-            //   console_version: HyperCloudConsoleInstaller.CONSOLE_VERSION
-            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step2-network`
             );

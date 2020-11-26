@@ -51,10 +51,6 @@ function InstallContentsHyperAuth2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
-            // setState({
-            //   // version: state.version,
-            //   // type: state.type
-            // });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step3`
             );

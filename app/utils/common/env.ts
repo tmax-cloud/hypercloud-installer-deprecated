@@ -1,12 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-console */
-/* eslint-disable global-require */
 import { remote } from 'electron';
-import { rootPath } from 'electron-root-path';
 import path from 'path';
-import { ROLE } from '../class/Node';
 import Env from '../class/Env';
-import * as product from './product';
 
 /**
  * 파일 작업은 모두 sync로 수행
@@ -113,8 +108,9 @@ export function loadEnvList() {
 }
 
 /**
- * @param envList
  * @description save env list
+ *
+ * @param envList
  */
 export function saveEnvList(envList: Env[]) {
   const jsonData = JSON.stringify(envList);
@@ -131,8 +127,9 @@ export function saveEnvList(envList: Env[]) {
 
 // Env CRUD
 /**
- * @param newEnv 새 환경
  * @description 새로운 환경 정보를 저장
+ *
+ * @param newEnv 새 환경
  */
 export function createEnv(env: Env) {
   const envList = loadEnvList();
@@ -141,8 +138,9 @@ export function createEnv(env: Env) {
 }
 
 /**
- * @param envName
  * @description 해당 환경 정보 리턴
+ *
+ * @param envName
  */
 export function loadEnvByName(envName: string) {
   const envList = loadEnvList();
@@ -155,8 +153,9 @@ export function loadEnvByName(envName: string) {
 }
 
 /**
- * @param envName
  * @description 해당 환경 정보 삭제
+ *
+ * @param envName
  */
 export function deleteEnvByName(envName: string) {
   const envList = loadEnvList();
@@ -170,9 +169,10 @@ export function deleteEnvByName(envName: string) {
 }
 
 /**
- * @param deleteEnvName 삭제 할 환경 이름
- * @param newEnv 새 환경
  * @description 기존 환경을 지우고, 새 환경으로 저장
+ *
+ * @param deleteEnvName 삭제 할 환경 이름
+ * @param newEnv 새 환
  */
 export function updateEnv(deleteEnvName: string, newEnv: Env) {
   deleteEnvByName(deleteEnvName);
@@ -208,9 +208,10 @@ export function updateEnv(deleteEnvName: string, newEnv: Env) {
 
 
 /**
+ * @description 해당 환경에서 해당 제품을 삭제한다.
+ *
  * @param envName 환경 이름
  * @param productName 제품 이름
- * @description 해당 환경에서 해당 제품을 삭제한다.
  */
 // export const deleteProductByName = (envName: string, productName: string) => {
 //   console.error(envName, productName);
@@ -230,8 +231,9 @@ export function updateEnv(deleteEnvName: string, newEnv: Env) {
 // };
 
 /**
- * @param envName 환경 이름
  * @description 해당 환경에서 모든 제품 삭제
+ *
+ * @param envName 환경 이름
  */
 // export const deleteAllProduct = (envName: string) => {
 //   const envList = loadEnvList();
@@ -245,8 +247,9 @@ export function updateEnv(deleteEnvName: string, newEnv: Env) {
 // };
 
 /**
- * @param newEnv 새 환경
  * @description 새로운 환경 정보를 넣어준다.
+ *
+ * @param newEnv 새 환경09
  */
 // export function addProductAtEnv(envName: string, productObj: any) {
 //   const envList = loadEnvList();
@@ -273,9 +276,10 @@ export function isEmpty() {
 }
 
 /**
+ * @description 해당 환경에 해당 제품이 설치 되어 있는지 여부
+ *
  * @param productName 제품 명
  * @param env 환경
- * @description 해당 환경에 해당 제품이 설치 되어 있는지 여부
  */
 // export function isInstalled(productName: any, env: any) {
 //   for (let i = 0; i < env.productList.length; i += 1) {
@@ -290,8 +294,9 @@ export function isEmpty() {
 // }
 
 /**
- * @param env 환경
  * @description 해당 환경에 필수 제품이 모두 설치 되어 있는지 여부
+ *
+ * @param env 환경
  */
 // export const isAllRequiredProductInstall = (env: any) => {
 //   const requiredProduct = product.getRequiredProduct();
@@ -314,8 +319,9 @@ export function isEmpty() {
 // };
 
 /**
- * @param nodeInfo 한 환경의 노드 리스트
  * @description 노드 리스트를, mainMaster, master, worker로 분리하여 리턴
+ *
+ * @param nodeInfo 한 환경의 노드 리스트-
  */
 // export const getArrSortedByRole = (nodeList: any) => {
 //   // mainMaster, master, worker로 분리

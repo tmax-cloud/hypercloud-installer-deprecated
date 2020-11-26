@@ -1,10 +1,4 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
@@ -17,9 +11,9 @@ export default class MetalLbInstaller extends AbstractInstaller {
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/MetalLB`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${MetalLbInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${MetalLbInstaller.IMAGE_DIR}`;
 
-  public static readonly METALLB_VERSION=`0.8.2`;
+  public static readonly METALLB_VERSION = `0.8.2`;
 
   // singleton
   private static instance: MetalLbInstaller;
@@ -35,7 +29,11 @@ export default class MetalLbInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { data: Array<string>; callback: any; setProgress: Function; }) {
+  public async install(param: {
+    data: Array<string>;
+    callback: any;
+    setProgress: Function;
+  }) {
     const { data, callback, setProgress } = param;
 
     setProgress(10);
@@ -80,7 +78,9 @@ export default class MetalLbInstaller extends AbstractInstaller {
   private _getInstallScript(data: Array<string>) {
     return `
       cd ~/${MetalLbInstaller.INSTALL_HOME};
-      sed -i 's/v0.8.2/'v${MetalLbInstaller.METALLB_VERSION}'/g' metallb_v${MetalLbInstaller.METALLB_VERSION}.copy.yaml;
+      sed -i 's/v0.8.2/'v${MetalLbInstaller.METALLB_VERSION}'/g' metallb_v${
+      MetalLbInstaller.METALLB_VERSION
+    }.copy.yaml;
       ${this._setMetalLbArea(data)}
       kubectl apply -f metallb_v${MetalLbInstaller.METALLB_VERSION}.copy.yaml;
       kubectl apply -f metallb_cidr.copy.yaml;
@@ -117,15 +117,19 @@ export default class MetalLbInstaller extends AbstractInstaller {
     console.debug('@@@@@@ Start copy yaml file... @@@@@@');
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = `
-    ${common.getCopyCommandByFilePath(`~/${MetalLbInstaller.INSTALL_HOME}/metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml`)}
-    ${common.getCopyCommandByFilePath(`~/${MetalLbInstaller.INSTALL_HOME}/metallb_cidr.yaml`)}
-    `
+    ${common.getCopyCommandByFilePath(
+      `~/${MetalLbInstaller.INSTALL_HOME}/metallb_v${MetalLbInstaller.METALLB_VERSION}.yaml`
+    )}
+    ${common.getCopyCommandByFilePath(
+      `~/${MetalLbInstaller.INSTALL_HOME}/metallb_cidr.yaml`
+    )}
+    `;
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish copy yaml file... ######');
   }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { callback: any; }) {
+  protected async _preWorkInstall(param: { callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
     await this._copyFile(callback);
@@ -148,26 +152,38 @@ export default class MetalLbInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download kubernetes image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${MetalLbInstaller.IMAGE_DIR}/`;
     await scp.sendFile(mainMaster, srcPath, `${MetalLbInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     mainMaster.cmd += this._getImagePathEditScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

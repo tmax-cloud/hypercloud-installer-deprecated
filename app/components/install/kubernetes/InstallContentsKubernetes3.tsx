@@ -1,6 +1,3 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -10,7 +7,6 @@ import {
   DialogContentText,
   DialogActions
 } from '@material-ui/core';
-// import { InstallPageContext } from '../../containers/InstallPage';
 import styles from '../InstallContents3.css';
 import ProgressBar from '../../ProgressBar';
 import routes from '../../../utils/constants/routes.json';
@@ -114,22 +110,6 @@ function InstallContentsKubernetes3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"

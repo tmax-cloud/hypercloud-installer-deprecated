@@ -1,5 +1,5 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React, { useState } from 'react';
+import { Switch, Route } from 'react-router';
 import styles from '../InstallContents0.css';
 import InstallContentsTekton1 from './InstallContentsTekton1';
 import InstallContentsTekton2 from './InstallContentsTekton2';
@@ -7,9 +7,6 @@ import InstallContentsTekton3 from './InstallContentsTekton3';
 import InstallContentsTekton4 from './InstallContentsTekton4';
 import InstallContentsTektonAlready from './InstallContentsTektonAlready';
 import InstallKubePlease from '../InstallKubePlease';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
 import TektonApprovalInstaller from '../../../utils/class/installer/TektonApprovalInstaller';
 import TektonCiCdTemplatesInstaller from '../../../utils/class/installer/TektonCiCdTemplatesInstaller';
 import TektonMailNotifierInstaller from '../../../utils/class/installer/TektonMailNotifierInstaller';

@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this */
-/* eslint-disable prettier/prettier */
 import AbstractCentosScript from './AbstractCentosScript';
 import { InterfaceHyperAuthInstall } from './InterfaceHyperAuthInstall';
 
-export default class CentosHyperAuthScript extends AbstractCentosScript implements InterfaceHyperAuthInstall {
+export default class CentosHyperAuthScript extends AbstractCentosScript
+  implements InterfaceHyperAuthInstall {
   createSslCert() {
     const openSslCnfPath = '/etc/pki/tls/openssl.cnf';
     return `

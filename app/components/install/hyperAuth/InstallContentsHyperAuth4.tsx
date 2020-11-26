@@ -13,14 +13,6 @@ function InstallContentsHyperAuth4(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  // nowEnv.deleteProductByName(CONST.PRODUCT.HYPERAUTH.NAME);
-  // nowEnv.addProduct({
-  //   name: CONST.PRODUCT.HYPERAUTH.NAME,
-  //   version: state.version
-  // });
-  // // json 파일 저장
-  // env.updateEnv(nowEnv.name, nowEnv);
-
   const getRegistryJsx = () => {
     if (state.type) {
       return (

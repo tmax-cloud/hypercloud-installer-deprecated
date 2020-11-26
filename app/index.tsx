@@ -14,7 +14,6 @@ const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 document.addEventListener('DOMContentLoaded', () => {
   new Titlebar({
     // backgroundColor: Color.fromHex('#fff'),
-    // backgroundColor: Color.fromHex('#fff'),
     icon: MasterImage,
     menu: null
   });

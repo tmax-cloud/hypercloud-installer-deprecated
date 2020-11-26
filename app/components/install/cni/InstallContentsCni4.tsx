@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 import styles from '../InstallContents4.css';
-import CONST from '../../../utils/constants/constant';
 import * as env from '../../../utils/common/env';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
@@ -11,22 +10,7 @@ function InstallContentsCni4(props: any) {
   console.debug(InstallContentsCni4.name, props);
   const { history, match, state } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
-
-  // nowEnv.deleteProductByName(CONST.PRODUCT.CNI.NAME);
-  // nowEnv.addProduct({
-  //   name: CONST.PRODUCT.CNI.NAME,
-  //   version: state.version,
-  //   type: state.type
-  // });
-  // // json 파일 저장
-  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -43,6 +27,7 @@ function InstallContentsCni4(props: any) {
         </div>
       );
     }
+    return <></>;
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -14,10 +13,6 @@ import ProgressBar from '../../ProgressBar';
 import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
-import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 import TektonPipelineInstaller from '../../../utils/class/installer/TektonPipelineInstaller';
 import TektonApprovalInstaller from '../../../utils/class/installer/TektonApprovalInstaller';
 import TektonCiCdTemplatesInstaller from '../../../utils/class/installer/TektonCiCdTemplatesInstaller';
@@ -163,22 +158,6 @@ function InstallContentsTekton3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.TEKTON.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"
@@ -221,9 +200,6 @@ function InstallContentsTekton3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.TEKTON.NAME}/step1`
                 );

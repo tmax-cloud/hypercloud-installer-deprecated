@@ -1,6 +1,5 @@
-/* eslint-disable new-cap */
+/* eslint-disable import/no-cycle */
 /* eslint-disable global-require */
-/* eslint-disable no-console */
 import Node from '../class/Node';
 
 interface SendCb {
@@ -9,6 +8,14 @@ interface SendCb {
   stderr: Function;
 }
 
+/**
+ * @description ssh로 command 전송하여 실행시켜 주는 함수
+ *
+ * @param node target Node 객체
+ * @param cb callback함수 모아놓은 객체
+ *
+ * @return command 실행 후 정상 종료 시 promise resolve(), 에러 발생 시 promise reject()
+ */
 export function send(node: any, cb?: SendCb) {
   const { Client } = require('ssh2');
   const conn = new Client();
@@ -18,6 +25,7 @@ export function send(node: any, cb?: SendCb) {
       .on('ready', () => {
         console.debug('Client :: ready');
         console.debug('node', node);
+        // command 실행
         conn.exec(node.cmd, (err, stream) => {
           console.log(node.cmd);
           if (err) throw err;
@@ -45,15 +53,24 @@ export function send(node: any, cb?: SendCb) {
         reject(err);
       })
       .connect({
+        // connection 정보들
         host: node.ip,
         port: node.port,
         username: node.user,
         password: node.password,
+        // 10초 timeout 설정
         readyTimeout: 10000
       });
   });
 }
 
+/**
+ * @description ssh connection 테스트 함수
+ *
+ * @param node 체크 하려는 Node객체
+ *
+ * @return 성공 시 promise resole(), 실패 시 promise reject();
+ */
 export function connectionTest(node: Node) {
   const ssh2 = require('ssh2');
   const connection = new ssh2();

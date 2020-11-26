@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/prop-types */
-/* eslint-disable no-console */
-/* eslint-disable import/no-cycle */
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import styles from './EnvHeader.css';
 import routes from '../../utils/constants/routes.json';
-import * as docker from '../../utils/common/docker';
 
 function EnvHeader(props: any) {
   console.debug(EnvHeader.name, props);

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import {
   Button,
@@ -108,22 +107,6 @@ function InstallContentsHyperAuth3(props: any) {
         <textarea className={styles.log} ref={logRef} disabled />
       </div>
       <div className={['childLeftRightCenter'].join(' ')}>
-        {/* <Button
-          variant="contained"
-          style={{ marginRight: '10px' }}
-          className={['primary'].join(' ')}
-          size="large"
-          onClick={() => {
-            // dispatchKubeInstall({
-            //   page: 2
-            // });
-            history.push(
-              `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step2`
-            );
-          }}
-        >
-          &lt; 이전
-        </Button> */}
         {progress === 100 ? (
           <Button
             variant="contained"
@@ -166,9 +149,6 @@ function InstallContentsHyperAuth3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step1`
                 );

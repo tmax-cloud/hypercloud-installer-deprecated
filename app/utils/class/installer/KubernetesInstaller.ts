@@ -1,12 +1,5 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import AbstractInstaller from './AbstractInstaller';
 import Env, { NETWORK_TYPE } from '../Env';
 import * as scp from '../../common/scp';
@@ -18,17 +11,17 @@ import ScriptKubernetesFactory from '../script/ScriptKubernetesFactory';
 import * as common from '../../common/common';
 
 export default class KubernetesInstaller extends AbstractInstaller {
-  public static readonly IMAGE_DIR=`k8s-install`;
+  public static readonly IMAGE_DIR = `k8s-install`;
 
-  public static readonly ARCHIVE_DIR=`archive_20.07.10`;
+  public static readonly ARCHIVE_DIR = `archive_20.07.10`;
 
-  public static readonly INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/K8S_Master/installer`;
+  public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/K8S_Master/installer`;
 
-  public static readonly IMAGE_REGISTRY_INSTALL_HOME=`${Env.INSTALL_ROOT}/hypercloud-install-guide/Image_Registry/installer`;
+  public static readonly IMAGE_REGISTRY_INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/Image_Registry/installer`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}`;
 
-  public static readonly ARCHIVE_HOME=`${Env.INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}`;
+  public static readonly ARCHIVE_HOME = `${Env.INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}`;
 
   public static readonly K8S_VERSION = `1.17.6`;
 
@@ -48,43 +41,36 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { registry: string; version: string; podSubnet: string; callback: any; setProgress: Function; }) {
+  public async install(param: {
+    registry: string;
+    version: string;
+    podSubnet: string;
+    callback: any;
+    setProgress: Function;
+  }) {
     const { registry, version, podSubnet, callback, setProgress } = param;
 
     await this._envSetting({
       registry,
       version,
       callback
-    })
+    });
     setProgress(20);
 
     await this._preWorkInstall({
       registry,
       version,
       callback
-    })
+    });
     setProgress(40);
 
-    await this._installMainMaster(
-      registry,
-      version,
-      podSubnet,
-      callback
-    )
+    await this._installMainMaster(registry, version, podSubnet, callback);
     setProgress(60);
 
-    await this._installMaster(
-      registry,
-      version,
-      callback
-    )
+    await this._installMaster(registry, version, callback);
     setProgress(80);
 
-    await this._installWorker(
-      registry,
-      version,
-      callback
-    )
+    await this._installWorker(registry, version, callback);
 
     await this._makeMasterCanSchedule();
     await this._makeMasterKubeConfig();
@@ -97,7 +83,12 @@ export default class KubernetesInstaller extends AbstractInstaller {
     await this._removeMainMaster();
   }
 
-  private async _installMainMaster(registry: string, version: string, podSubnet: string, callback: any) {
+  private async _installMainMaster(
+    registry: string,
+    version: string,
+    podSubnet: string,
+    callback: any
+  ) {
     console.debug('@@@@@@ Start installing main Master... @@@@@@');
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getK8sMainMasterInstallScript(
@@ -111,7 +102,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.debug('###### Finish installing main Master... ######');
   }
 
-  private async _installMaster(registry: string, version: string, callback: any) {
+  private async _installMaster(
+    registry: string,
+    version: string,
+    callback: any
+  ) {
     console.debug('@@@@@@ Start installing Master... @@@@@@');
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     const masterJoinCmd = await this._getMasterJoinCmd(mainMaster);
@@ -122,7 +117,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
           registry,
           version,
           master,
-          99-index
+          99 - index
         );
         master.cmd += `${masterJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
         return master.exeCmd(callback);
@@ -131,7 +126,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.debug('###### Finish installing Master... ######');
   }
 
-  private async _installWorker(registry: string, version: string, callback: any) {
+  private async _installWorker(
+    registry: string,
+    version: string,
+    callback: any
+  ) {
     console.debug('@@@@@@ Start installing Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
     const workerJoinCmd = await this._getWorkerJoinCmd(mainMaster);
@@ -186,7 +185,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   public async addWorker(registry: string, version: string, callback?: any) {
-    await this._preWorkAddWorker(registry, version, callback);
+    await this._preWorkAddWorker(registry, callback);
 
     console.debug('@@@@@@ Start adding Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
@@ -216,7 +215,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     mainMaster.cmd = command;
     await mainMaster.exeCmd();
 
-    workerArr.map((worker) => {
+    workerArr.map(worker => {
       const script = ScriptKubernetesFactory.createScript(worker.os.type);
       command = script.getK8sMasterRemoveScript();
       worker.cmd = command;
@@ -225,11 +224,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.debug('###### Finish deleting Worker... ######');
   }
 
-  private async _preWorkAddWorker(
-    registry: string,
-    version: string,
-    callback?: any
-  ) {
+  private async _preWorkAddWorker(registry: string, callback?: any) {
     console.debug('@@@@@@ Start pre work adding Worker... @@@@@@');
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
@@ -247,7 +242,6 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
       // await this._downloadImageFile();
       await this._sendImageFile();
-
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       // external network 경우 해주어야 할 작업들
       /**
@@ -275,12 +269,18 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _downloadPackageFile() {
     // TODO: download package file
-    console.debug('@@@@@@ Start downloading the package file to client local... @@@@@@');
-    console.debug('###### Finish downloading the package file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the package file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the package file to client local... ######'
+    );
   }
 
   private async _sendPackageFile() {
-    console.debug('@@@@@@ Start sending the package file to each node (using scp)... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the package file to each node (using scp)... @@@@@@'
+    );
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.ARCHIVE_DIR}/`;
     const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     console.debug(`srcPath`, srcPath);
@@ -290,11 +290,15 @@ export default class KubernetesInstaller extends AbstractInstaller {
         return scp.sendFile(node, srcPath, destPath);
       })
     );
-    console.debug('###### Finish sending the package file to each node (using scp)... ######');
+    console.debug(
+      '###### Finish sending the package file to each node (using scp)... ######'
+    );
   }
 
   private async _installLocalPackageRepository(callback: any) {
-    console.debug('@@@@@@ Start installing the local package repository at each node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing the local package repository at each node... @@@@@@'
+    );
     const destPath = `${KubernetesInstaller.ARCHIVE_HOME}/`;
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
@@ -303,20 +307,28 @@ export default class KubernetesInstaller extends AbstractInstaller {
         return node.exeCmd(callback);
       })
     );
-    console.debug('###### Finish installing the local package repository at each node... ######');
+    console.debug(
+      '###### Finish installing the local package repository at each node... ######'
+    );
   }
 
   private async _downloadGitFile() {
-    console.debug('@@@@@@ Start downloading the GIT file to client local... @@@@@@');
+    console.debug(
+      '@@@@@@ Start downloading the GIT file to client local... @@@@@@'
+    );
     const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
     console.debug(`repoPath`, CONST.GIT_REPO);
     console.debug(`localPath`, localPath);
     await git.clone(CONST.GIT_REPO, localPath, [`-b${CONST.GIT_BRANCH}`]);
-    console.debug('###### Finish downloading the GIT file to client local... ######');
+    console.debug(
+      '###### Finish downloading the GIT file to client local... ######'
+    );
   }
 
   private async _sendGitFile() {
-    console.debug('@@@@@@ Start sending the GIT file to each node (using scp)... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the GIT file to each node (using scp)... @@@@@@'
+    );
     const localPath = `${Env.LOCAL_INSTALL_ROOT}/hypercloud-install-guide/`;
     const destPath = `${Env.INSTALL_ROOT}/hypercloud-install-guide/`;
     await Promise.all(
@@ -324,7 +336,9 @@ export default class KubernetesInstaller extends AbstractInstaller {
         return scp.sendFile(node, localPath, destPath);
       })
     );
-    console.debug('###### Finish sending the GIT file to each node (using scp)... ######');
+    console.debug(
+      '###### Finish sending the GIT file to each node (using scp)... ######'
+    );
   }
 
   private async _cloneGitFile(callback: any) {
@@ -352,7 +366,9 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   private async _installImageRegistry(registry: string, callback: any) {
-    console.debug('@@@@@@ Start installing the image registry at main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start installing the image registry at main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const script = ScriptKubernetesFactory.createScript(mainMaster.os.type);
     mainMaster.cmd = script.getImageRegistrySettingScript(
@@ -360,20 +376,26 @@ export default class KubernetesInstaller extends AbstractInstaller {
       this.env.networkType
     );
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish installing the image registry at main master node... ######');
+    console.debug(
+      '###### Finish installing the image registry at main master node... ######'
+    );
   }
 
   private async _setPublicPackageRepository(callback: any) {
-    console.debug('@@@@@@ Start setting the public package repository at each node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start setting the public package repository at each node... @@@@@@'
+    );
     await Promise.all(
       this.env.nodeList.map((node: Node) => {
         const script = ScriptKubernetesFactory.createScript(node.os.type);
-        node.cmd = script.setCrioRepo(KubernetesInstaller.CRIO_VERSION)
-        node.cmd += script.setKubernetesRepo()
+        node.cmd = script.setCrioRepo(KubernetesInstaller.CRIO_VERSION);
+        node.cmd += script.setKubernetesRepo();
         return node.exeCmd(callback);
       })
     );
-    console.debug('###### Finish setting the public package repository at each node... ######');
+    console.debug(
+      '###### Finish setting the public package repository at each node... ######'
+    );
   }
 
   private _getK8sClusterMasterJoinScript(): string {
@@ -409,26 +431,28 @@ export default class KubernetesInstaller extends AbstractInstaller {
       ${this._registHostName()}
       ${
         isMultiMaster
-          ? script.getMasterMultiplexingScript(
-              mainMaster,
-              100,
-              mainMaster.ip
-            )
+          ? script.getMasterMultiplexingScript(mainMaster, 100, mainMaster.ip)
           : ''
       }
       cd ~/${KubernetesInstaller.INSTALL_HOME};
       sed -i 's|\\r$||g' k8s.config;
       . k8s.config;
       sudo sed -i "s|$imageRegistry|${registry}|g" ./k8s.config;
-      sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
+      sudo sed -i "s|$crioVersion|${
+        KubernetesInstaller.CRIO_VERSION
+      }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
       sudo sed -i "s|$podSubnet|${podSubnet}|g" ./k8s.config;
-      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${
+        Env.INSTALL_ROOT
+      }/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up mainMaster;
-      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
+      ${common.getDeleteDuplicationCommandByFilePath(
+        `/etc/sysctl.d/99-kubernetes-cri.conf`
+      )}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
@@ -449,14 +473,20 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sed -i 's|\\r$||g' k8s.config;
       . k8s.config;
       sudo sed -i "s|$imageRegistry|${registry}|g" ./k8s.config;
-      sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
+      sudo sed -i "s|$crioVersion|${
+        KubernetesInstaller.CRIO_VERSION
+      }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
-      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${
+        Env.INSTALL_ROOT
+      }/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up master;
-      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
+      ${common.getDeleteDuplicationCommandByFilePath(
+        `/etc/sysctl.d/99-kubernetes-cri.conf`
+      )}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
@@ -474,14 +504,20 @@ export default class KubernetesInstaller extends AbstractInstaller {
       sed -i 's|\\r$||g' k8s.config;
       . k8s.config;
       sudo sed -i "s|$imageRegistry|${registry}|g" ./k8s.config;
-      sudo sed -i "s|$crioVersion|${KubernetesInstaller.CRIO_VERSION}|g" ./k8s.config;
+      sudo sed -i "s|$crioVersion|${
+        KubernetesInstaller.CRIO_VERSION
+      }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
       sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
-      cp -f ~/${Env.INSTALL_ROOT}/hypercloud-install-guide/installer/install.sh .;
+      cp -f ~/${
+        Env.INSTALL_ROOT
+      }/hypercloud-install-guide/installer/install.sh .;
       chmod 755 install.sh;
       sed -i 's|\\r$||g' install.sh;
       ./install.sh up worker;
-      ${common.getDeleteDuplicationCommandByFilePath(`/etc/sysctl.d/99-kubernetes-cri.conf`)}
+      ${common.getDeleteDuplicationCommandByFilePath(
+        `/etc/sysctl.d/99-kubernetes-cri.conf`
+      )}
       #rm -rf ~/${Env.INSTALL_ROOT}/hypercloud-install-guide;
       `;
   }
@@ -491,10 +527,10 @@ export default class KubernetesInstaller extends AbstractInstaller {
     const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
     const masterNodeArr = [...masterArr, mainMaster];
     let script = '';
-    masterNodeArr.map((masterNode)=>{
-      script+=`
+    masterNodeArr.map(masterNode => {
+      script += `
       kubectl taint node ${masterNode.hostName} node-role.kubernetes.io/master:NoSchedule-;
-      `
+      `;
     });
 
     mainMaster.cmd = script;
@@ -503,7 +539,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   private async _makeMasterKubeConfig() {
     const { masterArr } = this.env.getNodesSortedByRole();
-    masterArr.map(async (masterNode)=>{
+    masterArr.map(async masterNode => {
       masterNode.cmd = `
       mkdir -p $HOME/.kube;
       sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config;
@@ -549,9 +585,13 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return masterJoinCmd;
   }
 
-  private async _envSetting(param: { registry: string; version: string; callback: any; }) {
+  private async _envSetting(param: {
+    registry: string;
+    version: string;
+    callback: any;
+  }) {
     console.debug('@@@@@@ Start env setting... @@@@@@');
-    const { registry, version, callback } = param;
+    const { registry, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
@@ -584,9 +624,13 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   // protected abstract 구현
-  protected async _preWorkInstall(param: { registry: string; version: string; callback: any; }) {
+  protected async _preWorkInstall(param: {
+    registry: string;
+    version: string;
+    callback: any;
+  }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
-    const { registry, version, callback } = param;
+    const { registry, callback } = param;
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**
@@ -594,7 +638,6 @@ export default class KubernetesInstaller extends AbstractInstaller {
        */
       await this._downloadImageFile();
       await this._sendImageFile();
-
     } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
       // external network 경우 해주어야 할 작업들
       /**
@@ -618,25 +661,41 @@ export default class KubernetesInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download kubernetes image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${KubernetesInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${KubernetesInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${KubernetesInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { registry: any; callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { registry: any; callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { registry, callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript(registry);
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(registry: string): string {

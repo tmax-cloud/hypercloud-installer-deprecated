@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-/* eslint-disable import/no-cycle */
 import React from 'react';
 import EnvHeader from '../components/env/EnvHeader';
 import EnvContents from '../components/env/EnvContents';
 
-function EnvPage(props: any) {
-  console.debug(EnvPage.name, props);
-  const { history, location, match } = props;
+function EnvPage({ history, location, match }: any) {
+  console.debug(EnvPage.name);
 
   return (
     <>

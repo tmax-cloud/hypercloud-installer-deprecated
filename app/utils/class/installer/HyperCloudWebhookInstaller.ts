@@ -1,19 +1,9 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable no-underscore-dangle */
-import { rootPath } from 'electron-root-path';
 import YAML from 'yaml';
 import * as scp from '../../common/scp';
 import AbstractInstaller from './AbstractInstaller';
-import CONST from '../../constants/constant';
 import Env, { NETWORK_TYPE } from '../Env';
-import ScriptHyperCloudOperatorFactory from '../script/ScriptHyperCloudOperatorFactory';
-import IngressControllerInstaller from './ingressControllerInstaller';
 import * as Common from '../../common/common';
 import Node from '../Node';
 
@@ -22,9 +12,9 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
   public static readonly INSTALL_HOME = `${Env.INSTALL_ROOT}/hypercloud-install-guide/HyperCloud\\ Webhook`;
 
-  public static readonly IMAGE_HOME=`${Env.INSTALL_ROOT}/${HyperCloudWebhookInstaller.IMAGE_DIR}`;
+  public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${HyperCloudWebhookInstaller.IMAGE_DIR}`;
 
-  public static readonly WEBHOOK_VERSION=`4.1.0.22`;
+  public static readonly WEBHOOK_VERSION = `4.1.0.22`;
 
   // singleton
   private static instance: HyperCloudWebhookInstaller;
@@ -40,8 +30,8 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     return this.instance;
   }
 
-  public async install(param: { callback: any; setProgress: Function; }) {
-    const { callback, setProgress } = param;
+  public async install(param: { callback: any; setProgress: Function }) {
+    const { callback } = param;
 
     await this._preWorkInstall({
       callback
@@ -154,8 +144,8 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
   private _cpConfigtoMaster() {
     const { masterArr } = this.env.getNodesSortedByRole();
-    let copyScript='';
-    masterArr.map((master)=>{
+    let copyScript = '';
+    masterArr.map(master => {
       copyScript += `
       sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./06_audit-webhook-config ${master.user}@${master.ip}:/etc/kubernetes/pki/audit-webhook-config;
       sshpass -p '${master.password}' scp -P ${master.port} -o StrictHostKeyChecking=no ./07_audit-policy.yaml ${master.user}@${master.ip}:/etc/kubernetes/pki/audit-policy.yaml;
@@ -178,18 +168,26 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
       stdout: (data: string) => {
         apiServerYaml = YAML.parse(data.toString());
       },
-      stderr: () => {},
+      stderr: () => {}
     });
     console.error('apiServerYaml', apiServerYaml);
-    apiServerYaml.spec.containers[0].command.push(`--audit-log-path=/var/log/kubernetes/apiserver/audit.log`)
-    apiServerYaml.spec.containers[0].command.push(`--audit-policy-file=/etc/kubernetes/pki/audit-policy.yaml`)
-    apiServerYaml.spec.containers[0].command.push(`--audit-webhook-config-file=/etc/kubernetes/pki/audit-webhook-config`)
+    apiServerYaml.spec.containers[0].command.push(
+      `--audit-log-path=/var/log/kubernetes/apiserver/audit.log`
+    );
+    apiServerYaml.spec.containers[0].command.push(
+      `--audit-policy-file=/etc/kubernetes/pki/audit-policy.yaml`
+    );
+    apiServerYaml.spec.containers[0].command.push(
+      `--audit-webhook-config-file=/etc/kubernetes/pki/audit-webhook-config`
+    );
     apiServerYaml.spec.dnsPolicy = 'ClusterFirstWithHostNet';
 
     console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
     mainMaster.cmd = `
-    echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-    `
+    echo "${YAML.stringify(
+      apiServerYaml
+    )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+    `;
     await mainMaster.exeCmd();
 
     await Common.waitApiServerUntilNomal(mainMaster);
@@ -203,18 +201,26 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
           stdout: (data: string) => {
             apiServerYaml = YAML.parse(data.toString());
           },
-          stderr: () => {},
+          stderr: () => {}
         });
         console.error('apiServerYaml', apiServerYaml);
-        apiServerYaml.spec.containers[0].command.push(`--audit-log-path=/var/log/kubernetes/apiserver/audit.log`)
-        apiServerYaml.spec.containers[0].command.push(`--audit-policy-file=/etc/kubernetes/pki/audit-policy.yaml`)
-        apiServerYaml.spec.containers[0].command.push(`--audit-webhook-config-file=/etc/kubernetes/pki/audit-webhook-config`)
+        apiServerYaml.spec.containers[0].command.push(
+          `--audit-log-path=/var/log/kubernetes/apiserver/audit.log`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--audit-policy-file=/etc/kubernetes/pki/audit-policy.yaml`
+        );
+        apiServerYaml.spec.containers[0].command.push(
+          `--audit-webhook-config-file=/etc/kubernetes/pki/audit-webhook-config`
+        );
         apiServerYaml.spec.dnsPolicy = 'ClusterFirstWithHostNet';
 
         console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
         master.cmd = `
-        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-        `
+        echo "${YAML.stringify(
+          apiServerYaml
+        )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `;
         await master.exeCmd();
       })
     );
@@ -232,9 +238,8 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
     const targetList = [...masterArr, mainMaster];
 
-
     await Promise.all(
-      targetList.map(async (node)=>{
+      targetList.map(async node => {
         node.cmd = `cat /etc/kubernetes/manifests/kube-apiserver.yaml;`;
         let apiServerYaml;
         await node.exeCmd({
@@ -242,21 +247,25 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
           stdout: (data: string) => {
             apiServerYaml = YAML.parse(data.toString());
           },
-          stderr: () => {},
+          stderr: () => {}
         });
         console.error('apiServerYaml', apiServerYaml);
-        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter((cmd: string | string[])=>{
-          return cmd.indexOf("--audit") === -1;
-        })
+        apiServerYaml.spec.containers[0].command = apiServerYaml.spec.containers[0].command.filter(
+          (cmd: string | string[]) => {
+            return cmd.indexOf('--audit') === -1;
+          }
+        );
         delete apiServerYaml.spec.dnsPolicy;
 
         console.error('apiServerYaml stringify', YAML.stringify(apiServerYaml));
         node.cmd = `
-        echo "${YAML.stringify(apiServerYaml)}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
-        `
+        echo "${YAML.stringify(
+          apiServerYaml
+        )}" > /etc/kubernetes/manifests/kube-apiserver.yaml;
+        `;
         await node.exeCmd();
       })
-    )
+    );
   }
 
   private async _removeMainMaster() {
@@ -300,25 +309,41 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
 
   protected async _downloadImageFile() {
     // TODO: download image file
-    console.debug('@@@@@@ Start downloading the image file to client local... @@@@@@');
-    console.debug('###### Finish downloading the image file to client local... ######');
+    console.debug(
+      '@@@@@@ Start downloading the image file to client local... @@@@@@'
+    );
+    console.debug(
+      '###### Finish downloading the image file to client local... ######'
+    );
   }
 
   protected async _sendImageFile() {
-    console.debug('@@@@@@ Start sending the image file to main master node... @@@@@@');
+    console.debug(
+      '@@@@@@ Start sending the image file to main master node... @@@@@@'
+    );
     const { mainMaster } = this.env.getNodesSortedByRole();
     const srcPath = `${Env.LOCAL_INSTALL_ROOT}/${HyperCloudWebhookInstaller.IMAGE_DIR}/`;
-    await scp.sendFile(mainMaster, srcPath, `${HyperCloudWebhookInstaller.IMAGE_HOME}/`);
-    console.debug('###### Finish sending the image file to main master node... ######');
+    await scp.sendFile(
+      mainMaster,
+      srcPath,
+      `${HyperCloudWebhookInstaller.IMAGE_HOME}/`
+    );
+    console.debug(
+      '###### Finish sending the image file to main master node... ######'
+    );
   }
 
-  protected async _registryWork(param: { callback: any; }) {
-    console.debug('@@@@@@ Start pushing the image at main master node... @@@@@@');
+  protected async _registryWork(param: { callback: any }) {
+    console.debug(
+      '@@@@@@ Start pushing the image at main master node... @@@@@@'
+    );
     const { callback } = param;
     const { mainMaster } = this.env.getNodesSortedByRole();
     mainMaster.cmd = this._getImagePushScript();
     await mainMaster.exeCmd(callback);
-    console.debug('###### Finish pushing the image at main master node... ######');
+    console.debug(
+      '###### Finish pushing the image at main master node... ######'
+    );
   }
 
   protected _getImagePushScript(): string {

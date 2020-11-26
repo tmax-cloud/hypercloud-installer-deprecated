@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import React from 'react';
 import {
   Button,
@@ -19,9 +18,6 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
-import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperCloudConsoleInstaller';
-import HyperCloudOperatorInstaller from '../../../utils/class/installer/HyperCloudOperatorInstaller';
-import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 
 function InstallContentsHyperCloud2Network(props: any) {
   console.debug(InstallContentsHyperCloud2Network.name, props);

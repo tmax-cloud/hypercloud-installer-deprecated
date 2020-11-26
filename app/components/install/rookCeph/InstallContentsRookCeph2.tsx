@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-one-expression-per-line */
-/* eslint-disable no-console */
 import React, { useContext, useState } from 'react';
 import {
   Button,
@@ -22,15 +20,13 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { CheckBox } from '@material-ui/icons';
-import { hostname } from 'os';
 import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
 import * as Common from '../../../utils/common/common';
-import { AppContext } from '../../../containers/HomePage';
+import { AppContext } from '../../../containers/AppContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function InstallContentsRookCeph2(props: any) {
   console.debug(InstallContentsRookCeph2.name, props);
-  const { history, match, state, setState, setOption } = props;
+  const { history, match, state, setOption } = props;
 
   const classes = useStyles();
 
@@ -535,7 +531,7 @@ function InstallContentsRookCeph2(props: any) {
                   <div>{hostName}</div>
                   <div>
                     {osdDiskList[hostName].length > 0 ? (
-                      osdDiskList[hostName].map((disk, index) => {
+                      osdDiskList[hostName].map((disk) => {
                         return (
                           <FormControlLabel
                             key={disk.diskName}
@@ -602,18 +598,6 @@ function InstallContentsRookCeph2(props: any) {
               hasError = true;
             }
             if (hasError) return;
-            console.debug({
-              disk: selectedOsdDisk,
-              osdCpu,
-              osdMemory,
-              monCpu,
-              monMemory,
-              mgrCpu,
-              mgrMemory,
-              mdsCpu,
-              mdsMemory
-            });
-            return;
             setOption((prev: any) => {
               return {
                 ...prev,

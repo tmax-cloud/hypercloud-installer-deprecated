@@ -1,6 +1,3 @@
-/* eslint-disable promise/catch-or-return */
-/* eslint-disable promise/always-return */
-/* eslint-disable no-console */
 import React, { useState, useContext } from 'react';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -37,7 +34,7 @@ import routes from '../../utils/constants/routes.json';
 import Node, { ROLE } from '../../utils/class/Node';
 import Env, { NETWORK_TYPE } from '../../utils/class/Env';
 import CONST from '../../utils/constants/constant';
-import { AppContext } from '../../containers/HomePage';
+import { AppContext } from '../../containers/AppContext';
 import { OS_TYPE } from '../../utils/class/os/AbstractOs';
 import CentOS from '../../utils/class/os/CentOS';
 import Ubuntu from '../../utils/class/os/Ubuntu';
@@ -328,6 +325,7 @@ function EnvContentsAdd(props: any) {
         </div>
       );
     }
+    return <></>;
   };
 
   // dialog
@@ -359,7 +357,7 @@ function EnvContentsAdd(props: any) {
     );
   };
 
-  const getRemoveButton = row => {
+  const getRemoveButton = (row: any) => {
     // 수정 페이지, 마스터면 제거 버튼 없음
     if (envBeforeEdit && isSelected(row.ip)) {
       return null;

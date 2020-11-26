@@ -1,5 +1,5 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React, { useState } from 'react';
+import { Switch, Route } from 'react-router';
 import styles from '../InstallContents0.css';
 import InstallContentsHyperAuth1 from './InstallContentsHyperAuth1';
 import InstallContentsHyperAuth2 from './InstallContentsHyperAuth2';

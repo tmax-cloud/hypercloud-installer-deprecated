@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import styles from '../InstallContents4.css';
 // import { InstallPageContext } from '../../containers/InstallPage';
-import CONST from '../../../utils/constants/constant';
 import * as env from '../../../utils/common/env';
 // import FinishImage from '../../../../resources/assets/img_finish_mint.svg';
 import FinishImage from '../../../../resources/assets/img_finish_blue.svg';
@@ -12,21 +11,7 @@ function InstallContentsMetalLb4(props: any) {
   console.debug(InstallContentsMetalLb4.name, props);
   const { history, match, state } = props;
 
-  // const appContext = useContext(AppContext);
-  // const { appState, dispatchAppState } = appContext;
-
   const nowEnv = env.loadEnvByName(match.params.envName);
-
-  // const kubeInstallContext = useContext(KubeInstallContext);
-  // const { kubeInstallState, dispatchKubeInstall } = kubeInstallContext;
-
-  // nowEnv.deleteProductByName(CONST.PRODUCT.METAL_LB.NAME);
-  // nowEnv.addProduct({
-  //   name: CONST.PRODUCT.METAL_LB.NAME,
-  //   version: state.version
-  // });
-  // // json 파일 저장
-  // env.updateEnv(nowEnv.name, nowEnv);
 
   const getRegistryJsx = () => {
     if (state.type) {
@@ -43,6 +28,7 @@ function InstallContentsMetalLb4(props: any) {
         </div>
       );
     }
+    return <></>;
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
