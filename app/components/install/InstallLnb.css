@@ -51,14 +51,22 @@
   padding: 0 !important;
 }
 
-.installed svg{
-  color: green !important;
+.notInstalled svg,
+.notInstalled span {
+  color:  #737579 !important;
+}
+
+.installed svg,
+.installed span{
+  color: white !important;
 }
 
 .clicked svg{
   color:#ec3854 !important;
 }
-
+.clicked span{
+  color: white !important;
+}
 
 
 

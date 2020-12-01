@@ -32,5 +32,5 @@
 
 /* LNB 글씨 색 변경 */
 .MuiStepLabel-label.MuiStepLabel-active{
-  color: white !important;
+  /* color: white !important; */
 }

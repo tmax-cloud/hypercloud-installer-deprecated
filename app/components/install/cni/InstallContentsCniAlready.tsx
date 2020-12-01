@@ -6,7 +6,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  IconButton} from '@material-ui/core';
+  IconButton
+} from '@material-ui/core';
 import MuiBox from '@material-ui/core/Box';
 import CloseIcon from '@material-ui/icons/Close';
 import styles from '../InstallContents1.css';

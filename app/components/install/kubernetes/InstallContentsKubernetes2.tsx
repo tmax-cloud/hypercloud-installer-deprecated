@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext} from 'react';
 import {
   Button,
   FormControl,
@@ -20,10 +20,14 @@ import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import { NETWORK_TYPE } from '../../../utils/class/Env';
 import * as validation from '../../../utils/common/validation';
+import { AppContext } from '../../../containers/AppContext';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
   const { history, match, state, setState } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -225,6 +229,10 @@ function InstallContentsKubernetes2(props: any) {
               version: state.version,
               podSubnet: `${ip}/${mask}`,
               registry
+            });
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.KUBERNETES.NAME
             });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step3`

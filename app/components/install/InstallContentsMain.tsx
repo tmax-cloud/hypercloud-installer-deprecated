@@ -16,6 +16,7 @@ import MetalLbImage from '../../../resources/assets/MetalLb_logo.png';
 import RookCephImage from '../../../resources/assets/Rook ceph_logo.png';
 import PrometheusImage from '../../../resources/assets/Prometheus_logo.png';
 import HyperCloudOperatorImage from '../../../resources/assets/HyperCloud Operator_logo.png';
+import HyperCloudImage from '../../../resources/assets/HyperCloud_logo.png';
 import TektonImage from '../../../resources/assets/Tekton_logo.png';
 // import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
@@ -92,7 +93,7 @@ function InstallContentsMain({ history, match, setClicked }: Props) {
     } else if (productName === CONST.PRODUCT.HYPERAUTH.NAME) {
       image = HyperCloudOperatorImage;
     } else if (productName === CONST.PRODUCT.HYPERCLOUD.NAME) {
-      image = HyperCloudOperatorImage;
+      image = HyperCloudImage;
     } else if (productName === CONST.PRODUCT.ROOK_CEPH.NAME) {
       image = RookCephImage;
     } else if (productName === CONST.PRODUCT.PROMETHEUS.NAME) {

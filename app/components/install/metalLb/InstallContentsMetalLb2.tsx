@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Button,
   TextField,
@@ -24,10 +24,14 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import * as validation from '../../../utils/common/validation';
+import { AppContext } from '../../../containers/AppContext';
 
 function InstallContentsMetalLb2(props: any) {
   console.debug(InstallContentsMetalLb2.name, props);
   const { history, match, state, setState } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -248,6 +252,10 @@ function InstallContentsMetalLb2(props: any) {
               // TODO: error msg
               return;
             }
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.METAL_LB.NAME
+            });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step3`
             );

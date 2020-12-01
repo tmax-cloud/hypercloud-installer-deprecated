@@ -612,6 +612,10 @@ function InstallContentsRookCeph2(props: any) {
                 mdsMemory
               };
             });
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.ROOK_CEPH.NAME
+            });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step3`
             );
