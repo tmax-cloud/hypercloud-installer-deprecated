@@ -71,6 +71,7 @@ function InstallContentsRookCeph(props: any) {
               location={location}
               state={state}
               setState={setState}
+              option={option}
             />
           )}
         />

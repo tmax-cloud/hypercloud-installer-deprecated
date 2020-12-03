@@ -28,8 +28,8 @@ function InstallContentsCniAlready(props: any) {
   const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
   const nowProduct = CONST.PRODUCT.CNI;
+  const product = nowEnv.isInstalled(nowProduct.NAME);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -98,21 +98,21 @@ function InstallContentsCniAlready(props: any) {
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>타입</span>
+              <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).type}
+                {product.version}
               </span>
             </div>
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>Version</span>
+              <span className={['medium', 'thick'].join(' ')}>Type</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).version}
+                {product.type}
               </span>
             </div>
           </div>

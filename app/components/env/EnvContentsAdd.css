@@ -4,31 +4,30 @@
   /* background-color: white; */
 }
 
-.box{
+.box {
   /* 영역 확인용 background-color */
   /* background-color: black; */
 }
 
-.rowBox{
-
+.rowBox {
 }
-.rowBox > div{
+.rowBox > div {
   height: 55px;
 }
-.rowBox>div:not(:last-child){
+.rowBox > div:not(:last-child) {
   margin-right: 20px;
 }
 
-.table{
+.table {
   margin: 10px;
   margin-left: 120px;
 }
 
-.errorBox{
+.errorBox {
   height: 20px;
 }
 
-.icon{
+.icon {
   width: 30px;
   height: 30px;
 }
@@ -38,7 +37,7 @@
   height: 40px;
 }
 
-.titleBox{
+.titleBox {
   margin: 5px 0 0 0;
   width: 120px;
 }
@@ -57,7 +56,7 @@
 .nodeAddButton {
   width: 65px;
   height: 35px;
-  background-color: white;
+  background-color: var(--global-color-white);
   /* border: 1px solid #0992AC !important;
   color: #0992AC !important; */
 }

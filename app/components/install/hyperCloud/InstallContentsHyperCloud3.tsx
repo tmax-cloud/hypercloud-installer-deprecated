@@ -49,7 +49,12 @@ function InstallContentsHyperCloud3(props: any) {
       name: CONST.PRODUCT.HYPERCLOUD.NAME,
       operator_version: state.operator_version,
       webhook_version: state.webhook_version,
-      console_version: state.console_version
+      console_version: state.console_version,
+      isUseIngress: state.isUseIngress,
+      sharedIngress: state.sharedIngress,
+      systemIngress: state.systemIngress,
+      email: state.email,
+      password: state.password
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -92,7 +97,8 @@ function InstallContentsHyperCloud3(props: any) {
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
 
-    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
+    const templateSeviceBrokerInstaller =
+      TemplateSeviceBrokerInstaller.getInstance;
     templateSeviceBrokerInstaller.env = nowEnv;
 
     try {

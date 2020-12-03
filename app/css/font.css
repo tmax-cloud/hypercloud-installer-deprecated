@@ -19,13 +19,13 @@ font
 }
 /* brightness */
 .dark {
-  color:#4F5257;
+  color: var(--font-color-dark);
 }
 .lightDark {
-  color:#6A6A6A;
+  color: var(--font-color-lightDark);
 }
-.indicator{
-  color: #0992AC
+.indicator {
+  color: var(--font-color-indicator);
 }
 /* weight */
 .thick {

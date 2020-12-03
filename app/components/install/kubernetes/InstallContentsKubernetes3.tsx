@@ -32,7 +32,7 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 7000);
+    }, 10000);
     return () => {
       clearInterval(timer);
     };
@@ -42,7 +42,9 @@ function InstallContentsKubernetes3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.KUBERNETES.NAME,
-      version: state.version
+      version: state.version,
+      registry: state.registry,
+      podSubnet: state.podSubnet
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);

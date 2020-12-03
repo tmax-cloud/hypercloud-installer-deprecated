@@ -42,7 +42,8 @@ function InstallContentsMetalLb3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.METAL_LB.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.METAL_LB.NAME,
-      version: state.version
+      version: state.version,
+      range: state.data
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);

@@ -1,13 +1,11 @@
-
-
 /*
 title bar
 */
 /* title bar 설정*/
 .titlebar {
-  background-color: #28384F !important;
+  background-color: var(--global-background-color) !important;
   /* background-image: url("../../resources/assets/lnb_logo_bg_mint.png"); */
-  background-image: url("../../resources/assets/lnb_logo_bg_blue.svg");
+  background-image: url('../../resources/assets/lnb_logo_bg_blue.svg');
   background-repeat: no-repeat;
   height: 60px !important;
   position: relative !important;
@@ -23,7 +21,7 @@ title bar
   height: inherit !important;
 }
 /* title bar 밑에서 부터 container 설정*/
-.container-after-titlebar{
+.container-after-titlebar {
   top: 0px !important;
   height: calc(100vh - 60px);
   position: relative !important;

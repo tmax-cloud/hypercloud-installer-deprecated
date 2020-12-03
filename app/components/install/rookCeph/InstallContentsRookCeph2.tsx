@@ -80,24 +80,43 @@ function InstallContentsRookCeph2(props: any) {
   // 선택된 disk를 나타내는 state
   const [diskError, setDiskError] = useState(false);
   const [selectedOsdDisk, setSelectedOsdDisk] = useState({});
-  const addSelectedOsdDisk = (hostName: string, diskName: string) => {
-    console.debug(selectedOsdDisk);
+  const addSelectedOsdDisk = (
+    hostName: string,
+    diskName: string,
+    diskSize: any
+  ) => {
     if (hostName in selectedOsdDisk) {
-      selectedOsdDisk[hostName].push(diskName);
+      selectedOsdDisk[hostName].push({
+        diskName,
+        diskSize
+      });
     } else {
-      selectedOsdDisk[hostName] = [diskName];
+      selectedOsdDisk[hostName] = [
+        {
+          diskName,
+          diskSize
+        }
+      ];
     }
     setSelectedOsdDisk(selectedOsdDisk);
     setDiskError(false);
+    console.debug(selectedOsdDisk);
   };
   const deleteSelectedOsdDisk = (hostName: string, diskName: string) => {
-    console.debug(selectedOsdDisk);
-    const idx = selectedOsdDisk[hostName].indexOf(diskName);
-    if (idx > -1) selectedOsdDisk[hostName].splice(idx, 1);
+    let idx = -1;
+    for (let i = 0; i < selectedOsdDisk[hostName].length; i += 1) {
+      if (selectedOsdDisk[hostName][i].diskName === diskName) {
+        idx = i;
+        break;
+      }
+    }
+
+    if (idx !== -1) selectedOsdDisk[hostName].splice(idx, 1);
     if (selectedOsdDisk[hostName].length === 0) {
       delete selectedOsdDisk[hostName];
       setSelectedOsdDisk(selectedOsdDisk);
     }
+    console.debug(selectedOsdDisk);
   };
 
   React.useEffect(() => {
@@ -531,17 +550,21 @@ function InstallContentsRookCeph2(props: any) {
                   <div>{hostName}</div>
                   <div>
                     {osdDiskList[hostName].length > 0 ? (
-                      osdDiskList[hostName].map((disk) => {
+                      osdDiskList[hostName].map(disk => {
                         return (
                           <FormControlLabel
                             key={disk.diskName}
-                            control={(
+                            control={
                               <Checkbox
                                 // checked={disk.checked}
                                 name={disk.diskName}
                                 onChange={e => {
                                   if (e.target.checked) {
-                                    addSelectedOsdDisk(hostName, disk.diskName);
+                                    addSelectedOsdDisk(
+                                      hostName,
+                                      disk.diskName,
+                                      disk.diskSize
+                                    );
                                   } else {
                                     deleteSelectedOsdDisk(
                                       hostName,
@@ -550,7 +573,7 @@ function InstallContentsRookCeph2(props: any) {
                                   }
                                 }}
                               />
-                            )}
+                            }
                             label={`${
                               disk.diskName
                             } ${Common.ChangeByteToGigaByte(disk.diskSize)}GB`}

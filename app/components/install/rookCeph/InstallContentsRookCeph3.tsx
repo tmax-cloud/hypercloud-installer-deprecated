@@ -33,7 +33,7 @@ function InstallContentsRookCeph3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 10000);
+    }, 12000);
     return () => {
       clearInterval(timer);
     };

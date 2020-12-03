@@ -1,4 +1,4 @@
-.wrap{
+.wrap {
   padding: 10px;
 }
 
@@ -7,11 +7,11 @@
   font-size: 30px;
 }
 
-.textBox{
+.textBox {
   margin-top: 80px;
   margin-bottom: 50px;
 }
-.textBoxRow{
+.textBoxRow {
   margin-bottom: 10px;
 }
 
@@ -21,7 +21,7 @@
 }
 .productBox:hover {
   cursor: pointer;
-  border: 1px solid #ec3854;
+  border: 1px solid var(--global-color-primary);
 }
 .productBox--second {
   height: 100%;
@@ -29,7 +29,7 @@
 }
 .productBox--second:hover {
   cursor: pointer;
-  border: 1px solid #1e6cb9;
+  border: 1px solid var(--global-color-secondary);
 }
 
 .productBoxContents {

@@ -2,6 +2,7 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
 @import '~@fortawesome/fontawesome-free/css/all.css';
 @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
@@ -14,6 +15,34 @@
 @import 'css/table.css';
 @import 'css/textfiled.css';
 @import 'css/titlebar.css';
+
+:root {
+  /* global */
+  --global-background-color: #28384f;
+
+  --global-color-red: red;
+  --global-color-white: white;
+
+  --global-color-primary: #ec3854;
+  --global-color-primary-hover: #d22d46;
+  --global-color-primary-active: #ba2e44;
+
+  --global-color-secondary: #1e6cb9;
+  --global-color-secondary-hover: #175b9e;
+  --global-color-secondary-active: #0f4b86;
+
+  /* table */
+  --table-color-primary: #31475e;
+
+  /* button */
+  --button-color-disabled: #c4c4c4;
+  --button-background-color-disabled: rgba(255, 255, 255, 0.5);
+
+  /* font */
+  --font-color-dark: #4f5257;
+  --font-color-lightDark: #6a6a6a;
+  --font-color-indicator: #0992ac;
+}
 
 /*
 h2 {
@@ -40,7 +69,6 @@ a:hover {
 } */
 
 body {
-  background-color: #ebebf730;
   position: relative;
   height: 100vh;
   width: 100vw;
@@ -62,7 +90,7 @@ a:hover {
 }
 
 h1 {
-  margin: 0
+  margin: 0;
 }
 
 li {
@@ -70,27 +98,27 @@ li {
 }
 
 ul {
-  padding: 0
+  padding: 0;
 }
 
-svg{
+svg {
   cursor: pointer;
 }
 
-#root{
+#root {
   height: 100%;
 }
 
 /*
 공통
 */
-.red{
-  color: red;
+.red {
+  color: var(--global-color-red);
 }
 
-.visible{
-  visibility : visible !important;
+.visible {
+  visibility: visible !important;
 }
-.hidden{
-  visibility : none !important;
+.hidden {
+  visibility: none !important;
 }

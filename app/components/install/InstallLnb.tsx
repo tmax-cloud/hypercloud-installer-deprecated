@@ -176,14 +176,15 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
                 <div className="childUpDownCenter">
                   {label}
                   {appState.installing === label ? (
-                    <img
-                      style={{
-                        width: '18px',
-                        marginLeft: '5px'
-                      }}
-                      alt="installing.gif"
-                      src={Installing}
-                    />
+                    // <img
+                    //   style={{
+                    //     width: '18px',
+                    //     marginLeft: '5px'
+                    //   }}
+                    //   alt="installing.gif"
+                    //   src={Installing}
+                    // />
+                    <div className={styles.loader}></div>
                   ) : (
                     ''
                   )}
