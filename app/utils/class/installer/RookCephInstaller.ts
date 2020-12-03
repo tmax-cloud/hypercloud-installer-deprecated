@@ -206,7 +206,8 @@ export default class RookCephInstaller extends AbstractInstaller {
 
   private _getRookCephRemoveConfigScript(diskNameList: any): string {
     let script = ``;
-    diskNameList.map((diskName: string) => {
+    diskNameList.map((d: string) => {
+      const { diskName } = d;
       script += `
       sudo rm -rf /var/lib/rook;
       sudo sgdisk --zap-all /dev/${diskName};
@@ -242,39 +243,43 @@ export default class RookCephInstaller extends AbstractInstaller {
       },
       stderr: () => {}
     });
-    // 리소스 최소값 설정
-    // clusterYaml.spec.resources = {
-    //   osd: {
-    //     limits:{
-    //       cpu: `${option.osdCpu}`,
-    //       memory: `${option.osdMemory}Gi`
-    //     },
-    //     requests:{
-    //       cpu: `${option.osdCpu}`,
-    //       memory: `${option.osdMemory}Gi`
-    //     }
-    //   },
-    //   mon: {
-    //     limits:{
-    //       cpu: `${option.monCpu}`,
-    //       memory: `${option.monMemory}Gi`
-    //     },
-    //     requests:{
-    //       cpu: `${option.monCpu}`,
-    //       memory: `${option.monMemory}Gi`
-    //     }
-    //   },
-    //   mgr: {
-    //     limits:{
-    //       cpu: `${option.mgrCpu}`,
-    //       memory: `${option.mgrMemory}Gi`
-    //     },
-    //     requests:{
-    //       cpu: `${option.mgrCpu}`,
-    //       memory: `${option.mgrMemory}Gi`
-    //     }
-    //   }
-    // };
+
+    // 리소스 설정
+    clusterYaml.spec.resources = {
+      osd: {
+        limits: {
+          cpu: `${option.osdCpu}`,
+          memory: `${option.osdMemory}Gi`
+        },
+        requests: {
+          cpu: `${option.osdCpu}`,
+          memory: `${option.osdMemory}Gi`
+        }
+      },
+      mon: {
+        limits: {
+          cpu: `${option.monCpu}`,
+          memory: `${option.monMemory}Gi`
+        },
+        requests: {
+          cpu: `${option.monCpu}`,
+          memory: `${option.monMemory}Gi`
+        }
+      },
+      mgr: {
+        limits: {
+          cpu: `${option.mgrCpu}`,
+          memory: `${option.mgrMemory}Gi`
+        },
+        requests: {
+          cpu: `${option.mgrCpu}`,
+          memory: `${option.mgrMemory}Gi`
+        }
+      }
+    };
+
+    // mon count 3 설정
+    clusterYaml.spec.mon.count = 3;
 
     // 선택한 OSD 설치 할 디스크 없으면, 자동으로 OSD 설치 가능한 디스크 탐색 모드로 설정
     if (osdCount === 0) {
@@ -284,9 +289,9 @@ export default class RookCephInstaller extends AbstractInstaller {
       const nodes = Object.keys(option.disk).map(hostName => {
         return {
           name: hostName,
-          devices: option.disk[hostName].map(diskName => {
+          devices: option.disk[hostName].map((d: any) => {
             return {
-              name: diskName
+              name: d.diskName
             };
           })
         };
@@ -338,14 +343,14 @@ data:
       `;
     }
 
-    // 리소스 최소값 설정
-    // mainMaster.cmd += `
-    // sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    // sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    // sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    // sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    // `;
-    // await mainMaster.exeCmd();
+    // 리소스 설정
+    mainMaster.cmd += `
+    sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+    `;
+    await mainMaster.exeCmd();
   }
 
   private _startNtp(): string {

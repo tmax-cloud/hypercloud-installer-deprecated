@@ -1,6 +1,6 @@
 .wrap {
-  background: #28384F;
-  color: white !important;
+  background: var(--global-background-color);
+  color: var(--global-color-white) !important;
   font-weight: bold;
   /* padding: 10px; */
   /* width: 25%; */
@@ -10,37 +10,25 @@
   height: 35px;
   margin-top: 19px;
 }
-.selectBox > div{
+.selectBox > div {
   width: 70%;
-  color: white !important;
+  color: var(--global-color-white) !important;
 }
-.selectBox > div::before, .selectBox > div::after{
-  border-bottom: 0px !important
+.selectBox > div::before,
+.selectBox > div::after {
+  border-bottom: 0px !important;
 }
-.selectBox > div > select{
-  background-color: #484C52 !important;
+.selectBox > div > select {
+  background-color: #484c52 !important;
   border-radius: 18.5px !important;
   padding-left: 20px !important;
 }
-.selectBox svg{
-  color: white;
+.selectBox svg {
+  color: var(--global-color-white);
 }
 .selectBox > a {
   margin-top: 5px;
   margin-left: 5px;
-}
-
-/* .listItemBox{
-  color: white;
-} */
-.listItemBox:hover{
-  /* background-color: #0992AC !important; */
-  color: #0992AC   !important;
-}
-
-.seletecItemBox{
-  /* background-color: #0992AC !important; */
-  color: #0992AC   !important;
 }
 
 .lnb {
@@ -51,16 +39,22 @@
   padding: 0 !important;
 }
 
-.installed svg{
-  color: green !important;
+.notInstalled svg,
+.notInstalled span {
+  color: #737579 !important;
 }
 
-.clicked svg{
-  color:#ec3854 !important;
+.installed svg,
+.installed span {
+  color: var(--global-color-white) !important;
 }
 
-
-
+.clicked svg {
+  color: var(--global-color-primary) !important;
+}
+.clicked span {
+  color: var(--global-color-white) !important;
+}
 
 /* @media (max-width: 600px) {
   .wrap {
@@ -72,3 +66,22 @@
     height: 20%;
   }
 } */
+
+.loader {
+  border: 3px solid #f3f3f3; /* Light grey */
+  border-top: 3px solid var(--global-color-primary); /* Blue */
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

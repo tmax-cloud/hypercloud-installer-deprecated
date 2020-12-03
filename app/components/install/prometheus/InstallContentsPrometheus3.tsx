@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -14,11 +14,15 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import PrometheusInstaller from '../../../utils/class/installer/PrometheusInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsPrometheus3(props: any) {
   console.debug(InstallContentsPrometheus3.name, props);
   const { history, match, state } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -39,7 +43,10 @@ function InstallContentsPrometheus3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.PROMETHEUS.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.PROMETHEUS.NAME,
-      version: state.version
+      version: state.version,
+      isUsePvc: state.isUsePvc,
+      serviceType: state.serviceType,
+      port: state.port
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -114,6 +121,10 @@ function InstallContentsPrometheus3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.PROMETHEUS.NAME}/step4`
               );
@@ -149,6 +160,10 @@ function InstallContentsPrometheus3(props: any) {
           <DialogActions>
             <Button
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 handleClose();
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.PROMETHEUS.NAME}/step1`

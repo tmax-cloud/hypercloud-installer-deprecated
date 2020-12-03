@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Button,
   Dialog,
@@ -28,18 +28,8 @@ function InstallContentsKubernetesAlready(props: any) {
   const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
   const nowProduct = CONST.PRODUCT.KUBERNETES;
-
-  const getVersion = () => {
-    // nowEnv 있을 경우만 실행
-    for (let i = 0; i < nowEnv.productList.length; i += 1) {
-      const target = nowEnv.productList[i];
-      if (target.name === nowProduct.NAME) {
-        return target.version;
-      }
-    }
-  };
+  const product = nowEnv.isInstalled(nowProduct.NAME);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -108,7 +98,17 @@ function InstallContentsKubernetesAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {getVersion()}
+                {product.version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>Pod Subnet</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {product.podSubnet}
               </span>
             </div>
           </div>

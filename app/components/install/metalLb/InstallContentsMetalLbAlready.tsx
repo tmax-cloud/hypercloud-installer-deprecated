@@ -20,7 +20,6 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import MetalLbInstaller from '../../../utils/class/installer/MetalLbInstaller';
 
-
 function InstallContentsMetalLbAlready(props: any) {
   console.debug(InstallContentsMetalLbAlready.name, props);
   const { history, match } = props;
@@ -29,8 +28,8 @@ function InstallContentsMetalLbAlready(props: any) {
   const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
   const nowProduct = CONST.PRODUCT.METAL_LB;
+  const product = nowEnv.isInstalled(nowProduct.NAME);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -50,7 +49,6 @@ function InstallContentsMetalLbAlready(props: any) {
 
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
-
 
     const metalLbInstaller = MetalLbInstaller.getInstance;
     metalLbInstaller.env = nowEnv;
@@ -94,15 +92,30 @@ function InstallContentsMetalLbAlready(props: any) {
               </div>
             </MuiBox>
           </div>
-          <div>
-          </div>
+          <div></div>
           <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).version}
+                {product.version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>IP Range</span>
+            </div>
+            <div>
+              <span className={['lightDark'].join(' ')}>
+                {product.range.map((r: string) => {
+                  return (
+                    <div key={r}>
+                      <span>{r}</span>
+                    </div>
+                  );
+                })}
               </span>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -13,11 +13,15 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import MetalLbInstaller from '../../../utils/class/installer/MetalLbInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsMetalLb3(props: any) {
   console.debug(InstallContentsMetalLb3.name, props);
   const { history, match, state } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -38,7 +42,8 @@ function InstallContentsMetalLb3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.METAL_LB.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.METAL_LB.NAME,
-      version: state.version
+      version: state.version,
+      range: state.data
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -113,6 +118,10 @@ function InstallContentsMetalLb3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step4`
               );
@@ -149,9 +158,10 @@ function InstallContentsMetalLb3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.METAL_LB.NAME}/step1`
                 );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -13,12 +13,15 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import KubernetesInstaller from '../../../utils/class/installer/KubernetesInstaller';
-
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsKubernetes3(props: any) {
   console.debug(InstallContentsKubernetes3.name, props);
   const { history, match, state } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -29,7 +32,7 @@ function InstallContentsKubernetes3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 7000);
+    }, 10000);
     return () => {
       clearInterval(timer);
     };
@@ -39,7 +42,9 @@ function InstallContentsKubernetes3(props: any) {
     nowEnv.deleteProductByName(CONST.PRODUCT.KUBERNETES.NAME);
     nowEnv.addProduct({
       name: CONST.PRODUCT.KUBERNETES.NAME,
-      version: state.version
+      version: state.version,
+      registry: state.registry,
+      podSubnet: state.podSubnet
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -116,6 +121,10 @@ function InstallContentsKubernetes3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step4`
               );
@@ -151,6 +160,10 @@ function InstallContentsKubernetes3(props: any) {
           <DialogActions>
             <Button
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 handleClose();
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.KUBERNETES.NAME}/step1`

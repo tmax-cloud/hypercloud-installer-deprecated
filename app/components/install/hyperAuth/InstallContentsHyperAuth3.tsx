@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -14,11 +14,15 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsHyperAuth3(props: any) {
   console.debug(InstallContentsHyperAuth3.name, props);
   const { history, match, state } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -113,6 +117,10 @@ function InstallContentsHyperAuth3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step4`
               );
@@ -148,6 +156,10 @@ function InstallContentsHyperAuth3(props: any) {
           <DialogActions>
             <Button
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 handleClose();
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step1`

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -14,11 +14,15 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import RookCephInstaller from '../../../utils/class/installer/RookCephInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsRookCeph3(props: any) {
   console.debug(InstallContentsRookCeph3.name, props);
   const { history, match, state, option } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -29,7 +33,7 @@ function InstallContentsRookCeph3(props: any) {
       setProgress(prevProgress =>
         prevProgress >= 100 ? 100 : prevProgress + 1
       );
-    }, 10000);
+    }, 12000);
     return () => {
       clearInterval(timer);
     };
@@ -116,6 +120,10 @@ function InstallContentsRookCeph3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step4`
               );
@@ -151,6 +159,10 @@ function InstallContentsRookCeph3(props: any) {
           <DialogActions>
             <Button
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 handleClose();
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.ROOK_CEPH.NAME}/step1`

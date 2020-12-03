@@ -20,7 +20,6 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import PrometheusInstaller from '../../../utils/class/installer/PrometheusInstaller';
 
-
 function InstallContentsPrometheusAlready(props: any) {
   console.debug(InstallContentsPrometheusAlready.name, props);
   const { history, match } = props;
@@ -29,8 +28,8 @@ function InstallContentsPrometheusAlready(props: any) {
   const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
   const nowProduct = CONST.PRODUCT.PROMETHEUS;
+  const product = nowEnv.isInstalled(nowProduct.NAME);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -50,7 +49,6 @@ function InstallContentsPrometheusAlready(props: any) {
 
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
-
 
     const rookCephInstaller = PrometheusInstaller.getInstance;
     rookCephInstaller.env = nowEnv;
@@ -95,14 +93,32 @@ function InstallContentsPrometheusAlready(props: any) {
             </MuiBox>
           </div>
           <div>
-          </div>
-          <div>
             <div>
               <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).version}
+                {product.version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>PVC</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {product.isUsePvc ? '사용함' : '사용안함'}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>Service</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {product.serviceType}/{product.port}
               </span>
             </div>
           </div>

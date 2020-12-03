@@ -32,8 +32,8 @@ function InstallContentsHyperCloudAlready(props: any) {
   const { dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
-
   const nowProduct = CONST.PRODUCT.HYPERCLOUD;
+  const product = nowEnv.isInstalled(nowProduct.NAME);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -53,7 +53,6 @@ function InstallContentsHyperCloudAlready(props: any) {
 
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
-
 
     // console delete
     const hyperCloudConsoleInstaller = HyperCloudConsoleInstaller.getInstance;
@@ -80,6 +79,46 @@ function InstallContentsHyperCloudAlready(props: any) {
     // kube-apiserver.yaml 수정부분은 맨 마지막에 수행
     // api server재기동에 시간이 걸려서, 다음 명령에서 kubectl이 동작하지 않음
     await hyperCloudWebhookInstaller.rollbackApiServerYaml();
+  };
+
+  const getNetworkJsx = state => {
+    let jsx;
+    if (state.isUseIngress) {
+      jsx = (
+        <div style={{ marginBottom: '30px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>- 인그레스</span>
+            <span>사용함</span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>- 인그레스 컨트롤러</span>
+            <span>
+              {state.sharedIngress ? '사용자 공용' : ''}
+              {state.sharedIngress && state.systemIngress ? ',' : ''}
+              {state.systemIngress ? '시스템' : ''}
+            </span>
+          </div>
+        </div>
+      );
+    } else {
+      jsx = (
+        <div style={{ marginBottom: '30px' }}>
+          <span>- 인그레스</span>
+          <span>사용안함</span>
+        </div>
+      );
+    }
+    return jsx;
   };
 
   return (
@@ -126,7 +165,7 @@ function InstallContentsHyperCloudAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).operator_version}
+                {product.operator_version}
               </span>
             </div>
           </div>
@@ -138,7 +177,7 @@ function InstallContentsHyperCloudAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).webhook_version}
+                {product.webhook_version}
               </span>
             </div>
           </div>
@@ -150,28 +189,48 @@ function InstallContentsHyperCloudAlready(props: any) {
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>
-                {nowEnv.isInstalled(nowProduct.NAME).console_version}
+                {product.console_version}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>네트워크</span>
+            </div>
+            <div>
+              <span className={['lightDark'].join(' ')}>
+                {getNetworkJsx(product)}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span className={['medium', 'thick'].join(' ')}>관리자 계정</span>
+            </div>
+            <div>
+              <span className={['medium', 'lightDark'].join(' ')}>
+                {product.email}
               </span>
             </div>
           </div>
           <div>
             <span className={['small', 'indicator'].join(' ')}>
               <a
-              onClick={async () => {
-                const { mainMaster } = nowEnv.getNodesSortedByRole();
-                mainMaster.cmd = `kubectl get svc -n console-system -o jsonpath='{.items[?(@.metadata.name=="console-lb")].status.loadBalancer.ingress[0].ip}'`;
-                let ip;
-                await mainMaster.exeCmd({
-                  close: () => {},
-                  stdout: (data: string) => {
-                    ip = data.toString();
-                  },
-                  stderr: () => {}
-                });
-                shell.openExternal(`https://${ip}/`);
-              }}
+                onClick={async () => {
+                  const { mainMaster } = nowEnv.getNodesSortedByRole();
+                  mainMaster.cmd = `kubectl get svc -n console-system -o jsonpath='{.items[?(@.metadata.name=="console-lb")].status.loadBalancer.ingress[0].ip}'`;
+                  let ip;
+                  await mainMaster.exeCmd({
+                    close: () => {},
+                    stdout: (data: string) => {
+                      ip = data.toString();
+                    },
+                    stderr: () => {}
+                  });
+                  shell.openExternal(`https://${ip}/`);
+                }}
               >
-              console로 이동
+                console로 이동
               </a>
             </span>
           </div>

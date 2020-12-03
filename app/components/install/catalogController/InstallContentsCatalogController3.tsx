@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -14,26 +14,20 @@ import routes from '../../../utils/constants/routes.json';
 import * as env from '../../../utils/common/env';
 import CONST from '../../../utils/constants/constant';
 import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsCatalogController3(props: any) {
   console.debug(InstallContentsCatalogController3.name, props);
   const { history, match, state } = props;
 
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   // progress bar
   const [progress, setProgress] = React.useState(0);
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prevProgress =>
-        prevProgress >= 100 ? 100 : prevProgress + 1
-      );
-    }, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   if (progress === 100) {
     nowEnv.deleteProductByName(CONST.PRODUCT.CATALOG_CONTROLLER.NAME);
@@ -89,8 +83,14 @@ function InstallContentsCatalogController3(props: any) {
 
   React.useEffect(() => {
     install();
-
-    return () => {};
+    const timer = setInterval(() => {
+      setProgress(prevProgress =>
+        prevProgress >= 100 ? 100 : prevProgress + 1
+      );
+    }, 5000);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   return (
@@ -113,6 +113,10 @@ function InstallContentsCatalogController3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CATALOG_CONTROLLER.NAME}/step4`
               );
@@ -148,10 +152,11 @@ function InstallContentsCatalogController3(props: any) {
           <DialogActions>
             <Button
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.CATALOG_CONTROLLER.NAME}/step1`
                 );

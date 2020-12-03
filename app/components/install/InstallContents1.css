@@ -1,4 +1,4 @@
-.wrap{
+.wrap {
   /* border: 1px solid red; */
   width: 100%;
 }
@@ -12,7 +12,7 @@
 
 .circle {
   position: relative;
-  border: 4px solid #C5C5C8 !important;
+  border: 4px solid #c5c5c8 !important;
   width: 300px !important;
   height: 300px !important;
 }
@@ -20,12 +20,12 @@
 .installedCircle {
   position: relative;
   /* border: 4px solid #0992AC !important; */
-  border: 4px solid #1E6CB9 !important;
+  border: 4px solid var(--global-color-secondary) !important;
   width: 300px !important;
   height: 300px !important;
 }
 
-.insideCircle > div{
+.insideCircle > div {
   padding: 0 20px;
 }
 
@@ -35,4 +35,3 @@
   left: 0px;
   top: 30px;
 }
-

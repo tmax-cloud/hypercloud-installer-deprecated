@@ -1,4 +1,9 @@
 {
+  // default formetter 지정
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // save 시, 자동 formetting
+  "editor.formatOnSave": true,
+
   "files.associations": {
     ".babelrc": "jsonc",
     ".eslintrc": "jsonc",

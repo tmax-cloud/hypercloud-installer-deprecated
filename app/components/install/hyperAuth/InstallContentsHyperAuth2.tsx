@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -14,10 +14,14 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
+import { AppContext } from '../../../containers/AppContext';
 
 function InstallContentsHyperAuth2(props: any) {
   console.debug(InstallContentsHyperAuth2.name, props);
   const { history, match, state, setState } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -51,6 +55,10 @@ function InstallContentsHyperAuth2(props: any) {
           className={['primary'].join(' ')}
           size="large"
           onClick={() => {
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.HYPERAUTH.NAME
+            });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERAUTH.NAME}/step3`
             );

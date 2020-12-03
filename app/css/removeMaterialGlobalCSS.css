@@ -8,9 +8,9 @@
 
 /* 버튼 disabled CSS 변경 */
 .MuiButton-contained.Mui-disabled {
-  color: #C4C4C4 !important;
-  background-color: rgba(255, 255, 255, 0.5) !important;
-  border: 1px solid #C4C4C4 !important;
+  color: var(--button-color-disabled) !important;
+  background-color: var(--button-background-color-disabled) !important;
+  border: 1px solid var(--button-color-disabled) !important;
 }
 
 /* checkbox */
@@ -18,19 +18,18 @@
   color: #0992AC !important;
 } */
 .MuiCheckbox-colorSecondary.Mui-checked {
-  color: #EC3854 !important;
+  color: var(--global-color-primary) !important;
 }
-
 
 /* radio */
 /* .MuiRadio-colorSecondary.Mui-checked {
   color: #0992AC;
 } */
 .MuiRadio-colorSecondary.Mui-checked {
-  color: #EC3854;
+  color: var(--global-color-primary);
 }
 
 /* LNB 글씨 색 변경 */
-.MuiStepLabel-label.MuiStepLabel-active{
-  color: white !important;
+.MuiStepLabel-label.MuiStepLabel-active {
+  /* color: white !important; */
 }

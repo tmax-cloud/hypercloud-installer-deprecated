@@ -20,7 +20,6 @@ import * as env from '../../../utils/common/env';
 import routes from '../../../utils/constants/routes.json';
 import CatalogControllerInstaller from '../../../utils/class/installer/CatalogControllerInstaller';
 
-
 function InstallContentsCatalogControllerAlready(props: any) {
   console.debug(InstallContentsCatalogControllerAlready.name, props);
   const { history, match } = props;
@@ -50,7 +49,6 @@ function InstallContentsCatalogControllerAlready(props: any) {
 
   const remove = async () => {
     console.debug(`nowEnv`, nowEnv);
-
 
     const catalogControllerInstaller = CatalogControllerInstaller.getInstance;
     catalogControllerInstaller.env = nowEnv;
@@ -95,9 +93,7 @@ function InstallContentsCatalogControllerAlready(props: any) {
           </div>
           <div>
             <div>
-              <span className={['medium', 'thick'].join(' ')}>
-                Version
-              </span>
+              <span className={['medium', 'thick'].join(' ')}>Version</span>
             </div>
             <div>
               <span className={['medium', 'lightDark'].join(' ')}>

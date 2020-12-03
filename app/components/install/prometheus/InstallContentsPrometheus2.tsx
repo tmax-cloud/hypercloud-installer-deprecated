@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -22,10 +22,14 @@ import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
+import { AppContext } from '../../../containers/AppContext';
 
 function InstallContentsPrometheus2(props: any) {
   console.debug(InstallContentsPrometheus2.name, props);
   const { history, match, state, setState } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -210,6 +214,10 @@ function InstallContentsPrometheus2(props: any) {
               isUsePvc: isUsePvc === 'true',
               serviceType,
               port
+            });
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.PROMETHEUS.NAME
             });
 
             history.push(

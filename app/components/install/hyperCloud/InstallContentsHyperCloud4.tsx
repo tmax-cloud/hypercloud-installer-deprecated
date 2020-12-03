@@ -12,22 +12,34 @@ function InstallContentsHyperCloud4(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const getRegistryJsx = () => {
-    if (state.type) {
-      return (
+  const getNetworkJsx = state => {
+    let jsx;
+    if (state.isUseIngress) {
+      jsx = (
         <div style={{ marginBottom: '30px' }}>
           <div>
-            <span className={['medium', 'thick'].join(' ')}>Type</span>
+            <span>- 인그레스</span>
+            <span>사용함</span>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
-              {state.type}
+            <span>- 인그레스 컨트롤러</span>
+            <span>
+              {state.sharedIngress ? '사용자 공용' : ''}
+              {state.sharedIngress && state.systemIngress ? ',' : ''}
+              {state.systemIngress ? '시스템' : ''}
             </span>
           </div>
         </div>
       );
+    } else {
+      jsx = (
+        <div style={{ marginBottom: '30px' }}>
+          <span>- 인그레스</span>
+          <span>사용안함</span>
+        </div>
+      );
     }
-    return <></>;
+    return jsx;
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
@@ -71,7 +83,26 @@ function InstallContentsHyperCloud4(props: any) {
             </span>
           </div>
         </div>
-        {getRegistryJsx()}
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>네트워크</span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {getNetworkJsx(state)}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>관리자 계정</span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.email}
+            </span>
+          </div>
+        </div>
         <div>
           <Button
             variant="contained"

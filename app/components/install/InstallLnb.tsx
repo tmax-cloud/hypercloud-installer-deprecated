@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
@@ -22,7 +22,9 @@ import * as env from '../../utils/common/env';
 import routes from '../../utils/constants/routes.json';
 // import InstalledImage from '../../../resources/assets/ic_finish_mint.svg';
 import InstalledImage from '../../../resources/assets/ic_finish_blue.svg';
+import Installing from '../../../resources/assets/installing.gif';
 import * as product from '../../utils/common/product';
+import { AppContext } from '../../containers/AppContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,6 +57,9 @@ type Props = {
 function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
   console.debug(InstallLnb.name);
 
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
   let nowEnv = env.loadEnvByName(match.params.envName);
 
   const requiredProduct = product.getRequiredProduct();
@@ -63,6 +68,10 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
   const classes = useStyles();
 
   const handleChange = e => {
+    dispatchAppState({
+      type: 'set_installing',
+      installing: ''
+    });
     history.push(`${routes.INSTALL.HOME}/${e.target.value}`);
   };
 
@@ -96,6 +105,8 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
     if (clicked === label) {
       return styles.clicked;
     }
+
+    return styles.notInstalled;
   };
   return (
     <div className={[styles.wrap].join(' ')}>
@@ -109,7 +120,15 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
             );
           })}
         </Select>
-        <Link to={routes.HOME}>
+        <Link
+          to={routes.HOME}
+          onClick={() => {
+            dispatchAppState({
+              type: 'set_installing',
+              installing: ''
+            });
+          }}
+        >
           <SettingsIcon />
         </Link>
       </div>
@@ -120,6 +139,10 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
           className="childUpDownCenter"
           disableSticky
           onClick={() => {
+            dispatchAppState({
+              type: 'set_installing',
+              installing: ''
+            });
             history.push(`${routes.INSTALL.HOME}/${nowEnv.name}/main`);
             setClicked('');
           }}
@@ -133,20 +156,39 @@ function InstallLnb({ history, match, location, clicked, setClicked }: Props) {
           orientation="vertical"
           className={classes.stepper_primary}
         >
-          {steps.map((label) => (
+          {steps.map(label => (
             <Step
               key={label}
               active
               completed={getcompleted(label)}
               className={getClassName(label)}
               onClick={() => {
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 nowEnv = env.loadEnvByName(match.params.envName);
                 product.goProductInstallPage(label, nowEnv, history);
                 setClicked(label);
               }}
             >
               <StepLabel className={classes.stepLabel_primary}>
-                {label}
+                <div className="childUpDownCenter">
+                  {label}
+                  {appState.installing === label ? (
+                    // <img
+                    //   style={{
+                    //     width: '18px',
+                    //     marginLeft: '5px'
+                    //   }}
+                    //   alt="installing.gif"
+                    //   src={Installing}
+                    // />
+                    <div className={styles.loader}></div>
+                  ) : (
+                    ''
+                  )}
+                </div>
               </StepLabel>
               <StepContent>
                 {/* <Typography>{getStepContent(index)}</Typography> */}

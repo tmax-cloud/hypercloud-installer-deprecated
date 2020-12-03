@@ -77,7 +77,7 @@ export default class Env {
     };
   }
 
-  public getProductByName(name: string){
+  public getProductByName(name: string) {
     for (let i = 0; i < this.productList.length; i += 1) {
       if (this.productList[i].name === name) {
         return this.productList[i];
@@ -119,7 +119,7 @@ export default class Env {
   }
 
   public deleteAllProduct() {
-    this.productList=[];
+    this.productList = [];
   }
 
   public deleteProductByName(productName: string) {

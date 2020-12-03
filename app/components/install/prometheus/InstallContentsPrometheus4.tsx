@@ -13,22 +13,6 @@ function InstallContentsPrometheus4(props: any) {
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
-  const getRegistryJsx = () => {
-    if (state.type) {
-      return (
-        <div style={{ marginBottom: '30px' }}>
-          <div>
-            <span className={['medium', 'thick'].join(' ')}>Type</span>
-          </div>
-          <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
-              {state.type}
-            </span>
-          </div>
-        </div>
-      );
-    }
-  };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
       <div style={{ textAlign: 'center' }}>
@@ -45,7 +29,26 @@ function InstallContentsPrometheus4(props: any) {
             </span>
           </div>
         </div>
-        {getRegistryJsx()}
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>PVC</span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.isUsePvc ? '사용함' : '사용안함'}
+            </span>
+          </div>
+        </div>
+        <div style={{ marginBottom: '30px' }}>
+          <div>
+            <span className={['medium', 'thick'].join(' ')}>Service</span>
+          </div>
+          <div>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {state.serviceType}/{state.port}
+            </span>
+          </div>
+        </div>
         <div>
           <Button
             variant="contained"

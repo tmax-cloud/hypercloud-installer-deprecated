@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -15,10 +15,14 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import * as validation from '../../../utils/common/validation';
+import { AppContext } from '../../../containers/AppContext';
 
 function InstallContentsHyperCloud2Admin(props: any) {
   console.debug(InstallContentsHyperCloud2Admin.name, props);
   const { history, match, state, setState } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
 
   const nowEnv = env.loadEnvByName(match.params.envName);
 
@@ -227,6 +231,10 @@ function InstallContentsHyperCloud2Admin(props: any) {
               ...state,
               email,
               password
+            });
+            dispatchAppState({
+              type: 'set_installing',
+              installing: CONST.PRODUCT.HYPERCLOUD.NAME
             });
             history.push(
               `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step3`

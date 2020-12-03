@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Button,
   Dialog,
@@ -18,11 +18,16 @@ import HyperCloudConsoleInstaller from '../../../utils/class/installer/HyperClou
 import HyperCloudWebhookInstaller from '../../../utils/class/installer/HyperCloudWebhookInstaller';
 import HyperAuthInstaller from '../../../utils/class/installer/HyperAuthInstaller';
 import TemplateSeviceBrokerInstaller from '../../../utils/class/installer/TemplateSeviceBrokerInstaller';
+import { AppContext } from '../../../containers/AppContext';
 
 const logRef: React.RefObject<HTMLTextAreaElement> = React.createRef();
 function InstallContentsHyperCloud3(props: any) {
   console.debug(InstallContentsHyperCloud3.name, props);
   const { history, match, state } = props;
+
+  const appContext = useContext(AppContext);
+  const { appState, dispatchAppState } = appContext;
+
   const nowEnv = env.loadEnvByName(match.params.envName);
 
   // progress bar
@@ -44,7 +49,12 @@ function InstallContentsHyperCloud3(props: any) {
       name: CONST.PRODUCT.HYPERCLOUD.NAME,
       operator_version: state.operator_version,
       webhook_version: state.webhook_version,
-      console_version: state.console_version
+      console_version: state.console_version,
+      isUseIngress: state.isUseIngress,
+      sharedIngress: state.sharedIngress,
+      systemIngress: state.systemIngress,
+      email: state.email,
+      password: state.password
     });
     // json 파일 저장
     env.updateEnv(nowEnv.name, nowEnv);
@@ -87,7 +97,8 @@ function InstallContentsHyperCloud3(props: any) {
     const hyperAuthInstaller = HyperAuthInstaller.getInstance;
     hyperAuthInstaller.env = nowEnv;
 
-    const templateSeviceBrokerInstaller = TemplateSeviceBrokerInstaller.getInstance;
+    const templateSeviceBrokerInstaller =
+      TemplateSeviceBrokerInstaller.getInstance;
     templateSeviceBrokerInstaller.env = nowEnv;
 
     try {
@@ -169,6 +180,10 @@ function InstallContentsHyperCloud3(props: any) {
             className={['secondary'].join(' ')}
             size="large"
             onClick={() => {
+              dispatchAppState({
+                type: 'set_installing',
+                installing: ''
+              });
               history.push(
                 `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step4`
               );
@@ -205,9 +220,10 @@ function InstallContentsHyperCloud3(props: any) {
             <Button
               onClick={() => {
                 handleClose();
-                // dispatchKubeInstall({
-                //   page: 1
-                // });
+                dispatchAppState({
+                  type: 'set_installing',
+                  installing: ''
+                });
                 history.push(
                   `${routes.INSTALL.HOME}/${nowEnv.name}/${CONST.PRODUCT.HYPERCLOUD.NAME}/step1`
                 );

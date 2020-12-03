@@ -3,11 +3,11 @@ table
 */
 /* header */
 thead.primary {
-  background-color: #31475E;
+  background-color: var(--table-color-primary);
 }
-thead.primary span{
-  color: white !important;
+thead.primary span {
+  color: var(--global-color-white) !important;
 }
-thead.primary svg{
-  color: white !important;
+thead.primary svg {
+  color: var(--global-color-white) !important;
 }

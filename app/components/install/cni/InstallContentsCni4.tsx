@@ -29,6 +29,7 @@ function InstallContentsCni4(props: any) {
     }
     return <></>;
   };
+
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
       <div style={{ textAlign: 'center' }}>
