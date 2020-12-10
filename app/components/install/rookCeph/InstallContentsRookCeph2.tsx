@@ -543,7 +543,8 @@ function InstallContentsRookCeph2(props: any) {
                 <div
                   style={{
                     border: `1px solid black`,
-                    margin: `5px`
+                    margin: `5px`,
+                    padding: `10px`
                   }}
                   key={hostName}
                 >

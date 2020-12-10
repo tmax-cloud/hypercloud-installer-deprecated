@@ -7,6 +7,9 @@ export default class ScriptHyperCloudConsoleFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosHyperCloudConsoleScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }

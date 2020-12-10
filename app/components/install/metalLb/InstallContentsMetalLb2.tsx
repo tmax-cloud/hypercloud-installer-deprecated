@@ -14,11 +14,13 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
+  TableBody,
+  Tooltip
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
@@ -110,6 +112,11 @@ function InstallContentsMetalLb2(props: any) {
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>Address Pool</span>
+          <Tooltip title="Kubernetes Service의 External IP 대역으로 사용됩니다.">
+            <IconButton>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
         </div>
         <div>
           <div>
@@ -142,8 +149,7 @@ function InstallContentsMetalLb2(props: any) {
             className={['medium'].join(' ')}
           >
             {' '}
-            ~
-{' '}
+            ~{' '}
           </span>
         </div>
         <div>
@@ -325,6 +331,12 @@ function InstallContentsMetalLb2(props: any) {
             </Button>
           </DialogActions>
         </Dialog>
+      </div>
+      <div>
+        <ul className={['small', 'indicator'].join(' ')}>
+          <li>IP가 최소 10개가 보장되어야 합니다.</li>
+          <li>HOST IP 대역에서 접근가능한 대역이어야 합니다.</li>
+        </ul>
       </div>
     </div>
   );

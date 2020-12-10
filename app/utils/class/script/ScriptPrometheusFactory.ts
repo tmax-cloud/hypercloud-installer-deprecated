@@ -7,6 +7,9 @@ export default class ScriptPrometheusFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosPrometheusScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }

@@ -53,9 +53,13 @@ function InstallContentsHyperCloud1(props: any) {
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.HYPERCLOUD.NAME} 를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {CONST.PRODUCT.HYPERCLOUD.NAME} 를 설치할 수 있습니다.
+            </span>
             <br />
-            <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              계속하시려면, 아래의 버튼을 클릭해 주세요.
+            </span>
           </div>
           <div>
             <Button
@@ -73,6 +77,17 @@ function InstallContentsHyperCloud1(props: any) {
             >
               다음 >
             </Button>
+          </div>
+          <div>
+            <ul className={['small', 'indicator'].join(' ')}>
+              <li>
+                정상적인 설치를 위해선, HyperAuth가 설치 되어있어야 합니다.
+              </li>
+              <li>
+                또한, HyperAuth의 POD들의 Status가 Running이어야 하고, 모두
+                Ready 상태이어야 합니다.
+              </li>
+            </ul>
           </div>
         </div>
       </div>

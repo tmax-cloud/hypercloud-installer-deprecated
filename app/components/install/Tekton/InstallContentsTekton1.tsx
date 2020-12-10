@@ -53,9 +53,13 @@ function InstallContentsTekton1(props: any) {
             </MuiBox>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>{CONST.PRODUCT.TEKTON.NAME} 를 설치할 수 있습니다.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              {CONST.PRODUCT.TEKTON.NAME} 를 설치할 수 있습니다.
+            </span>
             <br />
-            <span className={['medium', 'lightDark'].join(' ')}>계속하시려면, 아래의 버튼을 클릭해 주세요.</span>
+            <span className={['medium', 'lightDark'].join(' ')}>
+              계속하시려면, 아래의 버튼을 클릭해 주세요.
+            </span>
           </div>
           <div>
             <Button
@@ -71,6 +75,12 @@ function InstallContentsTekton1(props: any) {
               다음 >
             </Button>
           </div>
+          {/* <div>
+            <span className={['verySmall', 'indicator'].join(' ')}>
+              이전 단계 제품을 설치하지 않았을 경우, 해당 제품 설치는 가능하나,
+              정상동작은 보장하지 않습니다.
+            </span>
+          </div> */}
         </div>
       </div>
     </div>

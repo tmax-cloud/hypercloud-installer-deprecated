@@ -83,14 +83,14 @@ function InstallContentsCatalogController3(props: any) {
 
   React.useEffect(() => {
     install();
-    const timer = setInterval(() => {
-      setProgress(prevProgress =>
-        prevProgress >= 100 ? 100 : prevProgress + 1
-      );
-    }, 5000);
-    return () => {
-      clearInterval(timer);
-    };
+    // const timer = setInterval(() => {
+    //   setProgress(prevProgress =>
+    //     prevProgress >= 100 ? 100 : prevProgress + 1
+    //   );
+    // }, 5000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
   }, []);
 
   return (

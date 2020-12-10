@@ -122,3 +122,9 @@ svg {
 .hidden {
   visibility: none !important;
 }
+
+/* tooltip */
+/* default padding 제거 */
+.MuiButtonBase-root.MuiIconButton-root {
+  padding: 0px;
+}

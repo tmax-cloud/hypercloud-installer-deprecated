@@ -7,6 +7,9 @@ export default class ScriptRookCephFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosRookCephScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }

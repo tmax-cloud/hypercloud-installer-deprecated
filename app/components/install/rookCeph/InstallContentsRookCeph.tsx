@@ -14,7 +14,7 @@ function InstallContentsRookCeph(props: any) {
   const { history, location, match } = props;
 
   const [state, setState] = useState({
-    version: RookCephInstaller.CEPH_VERSION
+    version: RookCephInstaller.ROOK_VERSION
   });
 
   const [option, setOption] = useState({

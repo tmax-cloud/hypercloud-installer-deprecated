@@ -5,6 +5,7 @@
 
 .contents {
   text-align: center;
+  min-width: 300px;
 }
 .contents > div {
   margin-bottom: 20px;

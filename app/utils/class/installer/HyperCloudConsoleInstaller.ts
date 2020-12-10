@@ -175,11 +175,13 @@ export default class HyperCloudConsoleInstaller extends AbstractInstaller {
       `;
     }
 
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    script += `
-    sed -i "s/memory: '2Gi'/memory: '500Mi'/g" 3.deployment-pod.yaml;
-    sed -i "s/cpu: '1'/cpu: '0.5'/g" 3.deployment-pod.yaml;
-    `;
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i "s/memory: '2Gi'/memory: '1Gi'/g" 3.deployment-pod.yaml;
+      sed -i "s/cpu: '1'/cpu: '0.5'/g" 3.deployment-pod.yaml;
+      `;
+    }
 
     script += `
     kubectl create -f 3.deployment-pod.yaml;

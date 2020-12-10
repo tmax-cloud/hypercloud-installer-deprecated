@@ -21,7 +21,7 @@ interface SendCb {
 // SSH 연결 타임아웃 (ms)
 const CONNECTION_TIMER = 10000;
 // command 실행 타임아웃 (ms)
-const COMMAND_EXE_TIMER = 300000;
+const COMMAND_EXE_TIMER = 600000;
 
 export function send(node: any, cb?: SendCb) {
   const { Client } = require('ssh2');

@@ -1,4 +1,4 @@
-import React, { useState, useContext} from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Button,
   FormControl,
@@ -11,7 +11,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  TextField
+  TextField,
+  Tooltip
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import CONST from '../../../utils/constants/constant';
@@ -21,6 +22,7 @@ import * as env from '../../../utils/common/env';
 import { NETWORK_TYPE } from '../../../utils/class/Env';
 import * as validation from '../../../utils/common/validation';
 import { AppContext } from '../../../containers/AppContext';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
@@ -156,6 +158,11 @@ function InstallContentsKubernetes2(props: any) {
       <div className={['childLeftRightLeft'].join(' ')}>
         <div className={[styles.titleBox].join(' ')}>
           <span className={['medium'].join(' ')}>네트워크 대역</span>
+          <Tooltip title="Kubernetes POD의 IP 대역으로 사용됩니다.">
+            <IconButton>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
         </div>
         <div>
           <TextField

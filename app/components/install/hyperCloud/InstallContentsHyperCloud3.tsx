@@ -32,16 +32,6 @@ function InstallContentsHyperCloud3(props: any) {
 
   // progress bar
   const [progress, setProgress] = React.useState(0);
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prevProgress =>
-        prevProgress >= 100 ? 100 : prevProgress + 1
-      );
-    }, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   if (progress === 100) {
     nowEnv.deleteProductByName(CONST.PRODUCT.HYPERCLOUD.NAME);
@@ -156,8 +146,14 @@ function InstallContentsHyperCloud3(props: any) {
 
   React.useEffect(() => {
     install();
-
-    return () => {};
+    // const timer = setInterval(() => {
+    //   setProgress(prevProgress =>
+    //     prevProgress >= 100 ? 100 : prevProgress + 1
+    //   );
+    // }, 5000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
   }, []);
 
   return (

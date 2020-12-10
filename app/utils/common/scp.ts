@@ -10,7 +10,7 @@ import Node from '../class/Node';
  * @return
  */
 export function sendFile(node: Node, srcPath: string, destPath: string) {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const client = require('scp2');
     client.scp(
       srcPath,
@@ -23,6 +23,9 @@ export function sendFile(node: Node, srcPath: string, destPath: string) {
       },
       err => {
         console.debug(err);
+        // FIXME: 왜 resolve로 되어 있지?
+        // error면 reject 아닌가?
+        // 추후 문제 발생하면 reject로 변경해햐 할 듯..?
         resolve();
       }
     );

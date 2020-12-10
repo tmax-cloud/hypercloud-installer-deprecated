@@ -244,39 +244,42 @@ export default class RookCephInstaller extends AbstractInstaller {
       stderr: () => {}
     });
 
-    // 리소스 설정
-    clusterYaml.spec.resources = {
-      osd: {
-        limits: {
-          cpu: `${option.osdCpu}`,
-          memory: `${option.osdMemory}Gi`
+    // 실제 production, dev 에서만 리소스 설정 적용 함 (devlr 환경에서는 리소스 부족해서 설정 안함)
+    // dev는 (qa가 실제 테스트할 때 사용하고 있음)
+    if (process.env.RESOURCE !== 'low') {
+      clusterYaml.spec.resources = {
+        osd: {
+          limits: {
+            cpu: `${option.osdCpu}`,
+            memory: `${option.osdMemory}Gi`
+          },
+          requests: {
+            cpu: `${option.osdCpu}`,
+            memory: `${option.osdMemory}Gi`
+          }
         },
-        requests: {
-          cpu: `${option.osdCpu}`,
-          memory: `${option.osdMemory}Gi`
-        }
-      },
-      mon: {
-        limits: {
-          cpu: `${option.monCpu}`,
-          memory: `${option.monMemory}Gi`
+        mon: {
+          limits: {
+            cpu: `${option.monCpu}`,
+            memory: `${option.monMemory}Gi`
+          },
+          requests: {
+            cpu: `${option.monCpu}`,
+            memory: `${option.monMemory}Gi`
+          }
         },
-        requests: {
-          cpu: `${option.monCpu}`,
-          memory: `${option.monMemory}Gi`
+        mgr: {
+          limits: {
+            cpu: `${option.mgrCpu}`,
+            memory: `${option.mgrMemory}Gi`
+          },
+          requests: {
+            cpu: `${option.mgrCpu}`,
+            memory: `${option.mgrMemory}Gi`
+          }
         }
-      },
-      mgr: {
-        limits: {
-          cpu: `${option.mgrCpu}`,
-          memory: `${option.mgrMemory}Gi`
-        },
-        requests: {
-          cpu: `${option.mgrCpu}`,
-          memory: `${option.mgrMemory}Gi`
-        }
-      }
-    };
+      };
+    }
 
     // mon count 3 설정
     clusterYaml.spec.mon.count = 3;
@@ -343,13 +346,16 @@ data:
       `;
     }
 
-    // 리소스 설정
-    mainMaster.cmd += `
-    sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
-    `;
+    // 실제 production, dev 에서만 리소스 설정 적용 함 (devlr 환경에서는 리소스 부족해서 설정 안함)
+    // dev는 (qa가 실제 테스트할 때 사용하고 있음)
+    if (process.env.RESOURCE !== 'low') {
+      mainMaster.cmd += `
+      sed -i 's/#  limits:/  limits:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      sed -i 's/#  requests:/  requests:/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      sed -i 's/#    cpu: "4"/    cpu: ${option.mdsCpu}/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      sed -i 's/#    memory: "4096Mi"/    memory: ${option.mdsMemory}Gi/g' ~/${RookCephInstaller.INSTALL_HOME}/install/rook/file_system.yaml;
+      `;
+    }
     await mainMaster.exeCmd();
   }
 

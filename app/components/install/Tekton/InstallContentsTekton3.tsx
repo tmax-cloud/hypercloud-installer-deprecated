@@ -32,16 +32,6 @@ function InstallContentsTekton3(props: any) {
 
   // progress bar
   const [progress, setProgress] = React.useState(0);
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prevProgress =>
-        prevProgress >= 100 ? 100 : prevProgress + 1
-      );
-    }, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   if (progress === 100) {
     nowEnv.deleteProductByName(CONST.PRODUCT.TEKTON.NAME);
@@ -86,7 +76,8 @@ function InstallContentsTekton3(props: any) {
     const tektonTriggerInstaller = TektonTriggerInstaller.getInstance;
     const tektonApprovalInstaller = TektonApprovalInstaller.getInstance;
     const tektonMailNotifierInstaller = TektonMailNotifierInstaller.getInstance;
-    const tektonCiCdTemplatesInstaller = TektonCiCdTemplatesInstaller.getInstance;
+    const tektonCiCdTemplatesInstaller =
+      TektonCiCdTemplatesInstaller.getInstance;
 
     tektonPipelineInstaller.env = nowEnv;
     tektonTriggerInstaller.env = nowEnv;
@@ -144,8 +135,14 @@ function InstallContentsTekton3(props: any) {
 
   React.useEffect(() => {
     install();
-
-    return () => {};
+    // const timer = setInterval(() => {
+    //   setProgress(prevProgress =>
+    //     prevProgress >= 100 ? 100 : prevProgress + 1
+    //   );
+    // }, 5000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
   }, []);
 
   return (

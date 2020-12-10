@@ -53,7 +53,7 @@ function InstallContentsRookCeph4(props: any) {
 
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', width: '300px' }}>
         <div style={{ marginBottom: '50px' }}>
           <img src={FinishImage} alt="Logo" />
         </div>

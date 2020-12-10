@@ -111,12 +111,19 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
   }
 
   private _step2() {
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    return `
-    cd ~/${HyperCloudWebhookInstaller.INSTALL_HOME}/manifests;
-    sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 02_webhook-deployment.yaml;
+    let script = `cd ~/${HyperCloudWebhookInstaller.INSTALL_HOME}/manifests;`;
+
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 02_webhook-deployment.yaml;
+      `;
+    }
+    script += `
     kubectl apply -f 02_webhook-deployment.yaml;
     `;
+
+    return script;
   }
 
   private _step3() {
@@ -190,7 +197,7 @@ export default class HyperCloudWebhookInstaller extends AbstractInstaller {
     `;
     await mainMaster.exeCmd();
 
-    await Common.waitApiServerUntilNomal(mainMaster);
+    await Common.waitApiServerUntilNormal(mainMaster);
 
     // 다른 마스터에도 적용
     await Promise.all(

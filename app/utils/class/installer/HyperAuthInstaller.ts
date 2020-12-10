@@ -86,8 +86,8 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     await mainMaster.exeCmd(callback);
 
     // 특정 pod가 뜨고 난 후 다음 작업 해야함
-    // 1분 대기
-    await new Promise(resolve => setTimeout(resolve, 60000));
+    // 2분 대기
+    await new Promise(resolve => setTimeout(resolve, 120000));
 
     // Step 2. SSL 인증서 생성
     mainMaster.cmd = this._step2(mainMaster.os.type);
@@ -108,13 +108,20 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private _step1(): string {
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
-    sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
-    sed -i 's/memory: "5Gi"/memory: "500Mi"/g' 1.initialization.yaml;
+    let script = `cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;`;
+
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i 's/cpu: "1"/cpu: "0.5"/g' 1.initialization.yaml;
+      sed -i 's/memory: "5Gi"/memory: "1Gi"/g' 1.initialization.yaml;
+      `;
+    }
+    script += `
     kubectl apply -f 1.initialization.yaml;
     `;
+
+    return script;
   }
 
   private _step2(osType: string): string {
@@ -141,13 +148,20 @@ export default class HyperAuthInstaller extends AbstractInstaller {
   }
 
   private _step3(): string {
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    return `
-    cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;
-    sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 2.hyperauth_deployment.yaml;
-    sed -i 's/cpu: "1"/cpu: "0.5"/g' 2.hyperauth_deployment.yaml;
+    let script = `cd ~/${HyperAuthInstaller.INSTALL_HOME}/manifestCopy;`;
+
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i 's/memory: "1Gi"/memory: "500Mi"/g' 2.hyperauth_deployment.yaml;
+      sed -i 's/cpu: "1"/cpu: "0.5"/g' 2.hyperauth_deployment.yaml;
+      `;
+    }
+    script += `
     kubectl apply -f 2.hyperauth_deployment.yaml;
     `;
+
+    return script;
   }
 
   private async _step4() {
@@ -207,7 +221,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
     `;
     await mainMaster.exeCmd();
 
-    await Common.waitApiServerUntilNomal(mainMaster);
+    await Common.waitApiServerUntilNormal(mainMaster);
 
     // 다른 마스터에도 적용
     await Promise.all(
@@ -283,7 +297,7 @@ export default class HyperAuthInstaller extends AbstractInstaller {
 
         // oidc 부분 삭제하고 다시 넣어주기 때문에
         // api 서버 정상동작 확인할 필요 없음
-        // await Common.waitApiServerUntilNomal(node);
+        // await Common.waitApiServerUntilNormal(node);
       })
     );
   }

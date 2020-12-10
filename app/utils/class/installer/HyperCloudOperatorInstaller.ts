@@ -14,7 +14,7 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
 
   public static readonly IMAGE_HOME = `${Env.INSTALL_ROOT}/${HyperCloudOperatorInstaller.IMAGE_DIR}`;
 
-  public static readonly HPCD_VERSION = `4.1.1.0`;
+  public static readonly HPCD_VERSION = `4.1.4.7`;
 
   // singleton
   private static instance: HyperCloudOperatorInstaller;
@@ -186,23 +186,37 @@ export default class HyperCloudOperatorInstaller extends AbstractInstaller {
   }
 
   private _step4() {
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    return `
-    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
-    sed -i 's/memory: "5Gi"/memory: "500Mi"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
-    sed -i 's/cpu: "1"/cpu: "0.5"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
+    let script = `cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};`;
+
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i 's/memory: "5Gi"/memory: "1Gi"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
+      sed -i 's/cpu: "1"/cpu: "0.5"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
+      `;
+    }
+    script += `
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/3.mysql-create.yaml;
     `;
+
+    return script;
   }
 
   private _step5() {
-    // FIXME: 현재 임의로 sed로 resource 수정하고 있음, 추후 이슈 사항 있을 수도 있음!
-    return `
-    cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};
-    sed -i 's/memory: "1Gi"/memory: "500Mi"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
-    sed -i 's/cpu: "1"/cpu: "0.5"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+    let script = `cd ~/${HyperCloudOperatorInstaller.INSTALL_HOME};`;
+
+    // 개발 환경에서는 테스트 시, POD의 메모리를 조정하여 테스트
+    if (process.env.RESOURCE === 'low') {
+      script += `
+      sed -i 's/memory: "1Gi"/memory: "500Mi"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+      sed -i 's/cpu: "1"/cpu: "0.5"/g' hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
+      `;
+    }
+    script += `
     kubectl apply -f hypercloud-operator-${HyperCloudOperatorInstaller.HPCD_VERSION}/_yaml_Install/4.hypercloud4-operator.yaml;
     `;
+
+    return script;
   }
 
   private _step6(state: any) {

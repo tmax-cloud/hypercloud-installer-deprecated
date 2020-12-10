@@ -7,6 +7,9 @@ export default class ScriptHyperAuthFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosHyperAuthScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }

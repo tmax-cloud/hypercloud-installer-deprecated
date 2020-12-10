@@ -7,6 +7,9 @@ export default class ScriptKubernetesFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosKubernetesScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }

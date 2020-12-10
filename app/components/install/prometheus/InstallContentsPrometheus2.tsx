@@ -14,7 +14,8 @@ import {
   TextField,
   Select,
   MenuItem,
-  InputLabel
+  InputLabel,
+  Tooltip
 } from '@material-ui/core';
 // import { KubeInstallContext } from './InstallContentsKubernetes';
 import CloseIcon from '@material-ui/icons/Close';
@@ -23,6 +24,7 @@ import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
 import * as env from '../../../utils/common/env';
 import { AppContext } from '../../../containers/AppContext';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 function InstallContentsPrometheus2(props: any) {
   console.debug(InstallContentsPrometheus2.name, props);
@@ -171,6 +173,11 @@ function InstallContentsPrometheus2(props: any) {
           <div className={[styles.titleBox].join(' ')}>
             <span className={['medium'].join(' ')}> - 포트</span>
             <span style={{ color: 'red' }}>*</span>
+            <Tooltip title="Prometheus Service의 포트로 사용됩니다.">
+              <IconButton>
+                <HelpOutlineIcon />
+              </IconButton>
+            </Tooltip>
           </div>
           <div>
             <TextField
@@ -289,6 +296,11 @@ function InstallContentsPrometheus2(props: any) {
             </Button>
           </DialogActions>
         </Dialog>
+      </div>
+      <div>
+        <ul className={['small', 'indicator'].join(' ')}>
+          <li>사용가능한 포트를 입력하세요.</li>
+        </ul>
       </div>
     </div>
   );

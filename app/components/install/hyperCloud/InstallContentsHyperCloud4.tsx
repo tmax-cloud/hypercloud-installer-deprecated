@@ -17,11 +17,11 @@ function InstallContentsHyperCloud4(props: any) {
     if (state.isUseIngress) {
       jsx = (
         <div style={{ marginBottom: '30px' }}>
-          <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>- 인그레스</span>
             <span>사용함</span>
           </div>
-          <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>- 인그레스 컨트롤러</span>
             <span>
               {state.sharedIngress ? '사용자 공용' : ''}
@@ -43,7 +43,7 @@ function InstallContentsHyperCloud4(props: any) {
   };
   return (
     <div className={[styles.wrap, 'childLeftRightCenter'].join(' ')}>
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', width: '300px' }}>
         <div style={{ marginBottom: '50px' }}>
           <img src={FinishImage} alt="Logo" />
         </div>
@@ -88,7 +88,7 @@ function InstallContentsHyperCloud4(props: any) {
             <span className={['medium', 'thick'].join(' ')}>네트워크</span>
           </div>
           <div>
-            <span className={['medium', 'lightDark'].join(' ')}>
+            <span className={['lightDark'].join(' ')}>
               {getNetworkJsx(state)}
             </span>
           </div>

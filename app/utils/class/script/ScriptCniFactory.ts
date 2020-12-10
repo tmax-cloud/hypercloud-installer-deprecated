@@ -7,6 +7,9 @@ export default class ScriptCniFactory extends ScriptFactory {
     if (osType === OS_TYPE.CENTOS) {
       return new CentosCniScript();
     }
+    if (osType === OS_TYPE.UBUNTU) {
+      // TODO:
+    }
 
     throw new Error();
   }
