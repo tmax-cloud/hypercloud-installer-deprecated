@@ -8,6 +8,13 @@ import KubernetesInstaller from '../installer/KubernetesInstaller';
 
 export default class CentosKubernetesScript extends AbstractCentosScript
   implements InterfaceKubernetesInstall {
+  // ntp 설치
+  installNtp(): string {
+    return `
+      yum install -y ntp;
+      `;
+  }
+
   setKubernetesRepo(): string {
     return `
     cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo

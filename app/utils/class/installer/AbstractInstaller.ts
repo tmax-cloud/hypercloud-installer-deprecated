@@ -2,6 +2,8 @@
 import Env from '../Env';
 
 export default abstract class AbstractInstaller {
+  // installer 공통
+
   private _env!: Env;
 
   /**
@@ -20,6 +22,7 @@ export default abstract class AbstractInstaller {
     this._env = value;
   }
 
+  // installer 필수 구현
   public abstract async install(param?: any): Promise<any>;
 
   public abstract async remove(param?: any): Promise<any>;
