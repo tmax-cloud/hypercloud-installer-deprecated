@@ -21,7 +21,9 @@ import {
   FormControl,
   RadioGroup,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  InputLabel,
+  Select
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
@@ -80,7 +82,17 @@ function EnvContentsAdd(props: any) {
     };
   });
 
+<<<<<<< Updated upstream
   // 테이블에서 선택된 것들
+=======
+  const [mainMasterNodeIp, seMainMasterNodeIp] = useState('');
+
+  const handleChange = e => {
+    seMainMasterNodeIp(e.target.value);
+  };
+
+  // 테이블에서 체크된 것들
+>>>>>>> Stashed changes
   const [selected, setSelected] = React.useState<string[]>(() => {
     // edit page에서는 기존 마스터 노드들 선택되도록
     if (envBeforeEdit) {
@@ -282,6 +294,33 @@ function EnvContentsAdd(props: any) {
     return false;
   };
 
+  const [virtualIp, setVirtualIp] = useState('');
+  const [virtualIpError, setVirtualIpError] = useState('');
+  const hasVirtualIpError = (
+    target = virtualIp,
+    setFunc = setVirtualIpError
+  ) => {
+    if (target.length === 0) {
+      setFunc('가상 IP를 입력해주세요');
+      return true;
+    }
+
+    for (let i = 0; i < state.data.length; i += 1) {
+      if (state.data[i].ip === target) {
+        setFunc('노드 IP에 중복되는 IP가 존재합니다.');
+        return true;
+      }
+    }
+
+    if (!validation.checkIpFormat(target)) {
+      setFunc('IP 형식을 확인해 주세요.');
+      return true;
+    }
+
+    setFunc('');
+    return false;
+  };
+
   const [totalError, setTotalError] = useState('');
   const hasTotalError = (target = state.data, setFunc = setTotalError) => {
     if (target.length === 0) {
@@ -297,6 +336,13 @@ function EnvContentsAdd(props: any) {
         return true;
       }
       dict[targetHostName] = true;
+    }
+
+    if (!isEditPage) {
+      if (!mainMasterNodeIp) {
+        setFunc('메인 마스터 노드를 선택해주세요');
+        return true;
+      }
     }
 
     setFunc('');
@@ -482,7 +528,7 @@ function EnvContentsAdd(props: any) {
         </div>
         <div style={{ border: '' }}>
           <div
-            style={{ marginTop: '50px' }}
+            style={{ marginTop: '20px' }}
             className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}
           >
             <div className={styles.titleBox}>
@@ -704,6 +750,7 @@ function EnvContentsAdd(props: any) {
                       // 첫번째 추가 시, 마스터 노드로 설정
                       if (state.data.length === 0) {
                         setSelected([ip]);
+                        seMainMasterNodeIp(ip);
                       }
 
                       // hostName 미 입력시, 자동 설정
@@ -746,14 +793,6 @@ function EnvContentsAdd(props: any) {
                 + 추가
               </Button>
             </div>
-          </div>
-          <div
-            className={[
-              totalError ? 'visible red' : 'hidden',
-              styles.errorBox
-            ].join(' ')}
-          >
-            <span>{totalError}</span>
           </div>
           <div className={[styles.table, 'clear'].join(' ')}>
             <TableContainer component={Paper} variant="outlined">
@@ -853,8 +892,84 @@ function EnvContentsAdd(props: any) {
             {getEmptyTableRow()}
           </div>
         </div>
+        {!isEditPage && (
+          <>
+            <div className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}>
+              <div style={{ paddingTop: `15px` }} className={styles.titleBox}>
+                <span className={['dark', 'medium'].join(' ')}>
+                  메인 마스터 노드
+                </span>
+                <span style={{ color: 'red' }}>*</span>
+              </div>
+              <div>
+                <FormControl style={{ width: `250px` }}>
+                  <InputLabel htmlFor="age-native-simple">
+                    메인 마스터 노드 선택
+                  </InputLabel>
+                  <Select
+                    native
+                    value={mainMasterNodeIp}
+                    onChange={handleChange}
+                    inputProps={{
+                      name: 'age',
+                      id: 'age-native-simple'
+                    }}
+                  >
+                    <option aria-label="None" value="" />
+                    {state.data.map(row => {
+                      if (isSelected(row.ip)) {
+                        console.log(row);
+                        return (
+                          <option value={row.ip} key={row.ip}>
+                            {row.hostName} ({row.ip})
+                          </option>
+                        );
+                      }
+                      return null;
+                    })}
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+            <div className={[styles.rowBox, 'childLeftRightLeft'].join(' ')}>
+              <div className={styles.titleBox}>
+                <span className={['dark', 'medium'].join(' ')}>가상 IP</span>
+                <span style={{ color: 'red' }}>*</span>
+              </div>
+              <div>
+                <TextField
+                  required
+                  className={['long'].join(' ')}
+                  id="outlined-required"
+                  label=""
+                  placeholder=""
+                  variant="outlined"
+                  size="small"
+                  value={virtualIp}
+                  onChange={e => {
+                    setVirtualIp(e.target.value);
+                    // hasNameError(e.target.value);
+                  }}
+                  onBlur={e => {
+                    hasVirtualIpError(e.target.value);
+                  }}
+                  error={virtualIpError.length !== 0}
+                  helperText={virtualIpError}
+                />
+              </div>
+            </div>
+          </>
+        )}
         <div
-          style={{ marginTop: '50px' }}
+          className={[
+            totalError ? 'visible red' : 'hidden',
+            styles.errorBox
+          ].join(' ')}
+        >
+          <span>{totalError}</span>
+        </div>
+        <div
+          style={{ marginTop: '20px' }}
           className={[
             styles.rowBox,
             'childUpDownCenter',
@@ -919,6 +1034,7 @@ function EnvContentsAdd(props: any) {
                 // };
                 const newEnv = new Env(
                   name,
+                  envBeforeEdit.virtualIp,
                   envBeforeEdit.networkType,
                   envBeforeEdit.registry,
                   masterArr.concat(modifiedWorkerArr),
@@ -969,6 +1085,7 @@ function EnvContentsAdd(props: any) {
                   console.debug('Deleted worker nodeList', deletedWorker);
 
                   const kubernetesInstaller = KubernetesInstaller.getInstance;
+<<<<<<< Updated upstream
                   // 새로 추가된 노드에 install script 돌려야 함
                   const tempAddEnv = new Env(
                     name,
@@ -999,6 +1116,70 @@ function EnvContentsAdd(props: any) {
                   );
                   kubernetesInstaller.env = tempDeleteEnv;
                   await kubernetesInstaller.deleteWorker();
+=======
+                  if (deletedWorker.length > 0) {
+                    // 삭제된 워커
+                    const tempDeleteEnv = new Env(
+                      name,
+                      envBeforeEdit.virtualIp,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(deletedWorker),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempDeleteEnv;
+                    await kubernetesInstaller.deleteWorker();
+                  }
+                  if (deletedMaster.length > 0) {
+                    // 삭제된 마스터
+                    const tempDeleteEnv = new Env(
+                      name,
+                      envBeforeEdit.virtualIp,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(deletedMaster),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempDeleteEnv;
+                    await kubernetesInstaller.deleteMaster();
+                  }
+                  if (addedMaster.length > 0) {
+                    // 추가된 마스터
+                    const tempAddMasterEnv = new Env(
+                      name,
+                      envBeforeEdit.virtualIp,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(addedMaster),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempAddMasterEnv;
+                    await kubernetesInstaller.addMaster(
+                      tempAddMasterEnv.registry,
+                      kubernetesInfo.version
+                    );
+                  }
+                  if (addedWorker.length > 0) {
+                    // 추가된 워커
+                    const tempAddEnv = new Env(
+                      name,
+                      envBeforeEdit.virtualIp,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(addedWorker),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempAddEnv;
+                    await kubernetesInstaller.addWorker(
+                      tempAddEnv.registry,
+                      kubernetesInfo.version
+                    );
+                  }
+>>>>>>> Stashed changes
                 }
 
                 // 기존 데이터 삭제 후 수정 된 환경 데이터 추가
@@ -1009,6 +1190,7 @@ function EnvContentsAdd(props: any) {
                   loading: false
                 });
                 history.push(routes.ENV.EXIST);
+<<<<<<< Updated upstream
               } else {
                 // 추가
                 // const newEnv = {
@@ -1033,6 +1215,34 @@ function EnvContentsAdd(props: any) {
                     } else {
                       role = ROLE.MASTER;
                     }
+=======
+                return;
+              }
+
+              if (hasVirtualIpError()) hasError = true;
+              if (hasError) return;
+              const newEnv = new Env(
+                name,
+                virtualIp,
+                type,
+                '',
+                [],
+                [],
+                new Date()
+              );
+              for (let i = 0; i < state.data.length; i += 1) {
+                const node = state.data[i];
+                // worker
+                let role = ROLE.WORKER;
+                console.debug(node.ip);
+                console.debug(selected);
+                if (selected.indexOf(node.ip) !== -1) {
+                  // master
+                  if (mainMasterNodeIp === node.ip) {
+                    role = ROLE.MAIN_MASTER;
+                  } else {
+                    role = ROLE.MASTER;
+>>>>>>> Stashed changes
                   }
                   // newEnv.nodeList.push({
                   //   ip: node.ip,

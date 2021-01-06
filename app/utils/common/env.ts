@@ -38,6 +38,7 @@ import Env from '../class/Env';
 function makeEnvObject(object: any) {
   return new Env(
     object._name,
+    object._virtualIp,
     object._networkType,
     object._registry,
     object._nodeList,
@@ -178,34 +179,6 @@ export function updateEnv(deleteEnvName: string, newEnv: Env) {
   deleteEnvByName(deleteEnvName);
   createEnv(newEnv);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @description 해당 환경에서 해당 제품을 삭제한다.

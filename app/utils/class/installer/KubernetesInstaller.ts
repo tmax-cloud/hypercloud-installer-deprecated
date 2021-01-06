@@ -431,7 +431,15 @@ export default class KubernetesInstaller extends AbstractInstaller {
       ${this._registHostName()}
       ${
         isMultiMaster
+<<<<<<< Updated upstream
           ? script.getMasterMultiplexingScript(mainMaster, 100, mainMaster.ip)
+=======
+          ? script.getMasterMultiplexingScript(
+              mainMaster,
+              99999999,
+              this.env.virtualIp
+            )
+>>>>>>> Stashed changes
           : ''
       }
       cd ~/${KubernetesInstaller.INSTALL_HOME};
@@ -442,7 +450,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
         KubernetesInstaller.CRIO_VERSION
       }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
-      sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
+      sudo sed -i "s|$apiServer|${this.env.virtualIp}|g" ./k8s.config;
       sudo sed -i "s|$podSubnet|${podSubnet}|g" ./k8s.config;
       cp -f ~/${
         Env.INSTALL_ROOT
@@ -468,7 +476,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
     return `
       ${this._setHostName(master.hostName)}
       ${this._registHostName()}
-      ${script.getMasterMultiplexingScript(master, priority, mainMaster.ip)}
+      ${script.getMasterMultiplexingScript(
+        master,
+        priority,
+        this.env.virtualIp
+      )}
       cd ~/${KubernetesInstaller.INSTALL_HOME};
       sed -i 's|\\r$||g' k8s.config;
       . k8s.config;
@@ -477,7 +489,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
         KubernetesInstaller.CRIO_VERSION
       }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
-      sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
+      sudo sed -i "s|$apiServer|${this.env.virtualIp}|g" ./k8s.config;
       cp -f ~/${
         Env.INSTALL_ROOT
       }/hypercloud-install-guide/installer/install.sh .;
@@ -508,7 +520,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
         KubernetesInstaller.CRIO_VERSION
       }|g" ./k8s.config;
       sudo sed -i "s|$k8sVersion|${version}|g" ./k8s.config;
-      sudo sed -i "s|$apiServer|${mainMaster.ip}|g" ./k8s.config;
+      sudo sed -i "s|$apiServer|${this.env.virtualIp}|g" ./k8s.config;
       cp -f ~/${
         Env.INSTALL_ROOT
       }/hypercloud-install-guide/installer/install.sh .;

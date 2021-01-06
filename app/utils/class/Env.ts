@@ -18,6 +18,8 @@ export default class Env {
 
   private _name: string;
 
+  private _virtualIp: string;
+
   private _networkType: string;
 
   private _registry: string;
@@ -30,6 +32,7 @@ export default class Env {
 
   constructor(
     name: string,
+    virtualIp: string,
     networkType: string,
     registry: string,
     nodeList: any[],
@@ -37,6 +40,7 @@ export default class Env {
     updatedTime: Date
   ) {
     this._name = name;
+    this._virtualIp = virtualIp;
     this._networkType = networkType;
     this._registry = registry;
     this._nodeList = nodeList.map((node: any) => {
@@ -144,6 +148,14 @@ export default class Env {
   }
 
   /**
+   * Getter virtualIp
+   * @return {string}
+   */
+  public get virtualIp(): string {
+    return this._virtualIp;
+  }
+
+  /**
    * Getter type
    * @return {string}
    */
@@ -189,6 +201,14 @@ export default class Env {
    */
   public set name(value: string) {
     this._name = value;
+  }
+
+  /**
+   * Setter virtualIp
+   * @param {string} value
+   */
+  public set virtualIp(value: string) {
+    this._virtualIp = value;
   }
 
   /**
