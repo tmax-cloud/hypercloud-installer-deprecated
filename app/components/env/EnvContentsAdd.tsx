@@ -62,11 +62,12 @@ function EnvContentsAdd(props: any) {
 
   // 수정화면에서 envBeforeEdit에 수정 전 데이터를 저장해 놓음
   const envBeforeEdit = env.loadEnvByName(match.params.envName);
+  const isEditPage: boolean = envBeforeEdit !== null;
 
   // state.data에 테이블에 표현될 노드들 데이터를 담음
   const [state, setState] = useState(() => {
     // edit page에서는 해당 환경 데이터로 초기화 해줌
-    if (envBeforeEdit) {
+    if (isEditPage) {
       return {
         data: envBeforeEdit.nodeList,
         count: envBeforeEdit.nodeList.length
@@ -80,10 +81,10 @@ function EnvContentsAdd(props: any) {
     };
   });
 
-  // 테이블에서 선택된 것들
+  // 테이블에서 체크된 것들
   const [selected, setSelected] = React.useState<string[]>(() => {
     // edit page에서는 기존 마스터 노드들 선택되도록
-    if (envBeforeEdit) {
+    if (isEditPage) {
       const result = [];
       for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
         if (
@@ -99,27 +100,42 @@ function EnvContentsAdd(props: any) {
     // add page
     return [];
   });
+
   // 선택되어 있는 지 여부 리턴해주는 함수
   const isSelected = (clickedIp: string) => {
     return selected.indexOf(clickedIp) !== -1;
   };
+
   // table row click
   const handleClick = (event: React.MouseEvent<unknown>, clickedIp: string) => {
-    if (envBeforeEdit) {
-      // edit page에서 수정 불가능
-      return;
+    if (isEditPage) {
+      // edit page에서
+      // 기존에 존재하던 node면 수정 불가능
+      for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
+        if (envBeforeEdit.nodeList[i].ip === clickedIp) {
+          return;
+        }
+      }
+      // const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
+      // if (mainMaster.ip === clickedIp) {
+      //   return;
+      // }
     }
-    // TODO: 추후 다중 마스터 선택 가능 시, checkbox로 변경해야 함
+
     const selectedIndex = selected.indexOf(clickedIp);
     let newSelected: string[] = [];
     console.debug(selectedIndex);
     if (selectedIndex === -1) {
+      // 마스터 추가
       newSelected = newSelected.concat(selected, clickedIp);
     } else if (selectedIndex === 0) {
+      // 0번째 삭제
       if (selected.length === 1) {
+        // 1개라면 (마스터는 최소 1개 보장되어야 함)
+        // 삭제 하지 않고 그대로
         newSelected = selected;
       } else {
-        newSelected = newSelected.concat(selected.slice(1));
+        newSelected = newSelected.concat(selected.slice(1, selected.length));
       }
     } else if (selectedIndex === selected.length - 1) {
       newSelected = newSelected.concat(selected.slice(0, -1));
@@ -131,9 +147,27 @@ function EnvContentsAdd(props: any) {
     }
     console.debug('newSelected', newSelected);
     setSelected(newSelected);
-    // if (!envBeforeEdit) {
-    //   setSelected([clickedIp]);
-    // }
+  };
+
+  const isDisabled = (ip: string) => {
+    if (isEditPage) {
+      // edit page
+      // const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
+      // return mainMaster.ip === ip;
+
+      let disabled = false;
+      for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
+        if (envBeforeEdit.nodeList[i].ip === ip) {
+          // 기존에 존재하던 노드들은 선택 불가
+          disabled = true;
+          break;
+        }
+      }
+      return disabled;
+    }
+
+    // add page에서는 모두 선택 가능
+    return false;
   };
 
   const [name, setName] = useState(() => {
@@ -358,9 +392,16 @@ function EnvContentsAdd(props: any) {
   };
 
   const getRemoveButton = (row: any) => {
-    // 수정 페이지, 마스터면 제거 버튼 없음
-    if (envBeforeEdit && isSelected(row.ip)) {
-      return null;
+    if (envBeforeEdit) {
+      // if (isSelected(row.ip)) {
+      //   // 마스터면 제거 불가
+      //   return null;
+      // }
+      const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
+      if (mainMaster.ip === row.ip) {
+        // 수정 페이지, 메인 마스터면 제거 버튼 없음
+        return null;
+      }
     }
     return (
       <IconButton
@@ -401,7 +442,7 @@ function EnvContentsAdd(props: any) {
   };
 
   const [type, setType] = React.useState(() => {
-    if (envBeforeEdit) {
+    if (isEditPage) {
       return envBeforeEdit.networkType;
     }
     return NETWORK_TYPE.EXTERNAL;
@@ -812,7 +853,12 @@ function EnvContentsAdd(props: any) {
                       >
                         <Checkbox
                           checked={isSelected(row.ip)}
-                          disabled={envBeforeEdit !== null}
+                          disabled={isDisabled(row.ip)}
+                          style={
+                            isDisabled(row.ip) === true
+                              ? { color: 'rgba(0, 0, 0, 0.26) !important' }
+                              : {}
+                          }
                         />
                       </TableCell>
                       <TableCell
@@ -882,22 +928,13 @@ function EnvContentsAdd(props: any) {
                   masterArr,
                   workerArr
                 } = envBeforeEdit.getNodesSortedByRole();
-                masterArr.push(mainMaster);
 
                 // 수정된 worker들 넣어줌
                 const modifiedWorkerArr = [];
                 for (let i = 0; i < state.data.length; i += 1) {
                   const node = state.data[i];
                   if (selected.indexOf(node.ip) === -1) {
-                    // worker
-                    // modifiedWorkerArr.push({
-                    //   ip: node.ip,
-                    //   port: node.port,
-                    //   user: 'root',
-                    //   password: node.password,
-                    //   role: ROLE.WORKER,
-                    //   hostName: Common.getRandomString()
-                    // });
+                    // 선택 안되어 있으면 worker
                     modifiedWorkerArr.push(
                       new Node(
                         node.ip,
@@ -911,17 +948,33 @@ function EnvContentsAdd(props: any) {
                     );
                   }
                 }
-                // const newEnv = {
-                //   name,
-                //   nodeList: masterArr.concat(modifiedWorkerArr),
-                //   productList: envBeforeEdit.productList,
-                //   updatedTime: new Date()
-                // };
+                // 수정된 master들 넣어줌
+                const modifiedMasterArr = [];
+                for (let i = 0; i < state.data.length; i += 1) {
+                  const node = state.data[i];
+                  if (selected.indexOf(node.ip) !== -1) {
+                    // 선택되어 있으면 master
+                    if (mainMaster.ip !== node.ip) {
+                      // 메인마스터 노드 아닌 마스터노드
+                      modifiedMasterArr.push(
+                        new Node(
+                          node.ip,
+                          node.port,
+                          node.user,
+                          node.password,
+                          node.os,
+                          ROLE.MASTER,
+                          node.hostName
+                        )
+                      );
+                    }
+                  }
+                }
                 const newEnv = new Env(
                   name,
                   envBeforeEdit.networkType,
                   envBeforeEdit.registry,
-                  masterArr.concat(modifiedWorkerArr),
+                  [mainMaster, ...modifiedMasterArr, ...modifiedWorkerArr],
                   envBeforeEdit.productList,
                   new Date()
                 );
@@ -937,6 +990,23 @@ function EnvContentsAdd(props: any) {
                     loading: true
                   });
 
+                  // 추가된 마스터 노드 구함
+                  const addedMaster = [];
+                  for (let i = 0; i < modifiedMasterArr.length; i += 1) {
+                    let isAdded = true;
+                    for (let j = 0; j < masterArr.length; j += 1) {
+                      if (modifiedMasterArr[i].ip === masterArr[j].ip) {
+                        isAdded = false;
+                        break;
+                      }
+                    }
+                    if (isAdded) {
+                      addedMaster.push(modifiedMasterArr[i]);
+                    }
+                  }
+                  console.debug('Added master nodeList : ', addedMaster);
+
+                  // 추가된 워커 노드 구함
                   const addedWorker = [];
                   for (let i = 0; i < modifiedWorkerArr.length; i += 1) {
                     let isAdded = true;
@@ -951,6 +1021,22 @@ function EnvContentsAdd(props: any) {
                     }
                   }
                   console.debug('Added worker nodeList : ', addedWorker);
+
+                  // 삭제된 마스터 노드 구함
+                  const deletedMaster = [];
+                  for (let i = 0; i < masterArr.length; i += 1) {
+                    let isDeleted = true;
+                    for (let j = 0; j < modifiedMasterArr.length; j += 1) {
+                      if (masterArr[i].ip === modifiedMasterArr[j].ip) {
+                        isDeleted = false;
+                        break;
+                      }
+                    }
+                    if (isDeleted) {
+                      deletedMaster.push(masterArr[i]);
+                    }
+                  }
+                  console.debug('Deleted master nodeList', deletedMaster);
 
                   // 삭제된 워커 노드 구함
                   const deletedWorker = [];
@@ -969,36 +1055,64 @@ function EnvContentsAdd(props: any) {
                   console.debug('Deleted worker nodeList', deletedWorker);
 
                   const kubernetesInstaller = KubernetesInstaller.getInstance;
-                  // 새로 추가된 노드에 install script 돌려야 함
-                  const tempAddEnv = new Env(
-                    name,
-                    envBeforeEdit.networkType,
-                    envBeforeEdit.registry,
-                    masterArr.concat(addedWorker),
-                    envBeforeEdit.productList,
-                    new Date()
-                  );
-                  kubernetesInstaller.env = tempAddEnv;
-                  await kubernetesInstaller.addWorker(
-                    tempAddEnv.registry,
-                    kubernetesInfo.version
-                  );
-                  // await tempAddEnv?.installWorker(
-                  //   tempAddEnv.registry,
-                  //   kubernetesInfo.version
-                  // );
-
-                  // 삭제 된 노드에 마스터 노드에서 kubectl delete 명령어 날림
-                  const tempDeleteEnv = new Env(
-                    name,
-                    envBeforeEdit.networkType,
-                    envBeforeEdit.registry,
-                    masterArr.concat(deletedWorker),
-                    envBeforeEdit.productList,
-                    new Date()
-                  );
-                  kubernetesInstaller.env = tempDeleteEnv;
-                  await kubernetesInstaller.deleteWorker();
+                  if (deletedWorker.length > 0) {
+                    // 삭제된 워커
+                    const tempDeleteEnv = new Env(
+                      name,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(deletedWorker),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempDeleteEnv;
+                    await kubernetesInstaller.deleteWorker();
+                  }
+                  if (deletedMaster.length > 0) {
+                    // 삭제된 마스터
+                    const tempDeleteEnv = new Env(
+                      name,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(deletedMaster),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempDeleteEnv;
+                    await kubernetesInstaller.deleteMaster();
+                  }
+                  if (addedMaster.length > 0) {
+                    // 추가된 마스터
+                    const tempAddMasterEnv = new Env(
+                      name,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(addedMaster),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempAddMasterEnv;
+                    await kubernetesInstaller.addMaster(
+                      tempAddMasterEnv.registry,
+                      kubernetesInfo.version
+                    );
+                  }
+                  if (addedWorker.length > 0) {
+                    // 추가된 워커
+                    const tempAddEnv = new Env(
+                      name,
+                      envBeforeEdit.networkType,
+                      envBeforeEdit.registry,
+                      [mainMaster].concat(addedWorker),
+                      envBeforeEdit.productList,
+                      new Date()
+                    );
+                    kubernetesInstaller.env = tempAddEnv;
+                    await kubernetesInstaller.addWorker(
+                      tempAddEnv.registry,
+                      kubernetesInfo.version
+                    );
+                  }
                 }
 
                 // 기존 데이터 삭제 후 수정 된 환경 데이터 추가
@@ -1009,54 +1123,39 @@ function EnvContentsAdd(props: any) {
                   loading: false
                 });
                 history.push(routes.ENV.EXIST);
-              } else {
-                // 추가
-                // const newEnv = {
-                //   name,
-                //   nodeList: [] as any,
-                //   productList: [],
-                //   updatedTime: new Date()
-                // };
-                const newEnv = new Env(name, type, '', [], [], new Date());
-                let isSetMainMaster = false;
-                for (let i = 0; i < state.data.length; i += 1) {
-                  const node = state.data[i];
-                  // worker
-                  let role = ROLE.WORKER;
-                  console.debug(node.ip);
-                  console.debug(selected);
-                  if (selected.indexOf(node.ip) !== -1) {
-                    // master
-                    if (!isSetMainMaster) {
-                      role = ROLE.MAIN_MASTER;
-                      isSetMainMaster = true;
-                    } else {
-                      role = ROLE.MASTER;
-                    }
-                  }
-                  // newEnv.nodeList.push({
-                  //   ip: node.ip,
-                  //   port: node.port,
-                  //   user: 'root',
-                  //   password: node.password,
-                  //   role,
-                  //   hostName: Common.getRandomString()
-                  // });
-                  newEnv.nodeList.push(
-                    new Node(
-                      node.ip,
-                      node.port,
-                      node.user,
-                      node.password,
-                      node.os,
-                      role,
-                      node.hostName
-                    )
-                  );
-                }
-                env.createEnv(newEnv);
-                history.push(routes.ENV.EXIST);
+                return;
               }
+              const newEnv = new Env(name, type, '', [], [], new Date());
+              let isSetMainMaster = false;
+              for (let i = 0; i < state.data.length; i += 1) {
+                const node = state.data[i];
+                // worker
+                let role = ROLE.WORKER;
+                console.debug(node.ip);
+                console.debug(selected);
+                if (selected.indexOf(node.ip) !== -1) {
+                  // master
+                  if (!isSetMainMaster) {
+                    role = ROLE.MAIN_MASTER;
+                    isSetMainMaster = true;
+                  } else {
+                    role = ROLE.MASTER;
+                  }
+                }
+                newEnv.nodeList.push(
+                  new Node(
+                    node.ip,
+                    node.port,
+                    node.user,
+                    node.password,
+                    node.os,
+                    role,
+                    node.hostName
+                  )
+                );
+              }
+              env.createEnv(newEnv);
+              history.push(routes.ENV.EXIST);
             }}
           >
             {envBeforeEdit ? '저장' : '추가'}
