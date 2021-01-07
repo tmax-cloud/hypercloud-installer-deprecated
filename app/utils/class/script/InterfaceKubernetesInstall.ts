@@ -14,4 +14,7 @@ export interface InterfaceKubernetesInstall {
   setDockerRepo(): string;
   getImageRegistrySettingScript(registry: string, type: string): string;
   setPackageRepository(destPath: string): string;
+
+  // npt 설치
+  installNtp(): string;
 }

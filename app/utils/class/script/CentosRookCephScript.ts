@@ -9,10 +9,4 @@ export default class CentosRookCephScript extends AbstractCentosScript
     yum install -y gdisk;
     `;
   }
-
-  installNtp(): string {
-    return `
-    yum install -y ntp;
-    `;
-  }
 }

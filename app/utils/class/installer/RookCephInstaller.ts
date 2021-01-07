@@ -153,44 +153,46 @@ export default class RookCephInstaller extends AbstractInstaller {
     `;
   }
 
-  private async _setNtp(callback: any) {
-    console.debug('@@@@@@ Start setting ntp... @@@@@@');
-    const {
-      mainMaster,
-      masterArr,
-      workerArr
-    } = this.env.getNodesSortedByRole();
+  // FIXME: ntp 설치 kube 설치 단계로 이전
+  // 추후 주석 부분 아예 제거
+  // private async _setNtp(callback: any) {
+  //   console.debug('@@@@@@ Start setting ntp... @@@@@@');
+  //   const {
+  //     mainMaster,
+  //     masterArr,
+  //     workerArr
+  //   } = this.env.getNodesSortedByRole();
 
-    // 기존 서버 목록 주석 처리
-    if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
-      // main master를 ntp 서버로
-      // main master를 제외한 노드를 ntp client로 설정하기 위함
-      let script = ScriptRookCephFactory.createScript(mainMaster.os.type);
-      mainMaster.cmd = script.installNtp();
-      mainMaster.cmd += this._setNtpServer();
-      await mainMaster.exeCmd(callback);
-      workerArr.concat(masterArr);
-      await Promise.all(
-        workerArr.map(worker => {
-          script = ScriptRookCephFactory.createScript(worker.os.type);
-          worker.cmd = script.installNtp();
-          worker.cmd += this._setNtpClient(mainMaster.ip);
-          return worker.exeCmd(callback);
-        })
-      );
-    } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
-      // 한국 공용 타임서버 목록 설정
-      await Promise.all(
-        this.env.nodeList.map((node: Node) => {
-          const script = ScriptRookCephFactory.createScript(node.os.type);
-          node.cmd = script.installNtp();
-          node.cmd += this._setPublicNtp();
-          return node.exeCmd(callback);
-        })
-      );
-    }
-    console.debug('###### Finish setting ntp... ######');
-  }
+  //   // 기존 서버 목록 주석 처리
+  //   if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
+  //     // main master를 ntp 서버로
+  //     // main master를 제외한 노드를 ntp client로 설정하기 위함
+  //     let script = ScriptRookCephFactory.createScript(mainMaster.os.type);
+  //     mainMaster.cmd = script.installNtp();
+  //     mainMaster.cmd += this._setNtpServer();
+  //     await mainMaster.exeCmd(callback);
+  //     workerArr.concat(masterArr);
+  //     await Promise.all(
+  //       workerArr.map(worker => {
+  //         script = ScriptRookCephFactory.createScript(worker.os.type);
+  //         worker.cmd = script.installNtp();
+  //         worker.cmd += this._setNtpClient(mainMaster.ip);
+  //         return worker.exeCmd(callback);
+  //       })
+  //     );
+  //   } else if (this.env.networkType === NETWORK_TYPE.EXTERNAL) {
+  //     // 한국 공용 타임서버 목록 설정
+  //     await Promise.all(
+  //       this.env.nodeList.map((node: Node) => {
+  //         const script = ScriptRookCephFactory.createScript(node.os.type);
+  //         node.cmd = script.installNtp();
+  //         node.cmd += this._setPublicNtp();
+  //         return node.exeCmd(callback);
+  //       })
+  //     );
+  //   }
+  //   console.debug('###### Finish setting ntp... ######');
+  // }
 
   private async _installGdisk(callback: any) {
     console.debug('@@@@@@ Start installing gdisk... @@@@@@');
@@ -359,44 +361,46 @@ data:
     await mainMaster.exeCmd();
   }
 
-  private _startNtp(): string {
-    return `
-    systemctl start ntpd;
-    systemctl enable ntpd;
-    ntpq -p;
-    `;
-  }
+  // FIXME: ntp 설치 kube 설치 단계로 이전
+  // 추후 주석 부분 아예 제거
+  // private _startNtp(): string {
+  //   return `
+  //   systemctl start ntpd;
+  //   systemctl enable ntpd;
+  //   ntpq -p;
+  //   `;
+  // }
 
-  private _setNtpClient(mainMasterIp: string): string {
-    return `
-    echo -e "server ${mainMasterIp}" > /etc/ntp.conf;
-    ${this._startNtp()}
-    `;
-  }
+  // private _setNtpClient(mainMasterIp: string): string {
+  //   return `
+  //   echo -e "server ${mainMasterIp}" > /etc/ntp.conf;
+  //   ${this._startNtp()}
+  //   `;
+  // }
 
-  private _setNtpServer(): string {
-    return `
-    interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
-    inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
-    network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
-    netmask=\`ipcalc -m \${inet} | cut -d"=" -f2\`;
-    echo -e "restrict \${network} mask \${netmask} nomodify notrap\nserver 127.127.1.0 # local clock" > /etc/ntp.conf;
-    ${this._startNtp()}
-    `;
-  }
+  // private _setNtpServer(): string {
+  //   return `
+  //   interfaceName=\`ip -o -4 route show to default | awk '{print $5}'\`;
+  //   inet=\`ip -f inet addr show \${interfaceName} | awk '/inet /{ print $2}'\`;
+  //   network=\`ipcalc -n \${inet} | cut -d"=" -f2\`;
+  //   netmask=\`ipcalc -m \${inet} | cut -d"=" -f2\`;
+  //   echo -e "restrict \${network} mask \${netmask} nomodify notrap\nserver 127.127.1.0 # local clock" > /etc/ntp.conf;
+  //   ${this._startNtp()}
+  //   `;
+  // }
 
-  private _setPublicNtp(): string {
-    return `
-    echo -e "server 1.kr.pool.ntp.org\nserver 0.asia.pool.ntp.org\nserver 2.asia.pool.ntp.org" > /etc/ntp.conf;
-    ${this._startNtp()}
-    `;
-  }
+  // private _setPublicNtp(): string {
+  //   return `
+  //   echo -e "server 1.kr.pool.ntp.org\nserver 0.asia.pool.ntp.org\nserver 2.asia.pool.ntp.org" > /etc/ntp.conf;
+  //   ${this._startNtp()}
+  //   `;
+  // }
 
   // protected abstract 구현
   protected async _preWorkInstall(param: { isCdi?: boolean; callback: any }) {
     console.debug('@@@@@@ Start pre-installation... @@@@@@');
     const { callback } = param;
-    await this._setNtp(callback);
+    // await this._setNtp(callback);
     await this._installGdisk(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
