@@ -431,15 +431,11 @@ export default class KubernetesInstaller extends AbstractInstaller {
       ${this._registHostName()}
       ${
         isMultiMaster
-<<<<<<< Updated upstream
-          ? script.getMasterMultiplexingScript(mainMaster, 100, mainMaster.ip)
-=======
           ? script.getMasterMultiplexingScript(
               mainMaster,
               99999999,
               this.env.virtualIp
             )
->>>>>>> Stashed changes
           : ''
       }
       cd ~/${KubernetesInstaller.INSTALL_HOME};

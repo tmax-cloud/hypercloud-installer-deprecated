@@ -82,9 +82,6 @@ function EnvContentsAdd(props: any) {
     };
   });
 
-<<<<<<< Updated upstream
-  // 테이블에서 선택된 것들
-=======
   const [mainMasterNodeIp, seMainMasterNodeIp] = useState('');
 
   const handleChange = e => {
@@ -92,7 +89,6 @@ function EnvContentsAdd(props: any) {
   };
 
   // 테이블에서 체크된 것들
->>>>>>> Stashed changes
   const [selected, setSelected] = React.useState<string[]>(() => {
     // edit page에서는 기존 마스터 노드들 선택되도록
     if (envBeforeEdit) {
@@ -1085,38 +1081,6 @@ function EnvContentsAdd(props: any) {
                   console.debug('Deleted worker nodeList', deletedWorker);
 
                   const kubernetesInstaller = KubernetesInstaller.getInstance;
-<<<<<<< Updated upstream
-                  // 새로 추가된 노드에 install script 돌려야 함
-                  const tempAddEnv = new Env(
-                    name,
-                    envBeforeEdit.networkType,
-                    envBeforeEdit.registry,
-                    masterArr.concat(addedWorker),
-                    envBeforeEdit.productList,
-                    new Date()
-                  );
-                  kubernetesInstaller.env = tempAddEnv;
-                  await kubernetesInstaller.addWorker(
-                    tempAddEnv.registry,
-                    kubernetesInfo.version
-                  );
-                  // await tempAddEnv?.installWorker(
-                  //   tempAddEnv.registry,
-                  //   kubernetesInfo.version
-                  // );
-
-                  // 삭제 된 노드에 마스터 노드에서 kubectl delete 명령어 날림
-                  const tempDeleteEnv = new Env(
-                    name,
-                    envBeforeEdit.networkType,
-                    envBeforeEdit.registry,
-                    masterArr.concat(deletedWorker),
-                    envBeforeEdit.productList,
-                    new Date()
-                  );
-                  kubernetesInstaller.env = tempDeleteEnv;
-                  await kubernetesInstaller.deleteWorker();
-=======
                   if (deletedWorker.length > 0) {
                     // 삭제된 워커
                     const tempDeleteEnv = new Env(
@@ -1179,7 +1143,6 @@ function EnvContentsAdd(props: any) {
                       kubernetesInfo.version
                     );
                   }
->>>>>>> Stashed changes
                 }
 
                 // 기존 데이터 삭제 후 수정 된 환경 데이터 추가
@@ -1190,32 +1153,6 @@ function EnvContentsAdd(props: any) {
                   loading: false
                 });
                 history.push(routes.ENV.EXIST);
-<<<<<<< Updated upstream
-              } else {
-                // 추가
-                // const newEnv = {
-                //   name,
-                //   nodeList: [] as any,
-                //   productList: [],
-                //   updatedTime: new Date()
-                // };
-                const newEnv = new Env(name, type, '', [], [], new Date());
-                let isSetMainMaster = false;
-                for (let i = 0; i < state.data.length; i += 1) {
-                  const node = state.data[i];
-                  // worker
-                  let role = ROLE.WORKER;
-                  console.debug(node.ip);
-                  console.debug(selected);
-                  if (selected.indexOf(node.ip) !== -1) {
-                    // master
-                    if (!isSetMainMaster) {
-                      role = ROLE.MAIN_MASTER;
-                      isSetMainMaster = true;
-                    } else {
-                      role = ROLE.MASTER;
-                    }
-=======
                 return;
               }
 
@@ -1242,7 +1179,6 @@ function EnvContentsAdd(props: any) {
                     role = ROLE.MAIN_MASTER;
                   } else {
                     role = ROLE.MASTER;
->>>>>>> Stashed changes
                   }
                   // newEnv.nodeList.push({
                   //   ip: node.ip,
