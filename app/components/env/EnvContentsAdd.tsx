@@ -83,15 +83,12 @@ function EnvContentsAdd(props: any) {
     };
   });
 
-<<<<<<< HEAD
   const [mainMasterNodeIp, seMainMasterNodeIp] = useState('');
 
   const handleChange = e => {
     seMainMasterNodeIp(e.target.value);
   };
 
-=======
->>>>>>> ims-249186
   // 테이블에서 체크된 것들
   const [selected, setSelected] = React.useState<string[]>(() => {
     // edit page에서는 기존 마스터 노드들 선택되도록
@@ -122,15 +119,16 @@ function EnvContentsAdd(props: any) {
     if (isEditPage) {
       // edit page에서
       // 기존에 존재하던 node면 수정 불가능
-      for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
-        if (envBeforeEdit.nodeList[i].ip === clickedIp) {
-          return;
-        }
-      }
-      // const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
-      // if (mainMaster.ip === clickedIp) {
-      //   return;
+      // for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
+      //   if (envBeforeEdit.nodeList[i].ip === clickedIp) {
+      //     return;
+      //   }
       // }
+
+      const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
+      if (mainMaster.ip === clickedIp) {
+        return;
+      }
     }
 
     const selectedIndex = selected.indexOf(clickedIp);
@@ -163,18 +161,18 @@ function EnvContentsAdd(props: any) {
   const isDisabled = (ip: string) => {
     if (isEditPage) {
       // edit page
-      // const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
-      // return mainMaster.ip === ip;
+      const { mainMaster } = envBeforeEdit.getNodesSortedByRole();
+      return mainMaster.ip === ip;
 
-      let disabled = false;
-      for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
-        if (envBeforeEdit.nodeList[i].ip === ip) {
-          // 기존에 존재하던 노드들은 선택 불가
-          disabled = true;
-          break;
-        }
-      }
-      return disabled;
+      // let disabled = false;
+      // for (let i = 0; i < envBeforeEdit.nodeList.length; i += 1) {
+      //   if (envBeforeEdit.nodeList[i].ip === ip) {
+      //     // 기존에 존재하던 노드들은 선택 불가
+      //     disabled = true;
+      //     break;
+      //   }
+      // }
+      // return disabled;
     }
 
     // add page에서는 모두 선택 가능
@@ -457,15 +455,15 @@ function EnvContentsAdd(props: any) {
 
           // 제거한 노드가 마스터 노드라면
           // 첫번째 노드로 마스터 노드 변경
-          if (selected[0] === row.ip) {
-            if (state.data.length > 0) {
-              // 테이블에 남아 있는 노드 있는 경우
-              setSelected([state.data[0].ip]);
-            } else {
-              // 테이블에 남아 있는 노드 없는 경우
-              setSelected([]);
-            }
-          }
+          // if (selected[0] === row.ip) {
+          //   if (state.data.length > 0) {
+          //     // 테이블에 남아 있는 노드 있는 경우
+          //     setSelected([state.data[0].ip]);
+          //   } else {
+          //     // 테이블에 남아 있는 노드 없는 경우
+          //     setSelected([]);
+          //   }
+          // }
 
           setState(prevState => {
             const { data } = prevState;
@@ -721,13 +719,6 @@ function EnvContentsAdd(props: any) {
               </div>
             </div>
             <div>
-              {/* {loading && (
-              <CircularProgress
-                color="secondary"
-                size={40}
-                className={classes.buttonProgress}
-              />
-            )} */}
               <Button
                 className={['secondary', styles.nodeAddButton].join(' ')}
                 variant="contained"
@@ -1174,10 +1165,7 @@ function EnvContentsAdd(props: any) {
                     // 삭제된 워커
                     const tempDeleteEnv = new Env(
                       name,
-<<<<<<< HEAD
                       envBeforeEdit.virtualIp,
-=======
->>>>>>> ims-249186
                       envBeforeEdit.networkType,
                       envBeforeEdit.registry,
                       [mainMaster].concat(deletedWorker),
@@ -1191,10 +1179,7 @@ function EnvContentsAdd(props: any) {
                     // 삭제된 마스터
                     const tempDeleteEnv = new Env(
                       name,
-<<<<<<< HEAD
                       envBeforeEdit.virtualIp,
-=======
->>>>>>> ims-249186
                       envBeforeEdit.networkType,
                       envBeforeEdit.registry,
                       [mainMaster].concat(deletedMaster),
@@ -1208,10 +1193,7 @@ function EnvContentsAdd(props: any) {
                     // 추가된 마스터
                     const tempAddMasterEnv = new Env(
                       name,
-<<<<<<< HEAD
                       envBeforeEdit.virtualIp,
-=======
->>>>>>> ims-249186
                       envBeforeEdit.networkType,
                       envBeforeEdit.registry,
                       [mainMaster].concat(addedMaster),
@@ -1228,10 +1210,7 @@ function EnvContentsAdd(props: any) {
                     // 추가된 워커
                     const tempAddEnv = new Env(
                       name,
-<<<<<<< HEAD
                       envBeforeEdit.virtualIp,
-=======
->>>>>>> ims-249186
                       envBeforeEdit.networkType,
                       envBeforeEdit.registry,
                       [mainMaster].concat(addedWorker),
@@ -1256,7 +1235,6 @@ function EnvContentsAdd(props: any) {
                 history.push(routes.ENV.EXIST);
                 return;
               }
-<<<<<<< HEAD
 
               if (hasVirtualIpError()) hasError = true;
               if (hasError) return;
@@ -1269,10 +1247,6 @@ function EnvContentsAdd(props: any) {
                 [],
                 new Date()
               );
-=======
-              const newEnv = new Env(name, type, '', [], [], new Date());
-              let isSetMainMaster = false;
->>>>>>> ims-249186
               for (let i = 0; i < state.data.length; i += 1) {
                 const node = state.data[i];
                 // worker
@@ -1281,14 +1255,8 @@ function EnvContentsAdd(props: any) {
                 console.debug(selected);
                 if (selected.indexOf(node.ip) !== -1) {
                   // master
-<<<<<<< HEAD
                   if (mainMasterNodeIp === node.ip) {
                     role = ROLE.MAIN_MASTER;
-=======
-                  if (!isSetMainMaster) {
-                    role = ROLE.MAIN_MASTER;
-                    isSetMainMaster = true;
->>>>>>> ims-249186
                   } else {
                     role = ROLE.MASTER;
                   }
