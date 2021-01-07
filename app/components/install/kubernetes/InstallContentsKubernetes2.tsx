@@ -15,6 +15,7 @@ import {
   Tooltip
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import CONST from '../../../utils/constants/constant';
 import routes from '../../../utils/constants/routes.json';
 import styles from '../InstallContents2.css';
@@ -22,7 +23,6 @@ import * as env from '../../../utils/common/env';
 import { NETWORK_TYPE } from '../../../utils/class/Env';
 import * as validation from '../../../utils/common/validation';
 import { AppContext } from '../../../containers/AppContext';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 function InstallContentsKubernetes2(props: any) {
   console.debug(InstallContentsKubernetes2.name, props);
@@ -195,7 +195,7 @@ function InstallContentsKubernetes2(props: any) {
             className={['short'].join(' ')}
             id="outlined-required"
             // label="Name"
-            placeholder="24"
+            placeholder="16"
             variant="outlined"
             size="small"
             value={mask}

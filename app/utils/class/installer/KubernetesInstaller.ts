@@ -96,7 +96,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
       registry,
       version,
       podSubnet,
-      masterArr.length > 0
+      true
     );
     await mainMaster.exeCmd(callback);
     console.debug('###### Finish installing main Master... ######');
@@ -117,7 +117,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
           registry,
           version,
           master,
-          99 - index
+          Math.floor(Math.random() * 99999999)
         );
         master.cmd += `${masterJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
         return master.exeCmd(callback);
@@ -129,7 +129,7 @@ export default class KubernetesInstaller extends AbstractInstaller {
   private async _installWorker(
     registry: string,
     version: string,
-    callback: any
+    callback?: any
   ) {
     console.debug('@@@@@@ Start installing Worker... @@@@@@');
     const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
@@ -185,24 +185,13 @@ export default class KubernetesInstaller extends AbstractInstaller {
   }
 
   public async addWorker(registry: string, version: string, callback?: any) {
-    await this._preWorkAddWorker(registry, callback);
+    await this._preWorkAdd(registry, callback);
+    await this._installWorker(registry, version, callback);
+  }
 
-    console.debug('@@@@@@ Start adding Worker... @@@@@@');
-    const { mainMaster, workerArr } = this.env.getNodesSortedByRole();
-    const workerJoinCmd = await this._getWorkerJoinCmd(mainMaster);
-    await Promise.all(
-      workerArr.map(worker => {
-        worker.cmd = this._getK8sWorkerInstallScript(
-          mainMaster,
-          registry,
-          version,
-          worker
-        );
-        worker.cmd += `${workerJoinCmd.trim()} --cri-socket=/var/run/crio/crio.sock;`;
-        return worker.exeCmd(callback);
-      })
-    );
-    console.debug('###### Finish adding Worker... ######');
+  public async addMaster(registry: string, version: string, callback?: any) {
+    await this._preWorkAdd(registry, callback);
+    await this._installMaster(registry, version, callback);
   }
 
   public async deleteWorker() {
@@ -224,8 +213,36 @@ export default class KubernetesInstaller extends AbstractInstaller {
     console.debug('###### Finish deleting Worker... ######');
   }
 
-  private async _preWorkAddWorker(registry: string, callback?: any) {
+  public async deleteMaster() {
+    console.debug('@@@@@@ Start deleting Master... @@@@@@');
+
+    const { mainMaster, masterArr } = this.env.getNodesSortedByRole();
+    console.log(masterArr);
+    let command = '';
+
+    await Promise.all(
+      masterArr.map(master => {
+        console.log('aaaaaaaaaaaa');
+        const script = ScriptKubernetesFactory.createScript(master.os.type);
+        command = script.getK8sMasterRemoveScript();
+        master.cmd = command;
+        return master.exeCmd();
+      })
+    );
+
+    command = '';
+    masterArr.map(master => {
+      command += this._getDeleteWorkerNodeScript(master);
+    });
+    mainMaster.cmd = command;
+    await mainMaster.exeCmd();
+
+    console.debug('###### Finish deleting Master... ######');
+  }
+
+  private async _preWorkAdd(registry: string, callback?: any) {
     console.debug('@@@@@@ Start pre work adding Worker... @@@@@@');
+    await this._setNtp(callback);
     if (this.env.networkType === NETWORK_TYPE.INTERNAL) {
       // internal network 경우 해주어야 할 작업들
       /**

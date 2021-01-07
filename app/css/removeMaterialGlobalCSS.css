@@ -18,7 +18,7 @@
   color: #0992AC !important;
 } */
 .MuiCheckbox-colorSecondary.Mui-checked {
-  color: var(--global-color-primary) !important;
+  color: var(--global-color-primary);
 }
 
 /* radio */
