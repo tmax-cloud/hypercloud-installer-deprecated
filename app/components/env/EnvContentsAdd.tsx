@@ -765,8 +765,8 @@ function EnvContentsAdd(props: any) {
                               .replace('\n', '');
 
                             if (
-                              osType === OS_TYPE.CENTOS ||
-                              osType === OS_TYPE.PROLINUX
+                              osType.indexOf(OS_TYPE.CENTOS) !== -1 ||
+                              osType.indexOf(OS_TYPE.PROLINUX) !== -1
                             ) {
                               os = new CentOS();
                             } else {
