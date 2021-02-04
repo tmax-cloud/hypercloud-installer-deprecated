@@ -1,3 +1,6 @@
+# github repository가 변경되었습니다.
+v4.1.10이상 버전 릴리즈는 https://github.com/tmax-cloud/hypercloud-installer 에서 확인가능합니다.
+
 ## Install
 
  - 저장소 복사 (zip 형태로 다운받아 압축해제해도 무관)
