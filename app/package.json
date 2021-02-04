@@ -1,5 +1,5 @@
 {
-  "name": "hypercloud-installer",
+  "name": "hypercloud-installer-deprecated",
   "productName": "HyperCloud Installer",
   "version": "v4.1.9",
   "description": "HyperCloud Installer Application (Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development)",
@@ -7,7 +7,7 @@
   "author": {
     "name": "tmax-cloud",
     "email": "ck1_3@tmax.co.kr",
-    "url": "https://github.com/tmax-cloud/hypercloud-installer.git"
+    "url": "https://github.com/tmax-cloud/hypercloud-installer-deprecated.git"
   },
   "scripts": {
     "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
